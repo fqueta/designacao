@@ -69,7 +69,7 @@ class TesteController extends Controller
         // $firstday = date('l - d/m/Y', strtotime("monday +4 week"));
         // echo "First day of week after next week : ", $firstday;
 
-        $d=(new designaController)->save(5);
+        // $d=(new designaController)->save(5);
 
             // $host = request()->getHttpHost();
         // echo $host ."<br/>";
@@ -86,16 +86,24 @@ class TesteController extends Controller
         //     echo $day->format('D Y-m-d').'<br />';
         // }
 
-        $parOuImpar  = array(2,3,4,56,5,42,98,100);
+        // $parOuImpar  = array(2,3,4,56,5,42,98,100);
 
-        $ch = Qlib::getNumberRange(1,12);
+        // $ch = Qlib::getNumberRange(1,12);
 
         // $array  = array_map("ch", $parOuImpar);
 
-        $arr_month = Qlib::arr_month(date('Y'));
-        $ret = (new GetProgramController)->fileGet();
+        // $arr_month = Qlib::arr_month(date('Y'));
+        // $ret = (new GetProgramController)->fileGet();
         // $ret = Qlib::getAllDaysInAMonth(2024,3);
         // Qlib::lib_print($ret);
+        // $ret = (new designaController)->arr_historico(2,2,true);
+        // $ret = (new designaController)->list_participants(2,2);
+        $ret = (new designaController)->arr_historico([
+            'id_designacao'=>6,
+            'id_designado'=>2,
+            'ultima'=>true,
+            'operador'=>'!=',
+        ]);
         return $ret;
     }
     public function getNumberRange($inic,$fim,$r='impar'){

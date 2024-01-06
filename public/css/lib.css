@@ -150,6 +150,9 @@ ul.timeline > li:before {
     background-color: #7e0024;
     color: #fff;
 }
+.underline {
+    text-decoration: underline;
+}
 @keyframes lds-dual-ring {
     0% {
       transform: rotate(0deg);

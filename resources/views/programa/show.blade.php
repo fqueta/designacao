@@ -58,7 +58,7 @@
         @endforeach
     @endif
 </div>
-
+@include('qlib.btnedit')
 @stop
 
 @section('css')

@@ -976,13 +976,28 @@ class Qlib
         if($formato=='Y-m-d'){
             $d = explode('-',$data);
             $meses = self::meses();
-            $dia = $d[2];
-            $mes = $meses[$d[1]];
-            $ano = $d[0];
-            $ret = str_replace('{dia}',$dia,$tm);
-            $ret = str_replace('{mes}',$mes,$ret);
-            $ret = str_replace('{ano}',$ano,$ret);
+            if(isset($d[2])){
+                $dia = $d[2];
+                $mes = $meses[$d[1]];
+                $ano = $d[0];
+                $ret = str_replace('{dia}',$dia,$tm);
+                $ret = str_replace('{mes}',$mes,$ret);
+                $ret = str_replace('{ano}',$ano,$ret);
+            }
         }
         return $ret;
+    }
+    /**Mtodo para retornar a strig sql do query bilder do eloquento
+     * @param string $query do eloquento sem o meto get no final
+     */
+    static function eloquentSql($d){
+        $query = str_replace(array('?'), array('\'%s\''), $d->toSql());
+        $query = vsprintf($query, $d->getBindings());
+        dump($query);
+        $result = $d->get();
+        if($result->count() > 0){
+            $result = $result->toArray();
+        }
+        return $result;
     }
 }

@@ -35,14 +35,6 @@
         </div>
     </div>
 
-    <script>
-        $('#exampleModal').on('show.bs.modal', event => {
-            var button = $(event.relatedTarget);
-            var modal = $(this);
-            // Use above variables to manipulate the DOM
-
-        });
-    </script>
 @elseif($config['parte'] =='resumo_index')
     <div class="col-md-12 d-print-none">
         <div class="row pl-2 pr-2">

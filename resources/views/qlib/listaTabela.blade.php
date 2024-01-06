@@ -77,6 +77,11 @@
                                     <i class="fa fa-map-marker" aria-hidden="true"></i>
                                 </a>
                             @endif
+                            @if($routa=='programa')
+                            <a href="{{ $linkShow }}&v=estudante" title="visualizar arquivo de estudantes" class="btn btn-sm btn-outline-success mr-2">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            @endif
                             @if ($routa=='familias' || $routa=='programa' || $routa=='users'||$routa=='beneficiarios'||$routa=='lotes'||$routa=='quadras'||$routa=='bairros')
                                 <a href="{{ $linkShow }}" title="visualizar" class="btn btn-sm btn-outline-secondary mr-2">
                                     <i class="fas fa-eye"></i>
