@@ -15,48 +15,69 @@
     // dd($d);
     $quadro = 1;
     $mbcard = '';
+    $q = 1;
 @endphp
 @section('content')
 <div class="row">
-    <div class="col-md-12 mens">
-    </div>
-    @if(is_array($programa))
-        @foreach ($programa as $d_semana=>$semana)
-            @if(is_array($sessoes))
-                @foreach ($sessoes as $k_sessao=>$sessao)
-                    @php
-                        $partes = isset($semana[$k_sessao])?$semana[$k_sessao]:false;
-                        if($k_sessao=='inicio'){
-                            $title = 'Semana: '. App\Qlib\Qlib::dataExtensso($d_semana);
-                            $mbcard = '';
-                        }else{
-                            $title = $sessao['label'];
-                            $mbcard = '';
-                            if($k_sessao=='final'){
-                                if($quadro>2){
-                                    $quadro = 1;
-                                }
-                                if($quadro==2){
-                                    $mbcard = 'style="margin-bottom:20vw"';
-                                    $title .= $quadro;
-                                }
-                                $quadro++;
-                            }else{
-                                $mbcard = '';
-                            }
-                        }
-                    @endphp
-                    @if ($vista=='quadro')
-                        {{-- visualização para o quando de anuncios --}}
-                        @include('programa.quadro')
-                    @elseif ($vista=='estudante')
-                        {{-- visualização da folha de estudante s89 --}}
-                        @include('programa.estudante')
+    <table class="w-100">
+        <thead class="">
+            <tr>
+                <th>
+                    <div class="col-12 text-center d-none d-print-block ">
+                        <h3> {{__('Programação da Reunião de meio de semana')}} </h3>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    @if(is_array($programa))
+                        @foreach ($programa as $d_semana=>$semana)
+                            @if(is_array($sessoes))
+                                @foreach ($sessoes as $k_sessao=>$sessao)
+                                    @php
+                                        $partes = isset($semana[$k_sessao])?$semana[$k_sessao]:false;
+                                        if($k_sessao=='inicio'){
+                                            $title = 'Semana: '. App\Qlib\Qlib::dataExtensso($d_semana);
+                                            $mbcard = '';
+                                        }else{
+                                            $title = $sessao['label'];
+                                            $mbcard = '';
+                                            if($k_sessao=='final'){
+                                                if($quadro>2){
+                                                    $quadro = 1;
+                                                }
+                                                if($quadro==2){
+                                                    if($q==2){
+                                                        $mbcard = 'style="margin-bottom:7vw"';
+                                                    }else{
+                                                        $mbcard = 'style="margin-bottom:25vw"';
+                                                    }
+                                                    $title .= $quadro;
+                                                    $q++;
+                                                }
+                                                $quadro++;
+                                            }else{
+                                                $mbcard = '';
+                                            }
+                                        }
+                                    @endphp
+                                    @if ($vista=='quadro')
+                                        {{-- visualização para o quando de anuncios --}}
+                                        @include('programa.quadro')
+                                    @elseif ($vista=='estudante')
+                                        {{-- visualização da folha de estudante s89 --}}
+                                        @include('programa.estudante')
+                                    @endif
+                                @endforeach
+                            @endif
+                        @endforeach
                     @endif
-                @endforeach
-            @endif
-        @endforeach
-    @endif
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 @include('qlib.btnedit')
 @stop

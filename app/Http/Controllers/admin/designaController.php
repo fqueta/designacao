@@ -180,6 +180,7 @@ class designaController extends Controller
                 ->where('desassociado','=','n')
                 ->where('genero','=','m')
                 ->where('ativo','=','s')
+                ->orderBy('nome','asc')
                 ->get();
                 if($d->count() > 0){
                     $ret['exec'] = true;
@@ -212,6 +213,7 @@ class designaController extends Controller
                 ->where('desassociado','=','n')
                 ->where('genero','=','m')
                 ->where('ativo','=','s')
+                ->orderBy('nome','asc')
                 ->get();
                 if($d->count() > 0){
                     $ret['exec'] = true;
@@ -241,6 +243,7 @@ class designaController extends Controller
                 ->where('desassociado','=','n')
                 ->where('genero','=','m')
                 ->where('ativo','=','s')
+                ->orderBy('nome','asc')
                 ->get();
                 if($d->count() > 0){
                     $ret['exec'] = true;
@@ -270,6 +273,7 @@ class designaController extends Controller
                 $d = Publicador::where('inativo','=','n')
                 ->where('desassociado','=','n')
                 // ->where('genero','=','m')
+                ->orderBy('nome','asc')
                 ->where('ativo','=','s')
                 ->get();
                 if($id_designacao==6){
@@ -278,6 +282,7 @@ class designaController extends Controller
                     ->where('desassociado','=','n')
                     ->where('genero','=','m')
                     ->where('ativo','=','s')
+                    ->orderBy('nome','asc')
                     ->get();
                 }else{
                     $d = Publicador::where('inativo','=','n')

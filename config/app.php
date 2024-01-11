@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Data Brasil'),
+    'name' => env('APP_NAME', 'Designações vida e ministério'),
 
     /*
     |--------------------------------------------------------------------------

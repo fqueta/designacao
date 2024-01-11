@@ -673,7 +673,7 @@ class PostController extends Controller
             }
             //REGISTRAR EVENTOS
             // (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
-            $config['arr_desiganacao'] = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id');
+            $config['arr_desiganacao'] = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1' ORDER BY nome ASC",'nome','id');
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,
@@ -853,7 +853,7 @@ class PostController extends Controller
                                 if($dsa['id_designado']=='{'){
                                     $dsa['id_designado'] = 0;
                                 }
-                                if($dsa['id_designado']>0){
+                                if($dsa['id_designado']>0 || $dsa['id_designacao']>0){
                                     // dd($k,$dsa);
                                     if(isset($ddta['id']) && ($idReg=$ddta['id'])){
                                         $upn = designation::where('data','=',$data)->

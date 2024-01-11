@@ -2343,9 +2343,20 @@ function select_parcipante(obj){
                 var ret = tm1.replaceAll('{tr}',tr);
                 ret = ret.replaceAll('{id_m}',id_m);
                 $('#b-'+id_m).html(ret);
-                var tr=document.querySelector('.table-des').querySelector('tbody');
-                tr.addEventListener('click',function(e) {
-                    console.log(this);
+                var tr=document.querySelector('.table-des').querySelector('tbody').querySelectorAll('tr');
+                if(tr.length){
+                    tr.forEach(function(el){
+                        // console.log(el);
+                        el.addEventListener('click',function(e) {
+                            var sel=this.querySelector('input[type="radio"]');
+                            var val = sel.value;
+                            sel.click(); //selectionar o radio button
+                            // console.log(val);
+                        });
+                    });
+                }
+                $('#table-'+id_m).dataTable({
+                    'paging': false,
                 });
             }
         } catch (error) {

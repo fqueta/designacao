@@ -30,7 +30,7 @@ class tagSeeder extends Seeder
                 'ordem'=>2,
                 'value'=>'inicio',
                 'obs'=>'',
-                'config'=>['color'=>'greey','icon'=>'fa fa-times','t_p'=>'instrucao']
+                'config'=>['color'=>'greey','icon'=>'fa fa-times','t_p'=>'mecanica','local'=>'ministerio']
             ],
             [
                 'nome'=>'Tesouros',
