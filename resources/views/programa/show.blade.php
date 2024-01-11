@@ -54,7 +54,7 @@
                                                     }else{
                                                         $mbcard = 'style="margin-bottom:25vw"';
                                                     }
-                                                    $title .= $quadro;
+                                                    // $title .= $quadro;
                                                     $q++;
                                                 }
                                                 $quadro++;
