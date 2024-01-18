@@ -29,6 +29,7 @@
                 'name' => $name.'[id_designado]',
                 'data_extensso' => App\Qlib\Qlib::dataExtensso($v1),
                 'value'=>@$designacao['id_designado'],
+                'tipo'=>'id_designado',
             ])
         </div>
         <div class="col-md-1 text-right pt-3 mt-3">
@@ -40,7 +41,9 @@
             @include('programa.select_participantes',[
                 'arr' => $arr_participantes,
                 'name' => $name.'[id_ajudante]',
+                'data_extensso' => App\Qlib\Qlib::dataExtensso($v1),
                 'value'=>@$designacao['id_ajudante'],
+                'tipo'=>'id_ajudante',
             ])
             </div>
             <div class="col-md-8">

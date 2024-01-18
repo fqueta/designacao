@@ -2286,11 +2286,18 @@ function selec_desig(obj){
 }
 function select_parcipante(obj){
     const json_arr = obj.getAttribute('data-arr');
-    var campo = obj.getAttribute('data-campo'),id_m=campo.replaceAll('[','_'),campoi,data_extensso=obj.getAttribute('data-extensso');
+    var campo = obj.getAttribute('data-campo'),id_m=campo.replaceAll('[','_'),campoi,data_extensso=obj.getAttribute('data-extensso'),tipo=obj.getAttribute('data-tipo');
     id_m = id_m.replaceAll(']','');
-    console.log(id_m);
     campoi = campo;
-    campo = campo.replaceAll('id_designado','id_designacao');
+    // console.log(obj);
+    if(typeof tipo == 'undefined'){
+        tipo='id_designado';
+    }
+    if(typeof campoi == 'undefined'){
+        return;
+    }
+    campo = campo.replaceAll(tipo,'id_designacao');
+    // console.log(campo);
     var id_designacao = $('[name="' + campo + '"]').val();
     if(!id_designacao){
         alert('Designação não encontrada entre em contato com o suporte');
@@ -2304,6 +2311,7 @@ function select_parcipante(obj){
         csrf: true,
         data:{
             id_designacao: id_designacao,
+            tipo: tipo,
         }
     },function(res){
         $('#preload').fadeOut("fast");
@@ -2317,7 +2325,11 @@ function select_parcipante(obj){
         try {
             // console.log(res.dp[0].nome);
             if(parte=res.dp[0].nome){
-                $('#'+id_m+' .modal-title').html('<b>'+parte+'</b> '+data_extensso);
+                var ajudante=parte;
+                if(tipo=='id_ajudante'){
+                    ajudante='Ajudante de '+parte;
+                }
+                $('#'+id_m+' .modal-title').html('<b>'+ajudante+'</b> '+data_extensso);
             }
             if(d=res.data){
                 var tr = '';

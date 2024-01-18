@@ -127,6 +127,7 @@ class designaController extends Controller
         $ultima = isset($config['ultima']) ? $config['ultima'] : false;
         $type = isset($config['type']) ? $config['type'] : 'id_designado';
         $sessao = isset($config['sessao']) ? $config['sessao'] : false;
+        // dd($config,$id_designado,$id_designacao);
         if($id_designado && $id_designacao){
             if($ultima){
                 DB::getQueryLog();
@@ -159,16 +160,18 @@ class designaController extends Controller
     }
     /**
      * Metodos para listar participantes que podem participar de uma parte
-     * @param integer $id_designado, string $sessao
+     * @param integer $id_designado,string $tipo = tipos de campo de consulta do participante, string $sessao
      * @return array $ret
      */
-    public function list_participants($id_designacao, $sessao=false) {
+    public function list_participants($id_designacao, $tipo, $sessao=false) {
         //Listar dados da parte
         $dp = Tag::where('id', $id_designacao)->get();
         $ret['exec'] = false;
         if($dp->count() > 0) {
             $dp = $dp->toArray();
             $ret['dp'] = $dp;
+            //campo de participante id_designado ou id_ajudante
+            $tipo = $tipo ? $tipo : 'id_designado';
             $tip_parte = isset($dp[0]['config']['t_p'])?$dp[0]['config']['t_p']:false;
             //Listar dados dos participantes eligiveis para essa parte
             $ret['tip_parte'] = $tip_parte;
@@ -188,12 +191,14 @@ class designaController extends Controller
                     foreach ($d as $kd => $vd) {
                         $ultima_desta = $this->arr_historico([
                             'id_designado'=>$vd['id'],
+                            'type'=>$tipo,
                             'id_designacao'=>$id_designacao,
                             'ultima'=>true,
                         ]);
                         $ultima_outra = $this->arr_historico([
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
+                            'type'=>$tipo,
                             'ultima'=>true,
                             'operador'=>'!='
                         ]);
@@ -222,11 +227,13 @@ class designaController extends Controller
                         $ultima_desta = $this->arr_historico([
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
+                            'type'=>$tipo,
                             'ultima'=>true,
                         ]);
                         $ultima_outra = $this->arr_historico([
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
+                            'type'=>$tipo,
                             'ultima'=>true,
                             'operador'=>'!='
                         ]);
@@ -252,12 +259,14 @@ class designaController extends Controller
                         $ultima_desta = $this->arr_historico([
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
+                            'type'=>$tipo,
                             'ultima'=>true,
                             'operador'=>'='
                         ]);
                         $ultima_outra = $this->arr_historico([
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
+                            'type'=>$tipo,
                             'ultima'=>true,
                             'operador'=>'!='
                         ]);
@@ -299,12 +308,14 @@ class designaController extends Controller
                         $ultima_desta = $this->arr_historico([
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
+                            'type'=>$tipo,
                             'ultima'=>true,
                             'operador'=>'='
                         ]);
                         $ultima_outra = $this->arr_historico([
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
+                            'type'=>$tipo,
                             'ultima'=>true,
                             'operador'=>'!='
                         ]);
@@ -328,10 +339,11 @@ class designaController extends Controller
         $dr = $request->all();
         $ret['exec'] = false;
         $id_designacao = isset($dr['id_designacao']) ? $dr['id_designacao'] : false;
+        $tipo = isset($dr['tipo']) ? $dr['tipo'] : false;
         $sessao = isset($dr['sessao']) ? $dr['sessao'] : false;
         //Verificar se na requesição tem um id da parte
         if($id_designacao){
-            $ret = $this->list_participants($id_designacao,$sessao);
+            $ret = $this->list_participants($id_designacao,$tipo,$sessao);
         }
         //trazer arry das partes
         return response()->json($ret);

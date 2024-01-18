@@ -52,4 +52,4 @@
     </div>
 </div>
 <input type="hidden" name="{{$name}}" value="{{$value}}" /><br>
-<a href="javascript:void(0)" data-toggle="modal" data-target="#{{$id_m}}" onclick="select_parcipante(this);" data-extensso="{{@$data_extensso}}" class="underline" data-campo="{{$name}}"> {{$nome_select}} </a>
+<a href="javascript:void(0)" data-toggle="modal" data-target="#{{$id_m}}" data-tipo="{{$tipo}}" onclick="select_parcipante(this);" data-extensso="{{@$data_extensso}}" class="underline" data-campo="{{$name}}"> {{$nome_select}} </a>
