@@ -128,17 +128,36 @@ class designaController extends Controller
         $type = isset($config['type']) ? $config['type'] : 'id_designado';
         $sessao = isset($config['sessao']) ? $config['sessao'] : false;
         // dd($config,$id_designado,$id_designacao);
+
         if($id_designado && $id_designacao){
             if($ultima){
-                DB::getQueryLog();
-                $d = designation::select('designations.*','tags.nome','tags.config')
-                ->join('tags','tags.id','=','designations.id_designacao')
-                ->where('designations.'.$type,'=',$id_designado)
-                ->where('designations.id_designacao',$operador,$id_designacao)
-                ->where('designations.excluido','=','n')
-                ->orderBy('designations.data','desc')
-                ->limit(1)
-                ->get();
+                // DB::getQueryLog();
+                if($operador == '!=' && $type == 'id_ajudante'){
+
+                    // dd($type);
+                    $d = designation::select('designations.*','tags.nome','tags.config')
+                    ->join('tags','tags.id','=','designations.id_designacao')
+                    ->where(function($query) use ($id_designado,$type){
+                        $query  ->where('designations.id_designado','=',$id_designado)
+                                ->orWhere('designations.'.$type,'=',$id_designado);
+                    })
+                    // ->where('designations.'.$type,'=',$id_designado)
+                    ->where('designations.id_designacao',$operador,$id_designacao)
+                    ->where('designations.excluido','=','n')
+                    ->orderBy('designations.data','desc')
+                    ->limit(1)
+                    ->get();
+                    // dd($d);
+                }else{
+                    $d = designation::select('designations.*','tags.nome','tags.config')
+                    ->join('tags','tags.id','=','designations.id_designacao')
+                    ->where('designations.'.$type,'=',$id_designado)
+                    ->where('designations.id_designacao',$operador,$id_designacao)
+                    ->where('designations.excluido','=','n')
+                    ->orderBy('designations.data','desc')
+                    ->limit(1)
+                    ->get();
+                }
             }else{
                 $d = designation::select('designations.*','tags.nome','tags.config')
                 ->join('tags','tags.id','=','designations.id_designacao')
