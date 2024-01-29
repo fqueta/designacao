@@ -27,12 +27,15 @@ class designaController extends Controller
                         foreach ($va as $k1 => $val) {
                             if(isset($val['id'])){
                                 //Vamos consultar a desiganção
-                                $des = designation::where('data','=',$k)->where('id_designacao','=',$val['id'])->get();
+                                $des = designation::where('data','=',$k)
+                                ->where('post_type','=',$val['post_type'])
+                                ->where('id_designacao','=',$val['id'])->get();
                                 echo $k.'<br>';
                                 echo $val['id'].'<br>';
                                 if($des->count()){
                                     //se existir atualiza
-                                    $ret['save'][$k][$val['id']] = designation::where('data','=',$k)->where('id_designacao','=',$val['id'])->update([
+                                    $ret['save'][$k][$val['id']] = designation::where('data','=',$k)->where('post_type','=',$val['post_type'])
+                                    ->where('id_designacao','=',$val['id'])->update([
                                         'data' => $k,
                                         'id_designacao' => $val['id'],
                                         'ordem' => $k1,
@@ -63,10 +66,11 @@ class designaController extends Controller
     {
         $ret = false;
         if($dataI && $dataF){
-
-            $d = designation::whereBetween('data', [$dataI, $dataF])->orderBy('data','ASC') ->orderBy('ordem', 'ASC')->get();
+            $post_type = request()->segment(1);
+            $d = designation::whereBetween('data', [$dataI, $dataF])->orderBy('data','ASC')->where('post_type','=',$post_type)
+            ->orderBy('ordem', 'ASC')->get();
             $pr = [];
-            $ret['config']['tipos_designacao'] = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id');
+            $ret['config']['tipos_designacao'] = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1' AND config LIKE '%\"post_type\":\"$post_type\"%'",'nome','id');
             $ret['config']['participantes'] = Qlib::sql_array("SELECT id,nome FROM publicadores WHERE ativo='s' AND excluido='n' AND deletado='n' ORDER BY nome asc",'nome','id');
             if($d->count() > 0){
                 $monthI = Carbon::createFromFormat('Y-m-d', $dataI)->month;
@@ -84,9 +88,10 @@ class designaController extends Controller
                     if(isset($fd[$yearI][$monthI])){
                         foreach ($fd[$yearI][$monthI] as $dat => $vd) {
                             foreach ($arr_sessoes as $ks => $vs) {
-                                $dt = designation::whereDate('data', $vd)->
-                                where('sessao','=',$ks)->orderBy('ordem','asc')->
-                                get();
+                                $dt = designation::whereDate('data', $vd)
+                                ->where('post_type','=',$post_type)
+                                ->where('sessao','=',$ks)->orderBy('ordem','asc')
+                                ->get();
                                 if($dt->count()){
                                     $pr[$vd][$ks] = $dt->toArray();
                                 }
@@ -126,6 +131,7 @@ class designaController extends Controller
         $operador = isset($config['operador']) ? $config['operador'] : '=';
         $ultima = isset($config['ultima']) ? $config['ultima'] : false;
         $type = isset($config['type']) ? $config['type'] : 'id_designado';
+        $post_type = isset($config['post_type']) ? $config['post_type'] : '';
         $sessao = isset($config['sessao']) ? $config['sessao'] : false;
         // dd($config,$id_designado,$id_designacao);
 
@@ -143,6 +149,7 @@ class designaController extends Controller
                     })
                     // ->where('designations.'.$type,'=',$id_designado)
                     ->where('designations.id_designacao',$operador,$id_designacao)
+                    ->where('designations.post_type','=',$post_type)
                     ->where('designations.excluido','=','n')
                     ->orderBy('designations.data','desc')
                     ->limit(1)
@@ -152,6 +159,7 @@ class designaController extends Controller
                     $d = designation::select('designations.*','tags.nome','tags.config')
                     ->join('tags','tags.id','=','designations.id_designacao')
                     ->where('designations.'.$type,'=',$id_designado)
+                    ->where('designations.post_type','=',$post_type)
                     ->where('designations.id_designacao',$operador,$id_designacao)
                     ->where('designations.excluido','=','n')
                     ->orderBy('designations.data','desc')
@@ -162,6 +170,7 @@ class designaController extends Controller
                 $d = designation::select('designations.*','tags.nome','tags.config')
                 ->join('tags','tags.id','=','designations.id_designacao')
                 ->where('designations.'.$type,'=',$id_designado)
+                ->where('designations.post_type','=',$post_type)
                 ->where('designations.id_designacao',$operador,$id_designacao)
                 ->where('designations.excluido','=','n')
                 ->orderBy('designations.data','desc')

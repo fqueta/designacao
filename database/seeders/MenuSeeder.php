@@ -25,7 +25,7 @@ class MenuSeeder extends Seeder
                 'pai'=>''
             ],
             [
-                'categoria'=>'CADASTROS',
+                'categoria'=>'DESIGNAÇÕES',
                 'description'=>'Estudantes',
                 'icon'=>'fas fa-user',
                 'actived'=>true,
@@ -39,36 +39,54 @@ class MenuSeeder extends Seeder
                 'icon'=>'fas fa-file',
                 'actived'=>true,
                 'url'=>'programa',
-                'route'=>'programa.index',
-                'pai'=>''
-            ],
-            [
-                'categoria'=>'DESIGNAÇÕES',
-                'description'=>'Histórico de programas',
-                'icon'=>'fas fa-file',
-                'actived'=>true,
-                'url'=>'programa-historico',
-                'route'=>'programa.index',
+                'route'=>'',
                 'pai'=>''
             ],
             [
                 'categoria'=>'',
-                'description'=>'Novo programa',
+                'description'=>'Meio de semana',
                 'icon'=>'fas fa-file',
                 'actived'=>true,
-                'url'=>'programa-novo',
-                'route'=>'programa.create',
-                'pai'=>''
+                'url'=>'meio-semana',
+                'route'=>'meio-semana.index',
+                'pai'=>'programa'
             ],
             [
-                'categoria'=>'RELATORIOS',
-                'description'=>'Acessos',
-                'icon'=>'fas fa-calendar-alt',
+                'categoria'=>'',
+                'description'=>'Fim de semana',
+                'icon'=>'fas fa-file',
                 'actived'=>true,
-                'url'=>'relatorios_acessos',
-                'route'=>'relatorios.acessos',
-                'pai'=>'relatorios'
+                'url'=>'fim-semana',
+                'route'=>'fim-semana.index',
+                'pai'=>'programa'
             ],
+            // [
+            //     'categoria'=>'DESIGNAÇÕES',
+            //     'description'=>'Histórico de programas',
+            //     'icon'=>'fas fa-file',
+            //     'actived'=>true,
+            //     'url'=>'programa-historico',
+            //     'route'=>'programa.index',
+            //     'pai'=>''
+            // ],
+            // [
+            //     'categoria'=>'',
+            //     'description'=>'Novo programa',
+            //     'icon'=>'fas fa-file',
+            //     'actived'=>true,
+            //     'url'=>'programa-novo',
+            //     'route'=>'programa.create',
+            //     'pai'=>''
+            // ],
+            // [
+            //     'categoria'=>'RELATORIOS',
+            //     'description'=>'Acessos',
+            //     'icon'=>'fas fa-calendar-alt',
+            //     'actived'=>true,
+            //     'url'=>'relatorios_acessos',
+            //     'route'=>'relatorios.acessos',
+            //     'pai'=>'relatorios'
+            // ],
             /*[
                 'categoria'=>'',
                 'description'=>'Listagem de Ocupantes',

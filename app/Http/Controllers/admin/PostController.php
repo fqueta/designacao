@@ -33,6 +33,7 @@ class PostController extends Controller
     {
         $this->middleware('auth');
         $seg1 = request()->segment(1);
+        $seg2 = request()->segment(2);
         $type = false;
         if($seg1){
             $el = substr($seg1,-1,1);
@@ -41,6 +42,10 @@ class PostController extends Controller
             }else{
                 $type = $seg1;
             }
+            if($seg1=='meio-semana' || $seg1=='fim-semana'){
+                $type = $seg1;
+            }
+            // dd($type);
         }
         $this->post_type = $type;
         $this->sec = $seg1;
@@ -160,7 +165,7 @@ class PostController extends Controller
         if(Qlib::qoption('editor_padrao')=='laraberg'){
             $hidden_editor = 'hidden';
         }
-        if($route_name=="programa.create"){
+        if($route_name=="programa.create" || $route_name=="meio-semana.create" || $route_name=="fim-semana.create"){
             $fd = Qlib::arr_month(date('Y'));
             $fd2 = Qlib::arr_month2(date('Y'));
             // dd($fd,$fd2);
@@ -258,7 +263,8 @@ class PostController extends Controller
     }
     public function campos($dados=false){
         $sec = $this->sec;
-        if($sec=='programa'){
+        $hidden_editor = false;
+        if($sec=='programa' || $sec=='meio-semana' || $sec=='fim-semana'){
             $ret = $this->campos_programa($dados);
         }else{
             $ret = [
@@ -272,7 +278,7 @@ class PostController extends Controller
                 //'post_excerpt'=>['label'=>'Resumo (Opcional)','active'=>true,'placeholder'=>'Uma síntese do um post','type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                 //'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
                 'post_status'=>['label'=>'Status','active'=>true,'type'=>'chave_checkbox','value'=>'publish','valor_padrao'=>'publish','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['publish'=>'Em vigor','pending'=>'Cancelado']],
-                'post_content'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>$hidden_editor,'tam'=>'12','class_div'=>'','class'=>'editor-padrao summernote','placeholder'=>__('Escreva seu conteúdo aqui..')],
+                'post_content'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>@$hidden_editor,'tam'=>'12','class_div'=>'','class'=>'editor-padrao summernote','placeholder'=>__('Escreva seu conteúdo aqui..')],
             ];
         }
         return $ret;
@@ -285,7 +291,7 @@ class PostController extends Controller
             $title = 'Cadastro de postagens';
         }elseif($this->sec=='pages'){
             $title = 'Cadastro de paginas';
-        }elseif($this->sec=='programa'){
+        }elseif($this->sec=='programa' || $this->sec=='meio-semana' || $this->sec=='fim-semana'){
             $title = 'Programação';
             $this->label='programa';
         }else{
@@ -309,9 +315,8 @@ class PostController extends Controller
             'view'=>$this->view,
             'i'=>0,
         ];
-
         //REGISTRAR EVENTOS
-        (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
+        // (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
 
         return view($this->view.'.index',$ret);
     }
@@ -320,13 +325,13 @@ class PostController extends Controller
         $this->authorize('is_admin2', $user);
         if($this->sec=='posts'){
             $title = 'Cadastro de postagens';
-        }elseif($this->sec=='programa'){
+        }elseif($this->sec=='programa' || $this->sec=='meio-semana' || $this->sec=='fim-semana'){
             $title = 'Programação';
         }elseif($this->sec=='pages'){
             $title = 'Cadastro de paginas';
         }
-        if($this->sec=='programa'){
-            $this->view = $this->sec;
+        if($this->sec=='programa' || $this->sec=='meio-semana' || $this->sec=='fim-semana'){
+            $this->view = 'programa';
         }
         $titulo = $title;
         $config = [
@@ -341,11 +346,11 @@ class PostController extends Controller
         ];
         $campos = $this->campos();
          //REGISTRAR EVENTO CADASTRO
-         $regev = Qlib::regEvent(['action'=>'create','tab'=>$this->tab,'config'=>[
-            'obs'=>'Abriu tela de cadastro',
-            'link'=>$this->routa,
-            ]
-        ]);
+        //  $regev = Qlib::regEvent(['action'=>'create','tab'=>$this->tab,'config'=>[
+        //     'obs'=>'Abriu tela de cadastro',
+        //     'link'=>$this->routa,
+        //     ]
+        // ]);
         return view($this->view.'.createedit',[
             'config'=>$config,
             'title'=>$title,
@@ -502,8 +507,8 @@ class PostController extends Controller
                 $config['class_card1'] = 'col-md-12';
                 $config['class_card2'] = 'd-none';
             }
-            if($this->sec=='programa'){
-                $this->view=$this->sec;
+            if($this->sec=='programa' || $this->sec=='meio-semana' || $this->sec=='fim-semana'){
+                $this->view='programa';
             }
             //array de tipos de desiganações
             $ret = [
@@ -603,7 +608,7 @@ class PostController extends Controller
                 'id'=>$id,
                 'arquivos'=>'jpeg,jpg,png,pdf,PDF',
             ];
-            if($this->sec=='programa'){
+            if($this->sec=='programa' || $this->sec=='meio-semana' || $this->sec=='fim-semana'){
 
                 $fd = Qlib::arr_month2(date('Y'));
                 $ddo = [];
@@ -670,6 +675,9 @@ class PostController extends Controller
                 $config['dsalv'] = $dsalv;
                 $config['co'] = $dados[0]['config'];  //dados de config
                 $this->view = $this->sec;
+                if($this->sec=='meio-semana' || $this->sec=='fim-semana'){
+                    $this->view = 'programa';
+                }
             }
             //REGISTRAR EVENTOS
             // (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
@@ -828,6 +836,7 @@ class PostController extends Controller
         $ret['dataSalv'] = false;
         // dd($config);
         if(is_array($config)){
+            $post_type = request()->segment(1);
             $ordem = 0;
             foreach ($config as $data => $de) {
                 if(is_array($de)){
@@ -843,6 +852,7 @@ class PostController extends Controller
                                 $dataSalv[$data][$k]['id_designacao'] = isset($ddta['id_designacao'])?$ddta['id_designacao']:0;
                                 $dataSalv[$data][$k]['id_designado'] = isset($ddta['id_designado'])?$ddta['id_designado']:0;
                                 $dataSalv[$data][$k]['id_ajudante'] = isset($ddta['id_ajudante'])?$ddta['id_ajudante']:0;
+                                $dataSalv[$data][$k]['post_type'] = isset($ddta['post_type'])?$ddta['post_type']:$post_type;
                                 $dataSalv[$data][$k]['data'] = $data;
                                 $dataSalv[$data][$k]['ordem'] = $ordem;
                                 $dataSalv[$data][$k]['obs'] = $ddta['obs'];

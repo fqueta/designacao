@@ -1,19 +1,8 @@
-{{-- <select class="form-control" name="{{$name}}" id="">
-    <option value=""> Selecione </option>
-    @if (isset($arr) && is_array($arr))
-        @foreach ($arr as $ks=>$vs)
-            <option @if (@$value==$ks)
-                selected="selected"
-            @endif value="{{$ks}}">{{$vs}}</option>
-        @endforeach
-    @endif
-</select> --}}
-<!-- Button trigger modal -->
-
 @php
     $nome_select = 'Selecionar Participante';
     $id_m = str_replace('[', '_', $name);
     $id_m = str_replace(']', '', $id_m);
+    $post_type = request()->segment(1);
     if(isset($arr[@$value])){
         $nome_select = $arr[@$value];
     }
@@ -52,4 +41,4 @@
     </div>
 </div>
 <input type="hidden" name="{{$name}}" value="{{$value}}" /><br>
-<a href="javascript:void(0)" data-toggle="modal" data-target="#{{$id_m}}" data-tipo="{{$tipo}}" onclick="select_parcipante(this);" data-extensso="{{@$data_extensso}}" class="underline" data-campo="{{$name}}"> {{$nome_select}} </a>
+<a href="javascript:void(0)" data-toggle="modal" data-target="#{{$id_m}}" data-tipo="{{$tipo}}" data-post_type="{{$post_type}}" onclick="select_parcipante(this);" data-extensso="{{@$data_extensso}}" class="underline" data-campo="{{$name}}"> {{$nome_select}} </a>

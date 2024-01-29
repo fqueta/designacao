@@ -2286,7 +2286,7 @@ function selec_desig(obj){
 }
 function select_parcipante(obj){
     const json_arr = obj.getAttribute('data-arr');
-    var campo = obj.getAttribute('data-campo'),id_m=campo.replaceAll('[','_'),campoi,data_extensso=obj.getAttribute('data-extensso'),tipo=obj.getAttribute('data-tipo');
+    var campo = obj.getAttribute('data-campo'),id_m=campo.replaceAll('[','_'),campoi,data_extensso=obj.getAttribute('data-extensso'),tipo=obj.getAttribute('data-tipo'),post_type=obj.getAttribute('data-post_type');
     id_m = id_m.replaceAll(']','');
     campoi = campo;
     // console.log(obj);
@@ -2312,6 +2312,7 @@ function select_parcipante(obj){
         data:{
             id_designacao: id_designacao,
             tipo: tipo,
+            post_type: post_type,
         }
     },function(res){
         $('#preload').fadeOut("fast");

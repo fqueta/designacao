@@ -117,9 +117,27 @@ Route::resource('tags','\App\Http\Controllers\admin\TagsController',['parameters
 Route::resource('permissions','\App\Http\Controllers\admin\UserPermissions',['parameters' => [
     'permissions' => 'id'
 ]]);
-Route::resource('programa','\App\Http\Controllers\admin\PostController',['parameters' => [
-    'programa' => 'id'
+// Route::resource('programa','\App\Http\Controllers\admin\PostController',['parameters' => [
+//     'programa' => 'id'
+// ]]);
+Route::resource('meio-semana','\App\Http\Controllers\admin\PostController',['parameters' => [
+    'meio-semana' => 'id'
 ]]);
+Route::resource('fim-semana','\App\Http\Controllers\admin\PostController',['parameters' => [
+    'fim-semana' => 'id'
+]]);
+// Route::prefix('programa')->group(function(){
+//     Route::get('/index',[App\Http\Controllers\admin\PostController::class,'index'])->name('programa.index');
+//     Route::get('/create',[App\Http\Controllers\admin\PostController::class,'create'])->name('programa.create');
+//     Route::post('/',[App\Http\Controllers\admin\PostController::class,'store'])->name('programa.store');
+//     Route::get('/{id}/show',[App\Http\Controllers\admin\PostController::class,'show'])->name('programa.show');
+//     Route::get('/{id}/edit',[App\Http\Controllers\admin\PostController::class,'edit'])->name('programa.edit');
+//     Route::put('/{id}',[App\Http\Controllers\admin\PostController::class,'update'])->where('id', '[0-9]+')->name('programa.update');
+//     Route::post('/{id}',[App\Http\Controllers\admin\PostController::class,'update'])->where('id', '[0-9]+')->name('programa.update-ajax');
+//     Route::post('/{id}',[App\Http\Controllers\admin\PostController::class,'destroy'])->where('id', '[0-9]+')->name('programa.destroy');
+//     Route::get('/meio-semana',[App\Http\Controllers\admin\PostController::class,'index'])->name('programa.meio-semana');
+//     Route::get('/fim-semana',[App\Http\Controllers\admin\PostController::class,'index'])->name('programa.fim-semana');
+// });
 
 
 Auth::routes();

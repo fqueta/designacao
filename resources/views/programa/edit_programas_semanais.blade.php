@@ -14,7 +14,9 @@
     $des2 = isset($config['conf']['desiganations']) ? $config['conf']['desiganations'] : false;
     $sessoes = isset($des2['config']['sessoes']) ? $des2['config']['sessoes'] : $arr_sessoes;
     $arr_participantes = isset($des2['config']['participantes'])?$des2['config']['participantes']:[];
+    $config['conf']['arr_desiganacao'] = isset($config['conf']['desiganations']['config']['tipos_designacao']) ? $config['conf']['desiganations']['config']['tipos_designacao'] : [];
     // dd($des2);
+    // dd($config['conf']);
 
 @endphp
 <table class="table">

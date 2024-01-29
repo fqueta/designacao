@@ -59,7 +59,7 @@
                     $val->id = $val->ID;
                 }
                 $rlink = 'edit';
-                if($routa=='familias'||$routa=='programa'||$routa=='users'||$routa=='beneficiarios'||$routa=='lotes'||$routa=='quadras'||$routa=='bairros'){
+                if($routa=='familias'  || $routa=='meio-semana' || $routa=='fim-semana' ||$routa=='programa'||$routa=='users'||$routa=='beneficiarios'||$routa=='lotes'||$routa=='quadras'||$routa=='bairros'){
                     $rlink = 'show';
                 }
                 $linkShow = route($routa.'.'.$rlink,['id'=>$val->id]). '?redirect='.$redirect.'idCad='.$val->id;
@@ -77,12 +77,12 @@
                                     <i class="fa fa-map-marker" aria-hidden="true"></i>
                                 </a>
                             @endif
-                            @if($routa=='programa')
+                            @if($routa=='programa'  || $routa=='meio-semana' || $routa=='fim-semana')
                             <a href="{{ $linkShow }}&v=estudante" title="visualizar arquivo de estudantes" class="btn btn-sm btn-outline-success mr-2">
                                 <i class="fas fa-eye"></i>
                             </a>
                             @endif
-                            @if ($routa=='familias' || $routa=='programa' || $routa=='users'||$routa=='beneficiarios'||$routa=='lotes'||$routa=='quadras'||$routa=='bairros')
+                            @if ($routa=='familias' || $routa=='meio-semana' || $routa=='fim-semana' || $routa=='users'||$routa=='beneficiarios'||$routa=='lotes'||$routa=='quadras'||$routa=='bairros')
                                 <a href="{{ $linkShow }}" title="visualizar" class="btn btn-sm btn-outline-secondary mr-2">
                                     <i class="fas fa-eye"></i>
                                 </a>
@@ -94,7 +94,7 @@
                                 </svg>
                             </a>
                             @else
-                            @if ($routa=='familias' || $routa=='programa')
+                            @if ($routa=='familias' || $routa=='meio-semana' || $routa=='fim-semana')
                                 <a href=" {{ route($routa.'.show',['id'=>$val->id]) }}?redirect={{$redirect.'idCad='.$val->id}} " title="visualizar" class="btn btn-sm btn-outline-secondary mr-2">
                                     <i class="fas fa-eye"></i>
                                 </a>
