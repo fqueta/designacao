@@ -19,6 +19,7 @@ class designation extends Model
         'id_designado',
         'id_ajudante',
         'id_designacao',
+        'post_type',
         'sessao',
         'ativo',
         'ordem',

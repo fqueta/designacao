@@ -99,11 +99,13 @@ class TesteController extends Controller
         // $ret = (new designaController)->arr_historico(2,2,true);
         // $ret = (new designaController)->list_participants(2,2);
         $ret = (new designaController)->arr_historico([
-            'id_designacao'=>9,
-            'id_designado'=>33,
+            'id_designacao'=>2,
+            'id_designado'=>95,
             'ultima'=>true,
-            'type'=>'id_ajudante',
-            'operador'=>'=',
+            'type'=>'id_designado',
+            'post_type'=>'meio-semana',
+            'limit'=>4,
+            'operador'=>'!=',
         ]);
         return $ret;
     }

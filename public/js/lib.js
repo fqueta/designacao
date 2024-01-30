@@ -2323,6 +2323,8 @@ function select_parcipante(obj){
                         '<td>{ultima_desta}</td>'+
                         '<td>{ultima_outra}</td>'+
                     '</tr>';
+        var tm3 = '<ul class="w-100" ul-id="{reg_id}" style="display:none">{li}</ul>';
+        var tm4 = '<li>{nome}</li>';
         try {
             // console.log(res.dp[0].nome);
             if(parte=res.dp[0].nome){
@@ -2338,6 +2340,7 @@ function select_parcipante(obj){
                     const el = d[i];
                     var r = '<input type="radio" onclick="select_m_paraticipante(this,\''+campoi+'\',\''+id_m+'\');" nome="'+el.nome+'" value="'+el.id+'"/>';
                     var desta = el.ultima_desta.data_ex,outra=el.ultima_outra.data_ex;
+                    var u4 = el.ultimas_quatro,reg_id = el.id;
                     if(typeof desta=='undefined'){
                         desta='';
                     }
@@ -2347,29 +2350,47 @@ function select_parcipante(obj){
                     if(outra){
                         outra+=' | '+el.ultima_outra.nome;
                     }
+                    if(u4.length>0){
+                        var li = '';
+                        for (let ili = 0; ili < u4.length; ili++) {
+                            const eli = u4[ili];
+                            var nli = eli.data_ex+' | '+eli.nome;
+                            li += tm4.replaceAll('{nome}', nli);
+                            // console.log(eli);
+                        }
+                        var noli = tm3.replaceAll('{li}',li);
+                        noli = noli.replaceAll('{reg_id}',reg_id);
+                        outra = '<a class="underline" title="ver ultimas 4" href="#" d-ult-ck td-id="{reg_id}">'+outra+'</a>';
+                        outra += noli;
+                    }
                     tr += tm2.replaceAll('{nome}', el.nome.toUpperCase());
                     tr = tr.replaceAll('{radio}', r);
                     tr = tr.replaceAll('{ultima_desta}', desta);
                     tr = tr.replaceAll('{ultima_outra}', outra);
+                    tr = tr.replaceAll('{reg_id}', reg_id);
                     // console.log(el);
                 }
                 var ret = tm1.replaceAll('{tr}',tr);
                 ret = ret.replaceAll('{id_m}',id_m);
                 $('#b-'+id_m).html(ret);
                 var tr=document.querySelector('.table-des').querySelector('tbody').querySelectorAll('tr');
-                if(tr.length){
-                    tr.forEach(function(el){
-                        // console.log(el);
-                        el.addEventListener('click',function(e) {
-                            var sel=this.querySelector('input[type="radio"]');
-                            var val = sel.value;
-                            sel.click(); //selectionar o radio button
-                            // console.log(val);
-                        });
-                    });
-                }
+                // if(tr.length){
+                //     tr.forEach(function(el){
+                //         // console.log(el);
+                //         el.addEventListener('click',function(e) {
+                //             var sel=this.querySelector('input[type="radio"]');
+                //             var val = sel.value;
+                //             sel.click(); //selectionar o radio button
+                //             // console.log(val);
+                //         });
+                //     });
+                // }
                 $('#table-'+id_m).dataTable({
                     'paging': false,
+                });
+                $('[d-ult-ck]').on('click', function (e) {
+                    e.preventDefault();
+                    expandeU4($(this));
                 });
             }
         } catch (error) {
@@ -2384,11 +2405,25 @@ function select_parcipante(obj){
         console.log(err);
     });
 }
+function expandeU4(obj){
+    var id_alv = obj.attr('td-id'),ul_alvo=$('[ul-id="'+id_alv+'"]');
+    var pos = ul_alvo.attr('pos');
+    if(typeof pos == 'undefined'){
+        pos = 'hide';
+    }
+    if(pos=='hide'){
+        ul_alvo.show().attr('pos','show');
+
+    }else{
+        ul_alvo.hide().attr('pos','hide');
+    }
+    // obj.parent('ul').show();
+}
 function select_m_paraticipante(obj,campo,id_m){
     var id_designado = obj.value,nome_designado = obj.getAttribute('nome'),sel_id='[name="' + campo + '"]',sel_nome='[data-campo="' + campo + '"]';
     $(sel_id).val(id_designado);
     $(sel_nome).html(nome_designado);
     $('#'+id_m).modal('hide');
-    console.log(nome_designado,sel_id,sel_nome,id_m);
+    // console.log(nome_designado,sel_id,sel_nome,id_m);
 }
 // Waldir Bertges [name="des2[2024-02-05][partes][inicio][0][id_designacao]"] [data-campo="des2[2024-02-05][partes][inicio][0][id_designacao]"]

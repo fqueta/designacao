@@ -132,6 +132,7 @@ class designaController extends Controller
         $ultima = isset($config['ultima']) ? $config['ultima'] : false;
         $type = isset($config['type']) ? $config['type'] : 'id_designado';
         $post_type = isset($config['post_type']) ? $config['post_type'] : '';
+        $limit = isset($config['limit']) ? $config['limit'] : 1;
         $sessao = isset($config['sessao']) ? $config['sessao'] : false;
         // dd($config,$id_designado,$id_designacao);
 
@@ -152,7 +153,7 @@ class designaController extends Controller
                     ->where('designations.post_type','=',$post_type)
                     ->where('designations.excluido','=','n')
                     ->orderBy('designations.data','desc')
-                    ->limit(1)
+                    ->limit($limit)
                     ->get();
                     // dd($d);
                 }else{
@@ -163,7 +164,7 @@ class designaController extends Controller
                     ->where('designations.id_designacao',$operador,$id_designacao)
                     ->where('designations.excluido','=','n')
                     ->orderBy('designations.data','desc')
-                    ->limit(1)
+                    ->limit($limit)
                     ->get();
                 }
             }else{
@@ -182,7 +183,9 @@ class designaController extends Controller
             $ret['d'] = $d;
         }
         if(isset($ret['d'][0]['data'])){
-            $ret['d'][0]['data_ex']=Qlib::dataExtensso(@$ret['d'][0]['data']);
+            foreach ($ret['d'] as $kd => $vad) {
+                $ret['d'][$kd]['data_ex']=Qlib::dataExtensso(@$ret['d'][$kd]['data']);
+            }
         }
         return $ret;
     }
@@ -191,7 +194,7 @@ class designaController extends Controller
      * @param integer $id_designado,string $tipo = tipos de campo de consulta do participante, string $sessao
      * @return array $ret
      */
-    public function list_participants($id_designacao, $tipo, $sessao=false) {
+    public function list_participants($id_designacao, $tipo,$post_type, $sessao=false) {
         //Listar dados da parte
         $dp = Tag::where('id', $id_designacao)->get();
         $ret['exec'] = false;
@@ -218,22 +221,26 @@ class designaController extends Controller
                     $d = $d->toArray();
                     foreach ($d as $kd => $vd) {
                         $ultima_desta = $this->arr_historico([
+                            'post_type'=>$post_type,
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'id_designacao'=>$id_designacao,
                             'ultima'=>true,
                         ]);
                         $ultima_outra = $this->arr_historico([
+                            'post_type'=>$post_type,
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
-                            'operador'=>'!='
+                            'operador'=>'!=',
+                            'limit'=>4,
                         ]);
                         //Adicionar historico desta parte
                         $d[$kd]['ultima_desta'] = isset($ultima_desta['d'][0])?$ultima_desta['d'][0]:[];
                         //Adicionar historico de outras partes
                         $d[$kd]['ultima_outra'] = isset($ultima_outra['d'][0])?$ultima_outra['d'][0]:[];
+                        $d[$kd]['ultimas_quatro'] = isset($ultima_outra['d'])?$ultima_outra['d']:[];
                     }
                 }
             }elseif($tip_parte == 'instrucao'){
@@ -253,22 +260,26 @@ class designaController extends Controller
                     $d = $d->toArray();
                     foreach ($d as $kd => $vd) {
                         $ultima_desta = $this->arr_historico([
+                            'post_type'=>$post_type,
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
                         ]);
                         $ultima_outra = $this->arr_historico([
+                            'post_type'=>$post_type,
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
-                            'operador'=>'!='
+                            'operador'=>'!=',
+                            'limit'=>4,
                         ]);
                         //Adicionar historico desta parte
                         $d[$kd]['ultima_desta'] = isset($ultima_desta['d'][0])?$ultima_desta['d'][0]:[];
                         //Adicionar historico de outras partes
                         $d[$kd]['ultima_outra'] = isset($ultima_outra['d'][0])?$ultima_outra['d'][0]:[];
+                        $d[$kd]['ultimas_quatro'] = isset($ultima_outra['d'])?$ultima_outra['d']:[];
                     }
 
                 }
@@ -285,6 +296,7 @@ class designaController extends Controller
                     $d = $d->toArray();
                     foreach ($d as $kd => $vd) {
                         $ultima_desta = $this->arr_historico([
+                            'post_type'=>$post_type,
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
@@ -292,16 +304,19 @@ class designaController extends Controller
                             'operador'=>'='
                         ]);
                         $ultima_outra = $this->arr_historico([
+                            'post_type'=>$post_type,
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
-                            'operador'=>'!='
+                            'operador'=>'!=',
+                            'limit'=>4,
                         ]);
                         //Adicionar historico desta parte
                         $d[$kd]['ultima_desta'] = isset($ultima_desta['d'][0])?$ultima_desta['d'][0]:[];
                         //Adicionar historico de outras partes
                         $d[$kd]['ultima_outra'] = isset($ultima_outra['d'][0])?$ultima_outra['d'][0]:[];
+                        $d[$kd]['ultimas_quatro'] = isset($ultima_outra['d'])?$ultima_outra['d']:[];
                     }
 
                 }
@@ -334,6 +349,7 @@ class designaController extends Controller
                     $d = $d->toArray();
                     foreach ($d as $kd => $vd) {
                         $ultima_desta = $this->arr_historico([
+                            'post_type'=>$post_type,
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
@@ -341,16 +357,19 @@ class designaController extends Controller
                             'operador'=>'='
                         ]);
                         $ultima_outra = $this->arr_historico([
+                            'post_type'=>$post_type,
                             'id_designacao'=>$id_designacao,
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
-                            'operador'=>'!='
+                            'operador'=>'!=',
+                            'limit'=>4,
                         ]);
                         //Adicionar historico desta parte
                         $d[$kd]['ultima_desta'] = isset($ultima_desta['d'][0])?$ultima_desta['d'][0]:[];
                         //Adicionar historico de outras partes
                         $d[$kd]['ultima_outra'] = isset($ultima_outra['d'][0])?$ultima_outra['d'][0]:[];
+                        $d[$kd]['ultimas_quatro'] = isset($ultima_outra['d'])?$ultima_outra['d']:[];
                     }
 
                 }
@@ -368,10 +387,11 @@ class designaController extends Controller
         $ret['exec'] = false;
         $id_designacao = isset($dr['id_designacao']) ? $dr['id_designacao'] : false;
         $tipo = isset($dr['tipo']) ? $dr['tipo'] : false;
+        $post_type = isset($dr['post_type']) ? $dr['post_type'] : request()->segment(1);
         $sessao = isset($dr['sessao']) ? $dr['sessao'] : false;
         //Verificar se na requesição tem um id da parte
         if($id_designacao){
-            $ret = $this->list_participants($id_designacao,$tipo,$sessao);
+            $ret = $this->list_participants($id_designacao,$tipo,$post_type,$sessao);
         }
         //trazer arry das partes
         return response()->json($ret);
