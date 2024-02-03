@@ -447,7 +447,7 @@ class Qlib
         if($url && $perm){
             $arr_permissions = [];
             $logado = Auth::user();
-            $id_permission = $logado->id_permission;
+            $id_permission = isset($logado->id_permission)?$logado->id_permission:null;
             $dPermission = Permission::findOrFail($id_permission);
             if($dPermission && $dPermission->active=='s'){
                 $arr_permissions = Qlib::lib_json_array($dPermission->id_menu);
