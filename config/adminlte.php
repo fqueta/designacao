@@ -14,7 +14,7 @@ $config = [
     |
     */
 
-    'title' => 'Data Brasil 1.0',
+    'title' => 'Designações Bela Aurora 1.0',
     'title_prefix' => '',
     'title_postfix' => '',
 

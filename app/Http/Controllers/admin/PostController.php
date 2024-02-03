@@ -12,6 +12,7 @@ use App\Qlib\Qlib;
 use App\Models\User;
 use App\Models\_upload;
 use App\Models\designation;
+use App\Models\Publicador;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -882,12 +883,22 @@ class PostController extends Controller
                                     // Qlib::lib_print($dsa);
                                     if($upn==1){
                                         $ordem++;
+                                        //salvar ultima desiganção para o designado
                                     }else{
                                         $sv[$data][$k] = designation::create($dsa);
                                         // dd($dsa,$sv[$data][$k]);
-                                        $ret['sv'] = $sv[$data][$k];
+                                        $upn = $sv[$data][$k];
+                                        $ret['sv'] = $upn;
                                         $ordem++;
                                     }
+                                    if($upn && $dsa['id_designado']){
+                                        $ret['sultma'][$k] = Publicador::where('id','=',$dsa['id_designado'])
+                                        ->update([
+                                            'data_ultima' => $data,
+                                            'token_ultima' => $dsa['token'],
+                                        ]);
+                                    }
+
                                 }
 
                             }
