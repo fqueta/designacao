@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="{{url('/vendor/venobox/venobox.min.css')}}">
 <link rel="stylesheet" href="{{url('/css/jquery-ui.min.css')}}">
 <link rel="stylesheet" media="print" href="{{url('/css/print.css')}}">
-<link rel="stylesheet" href="{{url('/css/lib.css')}}">
+<link rel="stylesheet" href="{{url('/css/lib.css')}}?ver={{config('app.version')}}">
 @if (isset($_GET['popup']) && $_GET['popup'])
 <style>
     aside,.wrapper nav{
