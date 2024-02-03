@@ -18,6 +18,7 @@ class designation extends Model
         'numero',
         'id_designado',
         'id_ajudante',
+        'orador_visitante',
         'id_designacao',
         'post_type',
         'sessao',

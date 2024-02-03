@@ -119,6 +119,7 @@
                         @endcan
                     </td>
                 @if (isset($campos_tabela) && is_array($campos_tabela))
+
                     @foreach ($campos_tabela as $kd=>$vd)
                         @if (isset($vd['label']) && $vd['active'])
                             @if (isset($vd['type']) && ($vd['type']=='select' || $vd['type']=='selector'))
@@ -151,6 +152,10 @@
                                     }else{
                                         $td = $val->$kd;
                                     }
+                                    if($vd['label']=='Início do programa'){
+                                        $td = App\Qlib\Qlib::dataExtensso($td);
+                                    }
+
                                 @endphp
 
                                 <td class="{{str_replace('[]','',$kd)}}" title="{{$td}}">

@@ -235,10 +235,10 @@ class PostController extends Controller
             $etp = isset($_GET['etp']) ? $_GET['etp'] : 1;
             if($etp == 1){
                 $ret = [
-                    'ID'=>['label'=>'Id','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                    'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2'],
                     'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=>$this->post_type],
                     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                    'post_date_gmt'=>['label'=>'Periodo da designação','active'=>true,'placeholder'=>'','type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3'],
+                    'post_date_gmt'=>['label'=>'Início do programa','active'=>true,'placeholder'=>'','type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3'],
                     'post_name'=>['label'=>'Slug','active'=>false,'placeholder'=>'Ex.: nome-do-post','type'=>'hidden','exibe_busca'=>'d-block','event'=>'type_slug=true','tam'=>'12'],
                     'semanas'=>['label'=>'Edição das semanas','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'programa.edit_programas_semanais','script_show'=>''],
 
@@ -803,6 +803,7 @@ class PostController extends Controller
                         $dataSalv[$data][$k]['numero'] = isset($ddta['numero'])?$ddta['numero']:null;
                         $dataSalv[$data][$k]['id_designacao'] = isset($ddta['id'])?$ddta['id']:false;
                         $dataSalv[$data][$k]['id_designado'] = isset($ddta['id_designado'])?$ddta['id_designado']:0;
+                        $dataSalv[$data][$k]['orador_visitante'] = isset($ddta['orador_visitante'])?$ddta['orador_visitante']:0;
                         if(!$dataSalv[$data][$k]['id_designacao'])
                             $dataSalv[$data][$k]['id_designacao'] = (int)$dataSalv[$data][$k]['id_designacao'];
                         $dataSalv[$data][$k]['data'] = $data;
@@ -852,6 +853,7 @@ class PostController extends Controller
                                 $dataSalv[$data][$k]['id_designacao'] = isset($ddta['id_designacao'])?$ddta['id_designacao']:0;
                                 $dataSalv[$data][$k]['id_designado'] = isset($ddta['id_designado'])?$ddta['id_designado']:0;
                                 $dataSalv[$data][$k]['id_ajudante'] = isset($ddta['id_ajudante'])?$ddta['id_ajudante']:0;
+                                $dataSalv[$data][$k]['orador_visitante'] = isset($ddta['orador_visitante'])?$ddta['orador_visitante']:0;
                                 $dataSalv[$data][$k]['post_type'] = isset($ddta['post_type'])?$ddta['post_type']:$post_type;
                                 $dataSalv[$data][$k]['data'] = $data;
                                 $dataSalv[$data][$k]['ordem'] = $ordem;

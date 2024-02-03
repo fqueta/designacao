@@ -2279,9 +2279,10 @@ function remove_designacao(id){
     });
 }
 function selec_desig(obj){
-    var ac = obj.value;
-    if(ac=='cad'){
-        alert(abrirModal)
+    var id = obj.value;
+    console.log(id);
+    if(id==27){
+        // alert(abrirModal)
     }
 }
 function select_parcipante(obj){

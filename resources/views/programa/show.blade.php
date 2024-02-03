@@ -18,9 +18,9 @@
     $q = 1;
 @endphp
 @section('content')
-<div class="row">
+<div class="row mt-0 pt-0">
     <table class="w-100">
-        <thead class="">
+        <thead class="mt-0 pt-0">
             <tr>
                 <th>
                     <div class="col-12 text-center d-none d-print-block ">

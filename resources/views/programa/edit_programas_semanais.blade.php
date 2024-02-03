@@ -17,7 +17,7 @@
     $config['conf']['arr_desiganacao'] = isset($config['conf']['desiganations']['config']['tipos_designacao']) ? $config['conf']['desiganations']['config']['tipos_designacao'] : [];
     // dd($des2);
     // dd($config['conf']);
-
+    $sec = isset($config['conf']['sec']) ? $config['conf']['sec']: false;
 @endphp
 <table class="table">
     <thead>
@@ -78,7 +78,11 @@
                                                                                 $ordem = 0;
                                                                                 $name = 'des2['.$v1.'][partes][' . $k_sessao . '][' . $ordem . ']';
                                                                             @endphp
-                                                                            @include('programa.li_partes')
+                                                                            @if ($sec=='fim-semana')
+                                                                                @include('programa.li_partes_fim')
+                                                                            @else
+                                                                                @include('programa.li_partes_meio')
+                                                                            @endif
                                                                         @endif
                                                                     @endif
                                                                 </ul>

@@ -974,6 +974,14 @@ class Qlib
         $ret = false;
         $tm = $tm?$tm: '{dia} de {mes}, {ano}';
         if($formato=='Y-m-d'){
+            if(strlen($data>10)){
+                $dt = explode(" ",$data);
+                $d = isset($dt[0])?$dt[0]: false;
+                if(!$d){
+                    return $data;
+                }
+                $data = $d;
+            }
             $d = explode('-',$data);
             $meses = self::meses();
             if(isset($d[2])){
