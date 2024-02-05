@@ -852,7 +852,7 @@ class PostController extends Controller
                                 $dataSalv[$data][$k]['id_designacao'] = isset($ddta['id_designacao'])?$ddta['id_designacao']:0;
                                 $dataSalv[$data][$k]['id_designado'] = isset($ddta['id_designado'])?$ddta['id_designado']:0;
                                 $dataSalv[$data][$k]['id_ajudante'] = isset($ddta['id_ajudante'])?$ddta['id_ajudante']:0;
-                                $dataSalv[$data][$k]['orador_visitante'] = isset($ddta['orador_visitante'])?$ddta['orador_visitante']:0;
+                                $dataSalv[$data][$k]['orador_visitante'] = isset($ddta['orador_visitante'])?$ddta['orador_visitante']:false;
                                 $dataSalv[$data][$k]['post_type'] = isset($ddta['post_type'])?$ddta['post_type']:$post_type;
                                 $dataSalv[$data][$k]['data'] = $data;
                                 $dataSalv[$data][$k]['ordem'] = $ordem;

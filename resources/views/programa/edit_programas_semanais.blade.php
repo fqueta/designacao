@@ -230,9 +230,9 @@
                                                 </ul>
                                                 @endif
                                         </div>
-                                        <div class="card-footer text-muted">
+                                        {{-- <div class="card-footer text-muted">
                                             <button type="button" class="btn btn-outline-secondary" onclick="add_designation('{{$v1}}');"><i class="fas fa-plus"></i> {{__('Adicionar')}}</button>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
                                 <input type="hidden" name="prog[{{$v1}}]['data']" value="{{$v1}}">

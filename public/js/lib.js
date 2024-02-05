@@ -2232,6 +2232,7 @@ function add_designation2(data,sessao){
         // atr_li = atr_li.replaceAll('[0]', '['+id+']');
         var tok = uniqid();
         tem.setAttribute('id',atr_li);
+        tem.setAttribute('data-token',tok);
         tem.querySelectorAll('input[type="hidden"]').forEach(function(val) {
             val.value = '';
         });
@@ -2243,7 +2244,7 @@ function add_designation2(data,sessao){
         new_li = new_li.replaceAll('_0_', '_'+id+'_');
         document.getElementById(atr_li).innerHTML = new_li.replaceAll('[0]', '['+id+']');
         document.getElementById(atr_li).querySelector('[inp="token"]').value = tok;
-        // $('#'+atr_li+' .select2').select2();
+        document.getElementById(atr_li).querySelector('select').setAttribute('data-token',tok);
     }
 }
 function remove_designation(id){
@@ -2283,9 +2284,9 @@ function selec_desig(obj){
     console.log(id);
     if(id==27){
         // id da desiganação Orador
-        $('.d-orador-'+token).show();
+        $('[data-token="'+token+'"] .d-orador').show();
     }else{
-        $('.d-orador-'+token).hide();
+        $('[data-token="'+token+'"] .d-orador').hide();
     }
 }
 function select_parcipante(obj){
