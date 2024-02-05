@@ -3,7 +3,7 @@
         $name = 'des2['.$v1.'][partes][' . $k_sessao . '][' . $ordem . ']';
         $token = !empty($designacao['token']) ? $designacao['token'] : uniqid();
         $d_orador = 'none';
-        if($designacao['id_designacao']==27){
+        if(isset($designacao['id_designacao']) && $designacao['id_designacao']==27){
             //ou seja designacao = Orador
             $d_orador = 'block';
         }
