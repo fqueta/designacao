@@ -36,39 +36,55 @@
                         @foreach ($programa as $d_semana=>$semana)
                             @if(is_array($sessoes))
                                 @foreach ($sessoes as $k_sessao=>$sessao)
-                                    @php
-                                        $partes = isset($semana[$k_sessao])?$semana[$k_sessao]:false;
-                                        if($k_sessao=='inicio'){
-                                            $title = 'Semana: '. App\Qlib\Qlib::dataExtensso($d_semana);
-                                            $mbcard = '';
-                                        }else{
-                                            $title = $sessao['label'];
-                                            $mbcard = '';
-                                            if($k_sessao=='final'){
-                                                if($quadro>2){
-                                                    $quadro = 1;
+                                    @if ($routa=='fim-semana')
+                                        @if($k_sessao=='inicio')
+                                            @php
+                                                $partes = isset($semana[$k_sessao])?$semana[$k_sessao]:false;
+                                                if($k_sessao=='inicio'){
+                                                    $title = 'Dominigo: '. App\Qlib\Qlib::dataExtensso($d_semana);
+                                                    $mbcard = '';
                                                 }
-                                                if($quadro==2){
-                                                    if($q==2){
-                                                        $mbcard = 'style="margin-bottom:7vw"';
-                                                    }else{
-                                                        $mbcard = 'style="margin-bottom:25vw"';
-                                                    }
-                                                    // $title .= $quadro;
-                                                    $q++;
-                                                }
-                                                $quadro++;
-                                            }else{
+                                            @endphp
+                                            @if ($vista=='quadro')
+                                                {{-- visualização para o quando de anuncios --}}
+                                                @include('programa.quadro')
+                                            @endif
+                                        @endif
+                                    @else
+                                        @php
+                                            $partes = isset($semana[$k_sessao])?$semana[$k_sessao]:false;
+                                            if($k_sessao=='inicio'){
+                                                $title = 'Semana: '. App\Qlib\Qlib::dataExtensso($d_semana);
                                                 $mbcard = '';
+                                            }else{
+                                                $title = $sessao['label'];
+                                                $mbcard = '';
+                                                if($k_sessao=='final'){
+                                                    if($quadro>2){
+                                                        $quadro = 1;
+                                                    }
+                                                    if($quadro==2){
+                                                        if($q==2){
+                                                            $mbcard = 'style="margin-bottom:7vw"';
+                                                        }else{
+                                                            $mbcard = 'style="margin-bottom:25vw"';
+                                                        }
+                                                        // $title .= $quadro;
+                                                        $q++;
+                                                    }
+                                                    $quadro++;
+                                                }else{
+                                                    $mbcard = '';
+                                                }
                                             }
-                                        }
-                                    @endphp
-                                    @if ($vista=='quadro')
-                                        {{-- visualização para o quando de anuncios --}}
-                                        @include('programa.quadro')
-                                    @elseif ($vista=='estudante')
-                                        {{-- visualização da folha de estudante s89 --}}
-                                        @include('programa.estudante')
+                                        @endphp
+                                        @if ($vista=='quadro')
+                                            {{-- visualização para o quando de anuncios --}}
+                                            @include('programa.quadro')
+                                        @elseif ($vista=='estudante')
+                                            {{-- visualização da folha de estudante s89 --}}
+                                            @include('programa.estudante')
+                                        @endif
                                     @endif
                                 @endforeach
                             @endif

@@ -884,6 +884,18 @@ class Qlib
 
         return $dates;
     }
+    static function getSundays($y,$m){
+        $date = "$y-$m-01";
+        $first_day = date('N',strtotime($date));
+        $first_day = 7 - $first_day + 1;
+        $last_day =  date('t',strtotime($date));
+        $days = array();
+        for($i=$first_day; $i<=$last_day; $i=$i+7 ){
+            //$days[] = $i;  //this will give days of sundays
+            $days[] = "$y-".self::zerofill($m,2)."-".self::zerofill($i,2);  //dates of sundays
+        }
+        return  $days;
+    }
     public static function getAllDaysInAMonth($year, $month, $day = 'Monday', $daysError = 3) {
         $month = (int)$month;
         $dateString = 'first '.$day.' of '.$year.'-'.$month;
@@ -916,7 +928,6 @@ class Qlib
             }
             $i++;
         }
-
         return $ret;
     }
     public static function getNumberRange($inic,$fim,$r='impar'){
@@ -958,13 +969,18 @@ class Qlib
     static function arr_month2($s_year, $limt=2){
         $year_e = $s_year+$limt;
         $ret = [];
+        $local = request()->segment(1);
         foreach (range($s_year,$year_e) as $key => $value) {
             $meses = self::getNumberRange(1,12,'todos');
             $ml = [];
             if(is_array($meses)){
                 foreach ($meses as $km => $vm) {
                     $ml[$vm] = self::getAllDaysInAMonth($value,$vm);
-                    $ret[$value][$vm] = self::getAllDaysInAMonth($value,$vm);
+                    if($local=='fim-semana'){
+                        $ret[$value][$vm] = self::getSundays($value,$vm);
+                    }else{
+                        $ret[$value][$vm] = self::getAllDaysInAMonth($value,$vm);
+                    }
                 }
             }
         }

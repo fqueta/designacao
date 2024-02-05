@@ -2279,10 +2279,13 @@ function remove_designacao(id){
     });
 }
 function selec_desig(obj){
-    var id = obj.value;
+    var id = obj.value,token = obj.getAttribute('data-token');
     console.log(id);
     if(id==27){
-        // alert(abrirModal)
+        // id da desiganação Orador
+        $('.d-orador-'+token).show();
+    }else{
+        $('.d-orador-'+token).hide();
     }
 }
 function select_parcipante(obj){

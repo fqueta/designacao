@@ -4,25 +4,28 @@
     </div>
     <div class="card-body">
         @if (isset($_GET["tipoDesignacao"]) && is_object($_GET["tipoDesignacao"]))
+        {{-- {{dd()}} --}}
             <table class="table table-hover">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>{{__('Designação')}}</th>
                         <th>{{__('Ultima')}}</th>
                         <th>{{__('Sala')}}</th>
                         <th>{{__('Demora')}}</th>
                     </tr>
                 </thead>
-                @foreach ($_GET["tipoDesignacao"] as $k=>$v)
                 <tbody>
-                    <tr>
-                        <td>{{$v->nome}}</td>
-                        <td><input type="date" name="config[designacao][ultima_{{$v->id}}]" id="dat_ultima_{{$v->id}}"></td>
-                        <td>{{__('Sala')}}</td>
-                        <td>{{__('Demora')}}</td>
-                    </tr>
+                    @foreach ($_GET["tipoDesignacao"] as $k=>$v)
+                        <tr>
+                            <td><input type="checkbox" name="config[designacao][aceita][]" value="{{$v->id}}" id="aceita_{{$v->id}}"></td>
+                            <td>{{$v->nome}}</td>
+                            <td><input type="date" name="config[designacao][ultima_{{$v->id}}]" id="dat_ultima_{{$v->id}}"></td>
+                            <td>{{__('Sala')}}</td>
+                            <td>{{__('Demora')}}</td>
+                        </tr>
+                    @endforeach
                 </tbody>
-                @endforeach
             </table>
         @endif
     </div>

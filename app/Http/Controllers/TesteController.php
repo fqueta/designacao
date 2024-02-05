@@ -8,6 +8,7 @@ use App\Http\Controllers\admin\GetProgramController;
 use App\Models\Familia;
 use App\Models\User;
 use App\Qlib\Qlib;
+use DateTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -98,16 +99,18 @@ class TesteController extends Controller
         // Qlib::lib_print($ret);
         // $ret = (new designaController)->arr_historico(2,2,true);
         // $ret = (new designaController)->list_participants(2,2);
-        $ret = (new designaController)->arr_historico([
-            'id_designacao'=>2,
-            'id_designado'=>95,
-            'ultima'=>true,
-            'type'=>'id_designado',
-            'post_type'=>'meio-semana',
-            'limit'=>4,
-            'operador'=>'!=',
-        ]);
-        return $ret;
+        // $ret = (new designaController)->arr_historico([
+        //     'id_designacao'=>2,
+        //     'id_designado'=>95,
+        //     'ultima'=>true,
+        //     'type'=>'id_designado',
+        //     'post_type'=>'meio-semana',
+        //     'limit'=>4,
+        //     'operador'=>'!=',
+        // ]);
+        $days = Qlib::getSundays(2024,02);
+        dd($days);
+        // return $ret;
     }
     public function getNumberRange($inic,$fim,$r='impar'){
         $ret = array();

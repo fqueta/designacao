@@ -520,7 +520,6 @@ class PostController extends Controller
                 'listFiles'=>$listFiles,
                 'campos'=>$campos,
                 'routa'=>$this->routa,
-                'routa'=>$this->routa,
                 'exec'=>true,
             ];
             $json_sessoes = Qlib::qoption('sessoes_designacao');
@@ -628,7 +627,6 @@ class PostController extends Controller
                     $dt = explode('-', $dados[0]['post_date_gmt']);
                     $mes1 = (int)$dt[1];
                     $mes2 = (int)$dt[1]+1;
-
                     $ddo[$mes1] = $fd[$dt[0]][$mes1];
                     // $ddo[$mes2] = $fd[$dt[0]][$mes2];
                     $datai = $ddo[$mes1][0];

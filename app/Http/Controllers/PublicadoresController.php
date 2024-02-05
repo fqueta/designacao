@@ -9,6 +9,7 @@ use App\Qlib\Qlib;
 use App\Models\User;
 use App\Models\grupo;
 use App\Models\Publicador;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -327,10 +328,6 @@ class PublicadoresController extends Controller
                 'tam'=>'10',
                 'cp_busca'=>'tags]['
             ],
-            //'sep1'=>['label'=>'Contato de Emergência','active'=>false,'tam'=>'12','script'=>'<h5>Contato de Emergência</h5>','type'=>'html_script','class_div'=>'bg-secondary'],
-            //'config[nome_contato_em]'=>['label'=>'Nome','active'=>false,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'10','placeholder'=>'','cp_busca'=>'config][nome_contato_em'],
-            //'config[telefone_contato_em]'=>['label'=>'Telefone','active'=>false,'type'=>'tel','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','tam'=>'2','placeholder'=>'','cp_busca'=>'config][telefone_contato_em'],
-
             'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'config[designacao]'=>['label'=>'Designação','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'publicadores.config_designacao','script_show'=>'publicadores.show_config_designacao'],
@@ -458,8 +455,18 @@ class PublicadoresController extends Controller
         $get = $config ?$config: ['filter'=>['pai'=>1],'campo_order'=>'ordem','order'=>'ASC'];
         $ret = false;
         if($get){
-            $ret = (new TagsController($this->user))->queryTag($get);
+            // $ret = (new TagsController($this->user))->queryTag($get);
+            $ret = Tag::where('excluido','=','n')
+            ->where('deletado','=','n')
+            ->where('config','LIKE','%"post_type":"meio-semana"%')
+            ->where('config','LIKE','%"t_p":"estudante"%')
+            ->orderBy('ordem','ASC')
+            ->get();
+            // if($ret->count()){
+            //     $ret = $ret->toArray();
+            // }
         }
+
         return $ret;
     }
     public function edit($publicador,User $user)
@@ -490,8 +497,8 @@ class PublicadoresController extends Controller
                 'id'=>$id,
                 'dados'=>$tipoDesignacao,
             ];
-            if(isset($tipoDesignacao['tag'])){
-                $_GET["tipoDesignacao"] = $tipoDesignacao['tag'];
+            if(isset($tipoDesignacao)){
+                $_GET["tipoDesignacao"] = $tipoDesignacao;
             }
             $ret = [
                 'value'=>$dados[0],

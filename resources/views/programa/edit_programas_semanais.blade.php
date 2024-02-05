@@ -30,8 +30,6 @@
         </tr>
     </thead>
     <body>
-        {{-- <form id="frm-config" method="post"> --}}
-
             @foreach ($sem as $k=>$v)
                 @if (is_array($v))
                     @foreach ($v as $k1=>$v1)
@@ -62,36 +60,71 @@
                                                 @endphp
                                                 @if(is_array($sessoes))
                                                     @foreach ($sessoes as $k_sessao=>$sessao)
-                                                        <div class="card card-sessao-{{$k_sessao}}">
-                                                            <div class="card-header {{@$sessao['color']}}">
-                                                                {{@$sessao['label']}}
-                                                            </div>
-                                                            <div class="card-body">
-                                                                <ul class="list-group sortable">
-                                                                    {{-- @if(is_array($prg)) --}}
-                                                                    @if(isset($prg[$k_sessao]) && is_array($prg[$k_sessao]))
-                                                                    {{-- {{dd($prg)}} --}}
-                                                                        @include('programa.list_edit_desiganacao')
-                                                                    @else
-                                                                        @if($k_sessao=='inicio')
-                                                                            @php
-                                                                                $ordem = 0;
-                                                                                $name = 'des2['.$v1.'][partes][' . $k_sessao . '][' . $ordem . ']';
-                                                                            @endphp
-                                                                            @if ($sec=='fim-semana')
-                                                                                @include('programa.li_partes_fim')
-                                                                            @else
-                                                                                @include('programa.li_partes_meio')
+                                                        @if ($sec=='fim-semana')
+                                                            @if($k_sessao=='inicio')
+                                                            <div class="card card-sessao-{{$k_sessao}}">
+                                                                <div class="card-header {{@$sessao['color']}}">
+                                                                    {{@$sessao['label']}}
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <ul class="list-group sortable">
+                                                                        {{-- @if(is_array($prg)) --}}
+                                                                        @if(isset($prg[$k_sessao]) && is_array($prg[$k_sessao]))
+                                                                        {{-- {{dd($prg)}} --}}
+                                                                            @include('programa.list_edit_desiganacao')
+                                                                        @else
+                                                                            @if($k_sessao=='inicio')
+                                                                                @php
+                                                                                    $ordem = 0;
+                                                                                    $name = 'des2['.$v1.'][partes][' . $k_sessao . '][' . $ordem . ']';
+                                                                                @endphp
+                                                                                @if ($sec=='fim-semana')
+                                                                                    @include('programa.li_partes_fim')
+                                                                                @else
+                                                                                    @include('programa.li_partes_meio')
+                                                                                @endif
                                                                             @endif
                                                                         @endif
-                                                                    @endif
-                                                                </ul>
+                                                                    </ul>
 
+                                                                </div>
+                                                                <div class="card-footer text-muted">
+                                                                    <button type="button" class="btn btn-outline-secondary" onclick="add_designation2('{{$v1}}','{{$k_sessao}}');"><i class="fas fa-plus"></i> {{__('Adicionar')}}</button>
+                                                                </div>
                                                             </div>
-                                                            <div class="card-footer text-muted">
-                                                                <button type="button" class="btn btn-outline-secondary" onclick="add_designation2('{{$v1}}','{{$k_sessao}}');"><i class="fas fa-plus"></i> {{__('Adicionar')}}</button>
+                                                            @endif
+                                                        @else
+                                                            <div class="card card-sessao-{{$k_sessao}}">
+                                                                <div class="card-header {{@$sessao['color']}}">
+                                                                    {{@$sessao['label']}}
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <ul class="list-group sortable">
+                                                                        {{-- @if(is_array($prg)) --}}
+                                                                        @if(isset($prg[$k_sessao]) && is_array($prg[$k_sessao]))
+                                                                        {{-- {{dd($prg)}} --}}
+                                                                            @include('programa.list_edit_desiganacao')
+                                                                        @else
+                                                                            @if($k_sessao=='inicio')
+                                                                                @php
+                                                                                    $ordem = 0;
+                                                                                    $name = 'des2['.$v1.'][partes][' . $k_sessao . '][' . $ordem . ']';
+                                                                                @endphp
+                                                                                @if ($sec=='fim-semana')
+                                                                                    @include('programa.li_partes_fim')
+                                                                                @else
+                                                                                    @include('programa.li_partes_meio')
+                                                                                @endif
+                                                                            @endif
+                                                                        @endif
+                                                                    </ul>
+
+                                                                </div>
+                                                                <div class="card-footer text-muted">
+                                                                    <button type="button" class="btn btn-outline-secondary" onclick="add_designation2('{{$v1}}','{{$k_sessao}}');"><i class="fas fa-plus"></i> {{__('Adicionar')}}</button>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        @endif
                                                     @endforeach
                                                 @endif
                                                 {{-- {{dd($prg)}} --}}
