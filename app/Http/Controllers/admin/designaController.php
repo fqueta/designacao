@@ -396,4 +396,12 @@ class designaController extends Controller
         //trazer arry das partes
         return response()->json($ret);
     }
+    /**
+     * Metodo para cadastrar designações automaticas.
+     */
+    public function add_designacao($data) {
+        $arr_partes = [
+            ['numero'=>0,'data'=>$data,'token'=>uniqid(),'id_designacao'=>2,'sessao'=>'inicio','post_type'=>'meio-semana'], //presidencia
+        ];
+    }
 }

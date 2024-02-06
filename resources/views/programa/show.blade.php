@@ -18,7 +18,7 @@
     $q = 1;
 @endphp
 @section('content')
-<div class="row mt-0 pt-0">
+<div class="row mt-0 pt-0 table-responsive">
     <table class="w-100">
         <thead class="mt-0 pt-0">
             <tr>
