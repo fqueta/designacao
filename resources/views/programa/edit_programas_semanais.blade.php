@@ -42,7 +42,7 @@
                                     <div class="card card-secondary card-outline">
                                         <div class="card-header">
                                             <h3 class="card-title">
-                                                {{App\Qlib\Qlib::dataExtensso($v1)}} {!!App\Qlib\Qlib::link_programacao_woljw($v1,'<div class=""><a class="underline" href="{link}" target="_BLANK">Acesso à Progração no Jw.ORG</a></div>')!!}
+                                                {{App\Qlib\Qlib::dataExtensso($v1)}} {!!App\Qlib\Qlib::link_programacao_woljw($v1,'<div class=""><a class="underline" href="{link}" target="_BLANK">Acesso à Programação no Jw.ORG</a></div>')!!}
                                             </h3>
                                             <div class="card-tools d-print-none">
                                                 <label for="assembleia_{{$k1}}">
