@@ -108,9 +108,10 @@ class TesteController extends Controller
         //     'limit'=>4,
         //     'operador'=>'!=',
         // ]);
-        $days = Qlib::getSundays(2024,02);
-        dd($days);
-        // return $ret;
+        // $ret = Qlib::getSundays(2024,02);
+        $ret = Qlib::link_programacao_woljw('2024-01-01','<a href="{link}">Apostila</a>');
+        // dd($ret);
+        return $ret;
     }
     public function getNumberRange($inic,$fim,$r='impar'){
         $ret = array();

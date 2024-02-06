@@ -1024,4 +1024,44 @@ class Qlib
         }
         return $result;
     }
+    /**
+     * Metodo para retornar numero da semana de uma data aleatora
+     * @parmat data $data formato Y-m-d
+     * @return string $ret
+     */
+    static function numero_semana($data){
+        $dataActual = $data;
+        $dataSegundos = strtotime($dataActual);
+
+        $semana = date('W', $dataSegundos);
+        if($semana){
+            return (int)$semana;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * Metodo para retornar um link do programa da semana no wol.jw.org
+     * @parmat data $data formato Y-m-d, string $html ex.: <a href="{link}">Apostila</a>
+     * @return string $ret
+     */
+    static function link_programacao_woljw($data,$html=false){
+        $d = explode("-",$data);
+        $ret = '';
+        if(isset($d[0]) && strlen($d[0])==4){
+            $ano = $d[0];
+            $tl = 'https://wol.jw.org/pt/wol/meetings/r5/lp-t/{ano}/{semana}';
+            $semana = self::numero_semana($data);
+            if(!$semana){
+                return $ret;
+            }
+            $ret = str_replace('{ano}',$ano,$tl);
+            $ret = str_replace('{semana}',$semana,$ret);
+            if($html){
+                $ret = str_replace('{link}',$ret,$html);
+            }
+        }
+        return $ret;
+    }
 }
