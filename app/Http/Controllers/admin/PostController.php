@@ -837,13 +837,21 @@ class PostController extends Controller
         // dd($config);
         if(is_array($config)){
             $post_type = request()->segment(1);
+            $post_id = request()->segment(2);
             $ordem = 0;
             foreach ($config as $data => $de) {
                 if(is_array($de)){
+                    if(isset($de['visita']) && !empty($post_id)){
+                        $ret['sa_visita'] = Qlib::update_postmeta($post_id,'visita',$data);
+                        // dd($de['visita'],$data,$post_id);
+                    }
+                    if(isset($de['assembleia']) && !empty($post_id)){
+                        $ret['sa_assembleia'] = Qlib::update_postmeta($post_id,'assembleia',$data);
+                        // dd($de['visita'],$data,$post_id);
+                    }
                     foreach ($de['partes'] as $k => $ddta0) {
                         if(is_array($ddta0)){
                             foreach ($ddta0 as $k1 => $ddta) {
-                                // dd($ddta);
                                 $dataSalv[$data][$k]['numero'] = $ddta['numero'];
                                 $dataSalv[$data][$k]['token'] = $ddta['token'];
                                 if(empty($dataSalv[$data][$k]['numero'])){

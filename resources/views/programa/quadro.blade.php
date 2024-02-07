@@ -2,7 +2,7 @@
     <div class="card mb-1">
         <div class="card-header {{$sessao['color']}}">
             {{-- Semana: 04-10 de Setembro --}}
-            {{$title}}
+            {!!$title!!}
         </div>
         <div class="card-body pt-0 pb-0 mb-0">
             <div class="row ml-0">

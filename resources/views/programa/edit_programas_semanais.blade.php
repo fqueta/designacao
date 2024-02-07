@@ -1,5 +1,6 @@
 @if (isset($config['conf']['semanas']) && ($sem=$config['conf']['semanas']))
 @php
+    $post_id = request()->segment(2);
     $designacoes = isset($config['conf']['co']['des']) ? $config['conf']['co']['des'] : false;
     if(!$designacoes)
     $designacoes = isset($config['conf']['designacoes']['dds']) ? $config['conf']['designacoes']['dds'] : false;
@@ -49,12 +50,22 @@
                                                 @endif
                                                 {{App\Qlib\Qlib::dataExtensso($v1)}} {!!App\Qlib\Qlib::link_programacao_woljw($v1,'<div class=""><a class="underline" href="{link}" target="_BLANK">Acesso à Programação no Jw.ORG</a></div>')!!}
                                             </h3>
+                                            @php
+                                                $checked_ass = false;
+                                                $checked_visita = false;
+                                                if(App\Qlib\Qlib::tem_assembleia($post_id,$v1)){
+                                                    $checked_ass = 'checked';
+                                                }
+                                                if(App\Qlib\Qlib::tem_visita($post_id,$v1)){
+                                                    $checked_visita = 'checked';
+                                                }
+                                            @endphp
                                             <div class="card-tools d-print-none">
                                                 <label for="assembleia_{{$k1}}">
-                                                    <input type="checkbox" name="config[des][{{$v1}}][assembleia]" id="assembleia_{{$k1}}"> {{__('Assembléia')}}
+                                                    <input {{$checked_ass}} type="checkbox" name="des2[{{$v1}}][assembleia]" id="assembleia_{{$k1}}"> {{__('Assembléia')}}
                                                 </label>
                                                 <label for="visita_{{$k1}}">
-                                                    <input type="checkbox" name="config[des][{{$v1}}][visita]" id="visita_{{$k1}}"> {{__('Visita')}}
+                                                    <input {{$checked_visita}} type="checkbox" name="des2[{{$v1}}][visita]" id="visita_{{$k1}}"> {{__('Visita')}}
                                                 </label>
                                             </div>
                                         </div>

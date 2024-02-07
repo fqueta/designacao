@@ -7,6 +7,7 @@
 @stop
 @php
     $vista = isset($_GET['v'])?$_GET['v']:'quadro';
+    $post_id = request()->segment(2);
     $d = isset($designations) ? $designations : false;
     $sessoes = isset($designations['config']['sessoes']) ? $designations['config']['sessoes'] : false;
     $tipos = isset($designations['config']['tipos_designacao']) ? $designations['config']['tipos_designacao'] : false;
@@ -24,7 +25,15 @@
             <tr>
                 <th>
                     <div class="col-12 text-center d-none d-print-block ">
-                        <h3> {{__('Programação da Reunião de meio de semana')}} </h3>
+                        @php
+                            $post_type = request()->segment(1);
+                            if($post_type == 'fim-semana'){
+                                $tit = 'fim';
+                            }else{
+                                $tit = 'meio';
+                            }
+                        @endphp
+                        <h3> {{__('Programação da Reunião de '.$tit.' de semana')}} </h3>
                     </div>
                 </th>
             </tr>
@@ -55,6 +64,14 @@
                                             $partes = isset($semana[$k_sessao])?$semana[$k_sessao]:false;
                                             if($k_sessao=='inicio'){
                                                 $title = 'Semana: '. App\Qlib\Qlib::dataExtensso($d_semana);
+                                                $checked_ass = false;
+                                                $checked_visita = false;
+                                                if(App\Qlib\Qlib::tem_assembleia($post_id,$d_semana)){
+                                                    $title .= ' <div class="card-tools mr-1">Assembleia</div>';
+                                                }
+                                                if(App\Qlib\Qlib::tem_visita($post_id,$d_semana)){
+                                                    $title .= ' <div class="card-tools mr-1">Visita</div>';
+                                                }
                                                 $mbcard = '';
                                             }else{
                                                 $title = $sessao['label'];

@@ -34,6 +34,11 @@ class Qlib
             return false;
         }
     }
+    static function dataBanco(){
+        global $dtBanco;
+        $dtBanco = date('Y-m-d H:i:s', time());
+        return $dtBanco;
+    }
     static public function qoption($valor = false, $type = false){
         //type é o tipo de respsta
 		$ret = false;
@@ -554,6 +559,20 @@ class Qlib
         }
         return $ret;
     }
+    static public function buscaValorDb0($tab,$campo_bus,$valor,$select,$compleSql=false,$debug=false)
+    {
+        $ret = false;
+        if($tab && $campo_bus && $valor && $select){
+            $sql = "SELECT $select FROM $tab WHERE $campo_bus='$valor' $compleSql";
+            if(isset($debug)&&$debug){
+                echo $sql;
+            }
+            $d = DB::select($sql);
+            if($d)
+                $ret = $d[0]->$select;
+        }
+        return $ret;
+    }
     static public function valorTabDb($tab = false,$campo_bus,$valor,$select,$compleSql=false)
     {
 
@@ -1063,5 +1082,96 @@ class Qlib
             }
         }
         return $ret;
+    }
+    /**
+     * Metodo para salvar ou atualizar os meta posts
+     */
+    static function update_postmeta($post_id,$meta_key=null,$meta_value=null)
+    {
+        $ret = false;
+        $tab = 'postmeta';
+        if($post_id&&$meta_key&&$meta_value){
+            $verf = Qlib::totalReg($tab,"WHERE post_id='$post_id' AND meta_key='$meta_key'");
+            if($verf){
+                $ret=DB::table($tab)->where('post_id',$post_id)->where('meta_key',$meta_key)->update([
+                    'meta_value'=>$meta_value,
+                    'updated_at'=>self::dataBanco(),
+                ]);
+            }else{
+                $ret=DB::table($tab)->insert([
+                    'post_id'=>$post_id,
+                    'meta_value'=>$meta_value,
+                    'meta_key'=>$meta_key,
+                    'created_at'=>self::dataBanco(),
+                ]);
+            }
+            //$ret = DB::table($tab)->storeOrUpdate();
+        }
+        return $ret;
+    }
+    /**
+     * Metodo para pegar os meta posts
+     */
+    static function get_postmeta($post_id,$meta_key=null,$string=null)
+    {
+        $ret = false;
+        $tab = 'postmeta';
+        if($post_id){
+            if($meta_key){
+                $d = DB::table($tab)->where('post_id',$post_id)->where('meta_key',$meta_key)->get();
+                if($d->count()){
+                    if($string){
+                        $ret = $d[0]->meta_value;
+                    }else{
+                        $ret = [$d[0]->meta_value];
+                    }
+                }else{
+                    $post_id = self::get_id_by_token($post_id);
+                    if($post_id){
+                        $ret = self::get_postmeta($post_id,$meta_key,$string);
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+    /**
+     * Metodo buscar o post_id com o token
+     * @param string $token
+     * @return string $ret;
+     */
+    static function get_id_by_token($token)
+    {
+        if($token){
+            return Qlib::buscaValorDb0('posts','token',$token,'ID');
+        }
+    }
+    /**
+     * Metodo para verificar se uma programção tem assemblei
+     * @param int $post_id id do programa $data da semana
+     * @return boolean true if successful
+     */
+    static function tem_assembleia($post_id,$data){
+        $res = self::get_postmeta($post_id,'assembleia',true);
+        if($res){
+            if(strtotime($res) == strtotime($data)){
+                return $res;
+            }
+        }
+        return false;
+    }
+    /**
+     * Metodo para verificar se uma programção tem visita
+     * @param int $post_id id do programa $data da semana
+     * @return boolean true if successful
+     */
+    static function tem_visita($post_id,$data){
+        $res = self::get_postmeta($post_id,'visita',true);
+        if($res){
+            if(strtotime($res) == strtotime($data)){
+                return $res;
+            }
+        }
+        return false;
     }
 }
