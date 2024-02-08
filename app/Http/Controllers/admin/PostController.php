@@ -467,7 +467,16 @@ class PostController extends Controller
         $dados = Post::findOrFail($id);
         $this->authorize('ler', $this->routa);
         if(!empty($dados)){
-            $title = 'Programação da Reunião Vida e Ministério';
+            $sec = $this->sec;
+            if($sec == 'fim-semana'){
+                $title = 'Programação da Reunião de fim de semana';
+            }else{
+                if(isset($_GET['v'])=='estudante'){
+                    $title = 'Folha de estudantes da Reunião Vida e Ministério';
+                }else{
+                    $title = 'Programação da Reunião Vida e Ministério';
+                }
+            }
             $titulo = $title;
             //dd($dados);
             $dados['ac'] = 'alt';

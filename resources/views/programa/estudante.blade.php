@@ -1,5 +1,6 @@
     @if($k_sessao=='tesouros' || $k_sessao=='ministerio')
         @if (is_array($partes))
+        <div class="row">
             @foreach ($partes as $k_parte=>$parte)
                 @if (isset($parte['id_designado']) && $parte['id_designado']>0)
                     <div class="col-6 pr-2 pl-2">
@@ -100,6 +101,7 @@
                     </div>
                 @endif
             @endforeach
+        </div>
         @endif
     @endif
     {{-- @if ($k_sessao=='ministerio')
