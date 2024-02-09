@@ -13,7 +13,8 @@
     $tipos = isset($designations['config']['tipos_designacao']) ? $designations['config']['tipos_designacao'] : false;
     $participantes = isset($designations['config']['participantes']) ? $designations['config']['participantes'] : false;
     $programa = isset($designations['programa']) ? $designations['programa'] : false;
-    // dd($d);
+    $mbs1 = isset($config['mbs1']) ? $config['mbs1'] : 0;
+    $mbs2 = isset($config['mbs2']) ? $config['mbs2'] : 0;
     $quadro = 1;
     $mbcard = '';
     $q = 1;
@@ -82,9 +83,9 @@
                                                     }
                                                     if($quadro==2){
                                                         if($q==2){
-                                                            $mbcard = 'style="margin-bottom:7vw"';
+                                                            $mbcard = 'style="margin-bottom:'.$mbs1.'vw" data-id="mbs1"';
                                                         }else{
-                                                            $mbcard = 'style="margin-bottom:25vw"';
+                                                            $mbcard = 'style="margin-bottom:'.$mbs2.'vw" data-id="mbs2"';
                                                         }
                                                         // $title .= $quadro;
                                                         $q++;

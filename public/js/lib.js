@@ -2432,3 +2432,7 @@ function select_m_paraticipante(obj,campo,id_m){
     // console.log(nome_designado,sel_id,sel_nome,id_m);
 }
 // Waldir Bertges [name="des2[2024-02-05][partes][inicio][0][id_designacao]"] [data-campo="des2[2024-02-05][partes][inicio][0][id_designacao]"]
+function change_margin_b(obj,id){
+    let val = obj.value;
+    $('[data-id="'+id+'"]').css('margin-bottom',val+'vw');
+}

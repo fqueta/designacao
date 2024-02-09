@@ -120,3 +120,18 @@
         </div>
     </div>
 </div>
+@if ($mbcard)
+    @php
+        if($q==2){
+            $id_mb = 'mbs2';
+            $mb = $mbs2;
+        }else{
+            $id_mb = 'mbs1';
+            $mb = $mbs1;
+        }
+    @endphp
+    <div class="row d-flex justify-content-center d-print-none mb-4 pb-3">
+        <label for="">Margin</label>: <input type="number" class="text-center" value="{{$mb}}" onchange="change_margin_b(this,'{{$id_mb}}')" name="" id="{{$id_mb}}">
+        {{-- <button type="button" class="btn btn-secondary" onclick="change_margin_b(this)"> <i class="fas fa-check"></i>  </button> --}}
+    </div>
+@endif
