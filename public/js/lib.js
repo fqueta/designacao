@@ -2321,7 +2321,7 @@ function select_parcipante(obj){
         }
     },function(res){
         $('#preload').fadeOut("fast");
-        var tm1 = '<table id="table-{id_m}" class="table table-hover table-des"><thead><tr><th>#</th><th>Nome</th><th>Ultima desta</th><th>Ultima de outra</th></tr></thead><tbody>{tr}<tbody></table>';
+        var tm1 = '<div class="table-responsive"><table id="table-{id_m}" class="table table-hover table-des"><thead><tr><th>#</th><th>Nome</th><th>Ultima desta</th><th>Ultima de outra</th></tr></thead><tbody>{tr}<tbody></table></div>';
         var tm2 = '<tr>'+
                         '<td>{radio}</td>'+
                         '<td>{nome}</td>'+
