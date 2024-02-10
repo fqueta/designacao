@@ -19,7 +19,7 @@
                             @foreach ($partes as $k_parte=>$parte )
                                 @php
                                     $nomeParticipante = strtoupper(@$participantes[$parte['id_designado']]);
-                                    $col = 6;
+                                    $col = 12;
                                     $tema = false;
                                     if($tipos[$parte['id_designacao']]=='Orador'){
                                         $col = 6;
