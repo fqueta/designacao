@@ -4,8 +4,8 @@
        $vpint = 'd-none d-print-none';
     }
 @endphp
-<div class="col-12 {{$vpint}}" {!!$mbcard!!}>
-    <div class="card mb-1">
+<div class="col-12" {!!$mbcard!!}>
+    <div class="card mb-1 {{$vpint}}">
         <div class="card-header {{$sessao['color']}}">
             {{-- Semana: 04-10 de Setembro --}}
             {!!$title!!}
