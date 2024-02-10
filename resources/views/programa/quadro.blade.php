@@ -3,8 +3,14 @@
     if($assembleia && $k_sessao!='inicio'){
        $vpint = 'd-none d-print-none';
     }
+    if ($routa=='fim-semana'){
+        $mb='mb-3';
+    }else{
+        $mb='';
+    }
+
 @endphp
-<div class="col-12" {!!$mbcard!!}>
+<div class="col-12 {{$mb}}" {!!$mbcard!!}>
     <div class="card mb-1 {{$vpint}}">
         <div class="card-header {{$sessao['color']}}">
             {{-- Semana: 04-10 de Setembro --}}
@@ -23,7 +29,7 @@
                                     $tema = false;
                                     if($tipos[$parte['id_designacao']]=='Orador'){
                                         $col = 6;
-                                        $tema = '<div class="col-6"><b style="">Tema: </b><span>'.$parte['obs'].'</span></div>';
+                                        $tema = '<div class="col-6 pb-1"><b style="">Tema: </b><span>'.$parte['obs'].'</span></div>';
                                         if(!empty($parte['orador_visitante'])){
                                             $nomeParticipante = strtoupper($parte['orador_visitante']);
                                         }
