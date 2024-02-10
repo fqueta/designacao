@@ -1135,6 +1135,10 @@ class Qlib
         }
         return $ret;
     }
+    static function remove_postmeta($post_id,$meta_key){
+        $tab = 'postmeta';
+        return DB::table($tab)->where('post_id',$post_id)->where('meta_key',$meta_key)->delete();
+    }
     /**
      * Metodo buscar o post_id com o token
      * @param string $token

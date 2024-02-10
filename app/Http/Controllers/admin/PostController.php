@@ -855,10 +855,17 @@ class PostController extends Controller
                     if(isset($de['visita']) && !empty($post_id)){
                         $ret['sa_visita'] = Qlib::update_postmeta($post_id,'visita',$data);
                         // dd($de['visita'],$data,$post_id);
+                    }else{
+                        if(Qlib::get_postmeta($post_id,'visita',true)==$data){
+                            $ret['sa_visita'] = Qlib::remove_postmeta($post_id,'visita');
+                        }
                     }
                     if(isset($de['assembleia']) && !empty($post_id)){
                         $ret['sa_assembleia'] = Qlib::update_postmeta($post_id,'assembleia',$data);
-                        // dd($de['visita'],$data,$post_id);
+                    }else{
+                        if(Qlib::get_postmeta($post_id,'assembleia',true)==$data){
+                            $ret['sa_assembleia'] = Qlib::remove_postmeta($post_id,'assembleia');
+                        }
                     }
                     foreach ($de['partes'] as $k => $ddta0) {
                         if(is_array($ddta0)){

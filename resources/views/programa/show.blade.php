@@ -45,6 +45,9 @@
                     @if(is_array($programa))
                         @foreach ($programa as $d_semana=>$semana)
                             @if(is_array($sessoes))
+                                @php
+                                    $assembleia = false;
+                                @endphp
                                 @foreach ($sessoes as $k_sessao=>$sessao)
                                     @if ($routa=='fim-semana')
                                         @if($k_sessao=='inicio')
@@ -69,6 +72,7 @@
                                                 $checked_visita = false;
                                                 if(App\Qlib\Qlib::tem_assembleia($post_id,$d_semana)){
                                                     $title .= ' <div class="card-tools mr-1">Assembleia</div>';
+                                                    $assembleia = true;
                                                 }
                                                 if(App\Qlib\Qlib::tem_visita($post_id,$d_semana)){
                                                     $title .= ' <div class="card-tools mr-1">Visita</div>';
