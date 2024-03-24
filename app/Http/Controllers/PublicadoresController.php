@@ -236,7 +236,7 @@ class PublicadoresController extends Controller
         $ret['campos'] = $campos;
         return $ret;
     }
-    public function campos(){
+    public function campos($dados=false,$tipoDesigancao=false){
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2'],
@@ -330,7 +330,7 @@ class PublicadoresController extends Controller
             ],
             'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'config[designacao]'=>['label'=>'Designação','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'publicadores.config_designacao','script_show'=>'publicadores.show_config_designacao'],
+            'config[designacao]'=>['label'=>'Designação','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'publicadores.config_designacao','dados'=>['value'=>@$dados['config'],'tipoDesigancao'=>$tipoDesigancao],'script_show'=>'publicadores.show_config_designacao'],
 
         ];
     }
@@ -484,12 +484,12 @@ class PublicadoresController extends Controller
                 $dados[0]['config'] = Qlib::lib_json_array($dados[0]['config']);
             }
             $listFiles = false;
-            $campos = $this->campos();
+            $tipoDesignacao = $this->tipoDesignacao();
+            $campos = $this->campos($dados[0],$tipoDesignacao);
             /*
             if(isset($dados[0]['token'])){
                 $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
             }*/
-            $tipoDesignacao = $this->tipoDesignacao();
             $config = [
                 'ac'=>'alt',
                 'frm_id'=>'frm-publicadores',

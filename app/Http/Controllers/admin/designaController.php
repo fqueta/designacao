@@ -334,13 +334,16 @@ class designaController extends Controller
                     ->where('desassociado','=','n')
                     ->where('genero','=','m')
                     ->where('ativo','=','s')
+                    ->where('config','LIKE','%"'.$id_designacao.'"%')
                     ->orderBy('data_ultima','asc')
                     ->get();
                 }else{
                     $d = Publicador::where('inativo','=','n')
                     ->where('desassociado','=','n')
                     // ->where('genero','=','m')
+                    ->where('config','LIKE','%"'.$id_designacao.'"%')
                     ->where('ativo','=','s')
+                    ->orderBy('data_ultima','asc')
                     ->get();
 
                 }

@@ -203,6 +203,13 @@ class tagSeeder extends Seeder
                 'obs'=>'',
                 'config'=>['color'=>'info','post_type'=>'fim-semana','icon'=>'fa fa-times','t_p'=>'instrucao','local'=>'incio']
             ],
+            [
+                'nome'=>'Ajudante',
+                'pai'=>1,
+                'ordem'=>15,
+                'obs'=>'',
+                'config'=>['color'=>'warning','post_type'=>'meio-semana','icon'=>'fa fa-times','t_p'=>'estudante','genero'=>['m','f']]
+            ],
         ];
 
         foreach ($arr as $key => $value) {
