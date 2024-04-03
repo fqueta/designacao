@@ -321,6 +321,10 @@ class designaController extends Controller
 
                 }
             }else{
+                if($tipo=='id_ajudante'){
+                    //id da desiganção de ajudante
+                    $id_designacao = 28;
+                }
                 //Somento varao ancião e servos
                 $d = Publicador::where('inativo','=','n')
                 ->where('desassociado','=','n')
@@ -341,10 +345,11 @@ class designaController extends Controller
                     $d = Publicador::where('inativo','=','n')
                     ->where('desassociado','=','n')
                     // ->where('genero','=','m')
-                    ->where('config','LIKE','%"'.$id_designacao.'"%')
+                    ->where('config','LIKE','%"'.$id_designacao.'"%')  //desiganções que podem fazer
                     ->where('ativo','=','s')
                     ->orderBy('data_ultima','asc')
                     ->get();
+                    // dd($d->toArray());
 
                 }
                 if($d->count() > 0){

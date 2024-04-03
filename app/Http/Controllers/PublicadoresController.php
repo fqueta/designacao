@@ -450,7 +450,7 @@ class PublicadoresController extends Controller
         //
     }
 
-    public function tipoDesignacao($config=false)
+    public function tipoDesignacao($publicador=null,$config=false)
     {
         $get = $config ?$config: ['filter'=>['pai'=>1],'campo_order'=>'ordem','order'=>'ASC'];
         $ret = false;
@@ -459,9 +459,45 @@ class PublicadoresController extends Controller
             $ret = Tag::where('excluido','=','n')
             ->where('deletado','=','n')
             ->where('config','LIKE','%"post_type":"meio-semana"%')
-            ->where('config','LIKE','%"t_p":"estudante"%')
-            ->orderBy('ordem','ASC')
-            ->get();
+            ->orderBy('ordem','ASC');
+            if($publicador){
+                $pub = Publicador::Find($publicador);
+                if($pub->count() > 0){
+                    $pub = $pub->toArray();
+                    if($pub['genero']=='m' && $pub['fun']=='anc'){
+                        //se for anciao
+                    }elseif($pub['genero']=='m' && $pub['fun']=='sm'){
+                        //se for servo ministerial
+                    }elseif($pub['genero']=='m'){
+                        //se for varão batizado
+                        $ret = $ret
+                        ->where('id','!=','2')
+                        ->where('id','!=','4')
+                        ->where('id','!=','5')
+                        ->where('id','!=','8');
+
+                    }elseif($pub['genero']=='f'){
+                        //é irmã so pode partes de estudantes
+                        //Id 6 é da leitura da biblia
+                        $ret = $ret
+                        ->where('id','!=','6')
+                        ->where('id','!=','7')
+                        ->where('id','!=','8')
+                        ->where('id','!=','13')
+                        ->where('config','LIKE','%"t_p":"estudante"%');
+                    }
+                }
+                $ret = $ret->get();
+            }else{
+                // $ret = Tag::where('excluido','=','n')
+                // ->where('deletado','=','n')
+                // ->where('config','LIKE','%"post_type":"meio-semana"%')
+                // ->where('config','LIKE','%"t_p":"estudante"%')
+                // ->orderBy('ordem','ASC');
+                $ret = $ret
+                ->where('config','LIKE','%"t_p":"estudante"%');
+                $ret = $ret->get();
+            }
             // if($ret->count()){
             //     $ret = $ret->toArray();
             // }
@@ -484,7 +520,7 @@ class PublicadoresController extends Controller
                 $dados[0]['config'] = Qlib::lib_json_array($dados[0]['config']);
             }
             $listFiles = false;
-            $tipoDesignacao = $this->tipoDesignacao();
+            $tipoDesignacao = $this->tipoDesignacao($publicador);
             $campos = $this->campos($dados[0],$tipoDesignacao);
             /*
             if(isset($dados[0]['token'])){
