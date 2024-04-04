@@ -215,6 +215,7 @@ class designaController extends Controller
                 ->where('genero','=','m')
                 ->where('ativo','=','s')
                 ->orderBy('data_ultima','asc')
+                ->where('config','LIKE','%"'.$id_designacao.'"%')
                 ->get();
                 if($d->count() > 0){
                     $ret['exec'] = true;
@@ -253,6 +254,7 @@ class designaController extends Controller
                 ->where('desassociado','=','n')
                 ->where('genero','=','m')
                 ->where('ativo','=','s')
+                ->where('config','LIKE','%"'.$id_designacao.'"%')
                 ->orderBy('data_ultima','asc')
                 ->get();
                 if($d->count() > 0){
