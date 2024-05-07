@@ -2436,3 +2436,27 @@ function change_margin_b(obj,id){
     let val = obj.value;
     $('[data-id="'+id+'"]').css('margin-bottom',val+'vw');
 }
+
+function sinc_partes_jw(obj){
+    var data = obj.getAttribute('data-semanas');
+    if(typeof data =='string'){
+        getAjax({
+            url:'/ajax/sinc-partes-jw',
+            type: 'POST',
+            dataType: 'json',
+            csrf: true,
+            data:{
+                dados:data
+            }
+        },function(res){
+            $('#preload').fadeOut("fast");
+            $('.mes').html(res.mens);
+            if(res.exec){
+                $('[data-li_id="'+id+'"]').remove();
+            }
+        },function(err){
+            $('#preload').fadeOut("fast");
+            console.log(err);
+        });
+    }
+}

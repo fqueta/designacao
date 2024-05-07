@@ -178,8 +178,8 @@ class Qlib
 			$ret = false;
 			if($arr){
 				//$ret = base64_encode(json_encode($arr));
-				$ret = base64_decode($arr);
-				$ret = json_decode($ret,true);
+                $ret = base64_decode((string)$arr);
+                $ret = json_decode($ret,true);
 
 			}
 			return $ret;

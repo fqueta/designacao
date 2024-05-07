@@ -127,7 +127,7 @@ class tagSeeder extends Seeder
                 'config'=>['color'=>'warning','post_type'=>'meio-semana','icon'=>'fa fa-times','t_p'=>'especial']
             ],
             [
-                'nome'=>'Estudo bíblico',
+                'nome'=>'Estudo bíblico de congregação',
                 'pai'=>1,
                 'ordem'=>15,
                 'obs'=>'Essa designação de estudante deve ser feita por um irmão. Ele deve fazer um discurso para a congregação.',

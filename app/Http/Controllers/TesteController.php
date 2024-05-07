@@ -109,7 +109,7 @@ class TesteController extends Controller
         //     'operador'=>'!=',
         // ]);
         // $ret = Qlib::getSundays(2024,02);
-        $ret = Qlib::link_programacao_woljw('2024-01-01','<a href="{link}">Apostila</a>');
+        $ret = (new designaController)->add_designacao('2024-05-13');
         // dd($ret);
         return $ret;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Http\Controllers\Api\VmpController;
 use App\Http\Controllers\Controller;
 use App\Models\designation;
 use App\Models\Post;
@@ -411,9 +412,101 @@ class designaController extends Controller
     /**
      * Metodo para cadastrar designações automaticas.
      */
-    public function add_designacao($data) {
-        $arr_partes = [
-            ['numero'=>0,'data'=>$data,'token'=>uniqid(),'id_designacao'=>2,'sessao'=>'inicio','post_type'=>'meio-semana'], //presidencia
-        ];
+    public function add_designacao($config) {
+        // $arr_partes = [
+        //     ['numero'=>0,'data'=>$data,'token'=>uniqid(),'id_designacao'=>2,'sessao'=>'inicio','post_type'=>'meio-semana'], //presidencia
+        // ];
+        $ret['exec'] = false;
+        if(is_array($config)){
+            foreach ($config as $k => $data) {
+                $link = Qlib::link_programacao_woljw($data);
+                $arr_partes = (new VmpController)->gera_api($link,$data);
+                if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
+                    $arr_sessoes = ['tesouros','ministerio','vida'];
+                    foreach ($arr_sessoes as $ks => $vs) {
+                        foreach ($arr_partes['partes'][$vs] as $kp => $vp) {
+                            //verifica se ja existe
+                            $vp['data'] = $data;
+                            $vp['token'] = uniqid();
+                            $vp['sessao'] = $vs;
+                            $vp['post_type'] = 'meio-semana';
+                            $vp['ativo'] = 's';
+                            // dump($vp);
+                            $salv = $this->inserir_parte($vp);
+                            $ret['exec'] = @$salv['exec'];
+                            $ret['salv_'.$vp['numero'].'_'.$vp['data']][$data] = $salv;
+                        }
+
+                    }
+                }
+                sleep(2);
+            }
+        }elseif(is_string($config) && ($data = $config)){
+            $link = Qlib::link_programacao_woljw($data);
+            $arr_partes = (new VmpController)->gera_api($link,$data);
+            if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
+                $arr_sessoes = ['tesouros','ministerio','vida'];
+                foreach ($arr_sessoes as $ks => $vs) {
+                    foreach ($arr_partes['partes'][$vs] as $kp => $vp) {
+                        //verifica se ja existe
+                        $vp['data'] = $data;
+                        $vp['token'] = uniqid();
+                        $vp['sessao'] = $vs;
+                        $vp['post_type'] = 'meio-semana';
+                        $vp['ativo'] = 's';
+                        // dump($vp);
+                        $salv = $this->inserir_parte($vp);
+                        $ret['exec'] = @$salv['exec'];
+                        $ret['salv_'.$vp['numero'].'_'.$vp['data']] = $salv;
+                    }
+
+                }
+            }
+
+        }
+        return $ret;
+    }
+    /**
+     * Metodo para inserir uma parte
+     * @param Array $dados
+     * @return boolean true | false
+     */
+    public function inserir_parte($dados) {
+        $ret['exec'] = false;
+        if(isset($dados['data']) && isset($dados['numero']) && $dados['numero'] > 0) {
+            //se não encontrar salva
+            $ver = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->get();
+            // dump($dados,$ver);
+            if($ver->count() == 0){
+                $salv = designation::create($dados);
+                $ret['salv'] = $salv;
+            }else{
+                unset($dados['tema'],$dados['tempo']);
+                $salv = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->update($dados);
+                if($salv==1){
+                    $ret['salv'] = $salv;
+                    $ret['exec'] = true;
+                }
+            }
+        }
+    }
+    /**
+     * Metodo para sincronizar partes da api do jw
+     * @param array $arr_datas
+     * @return boolean true|false
+     */
+    public function sinc_partes(Request $request){
+        // $ret = (new designaController)->add_designacao('2024-05-13');
+        $dados = $request->all();
+        $arr_datas=[];
+        if(isset($dados['dados']) && is_string($dados['dados'])){
+
+            $arr_datas = Qlib::decodeArray($dados['dados']);
+            if(is_array($arr_datas)){
+                $ret['sinc'] = $this->add_designacao($arr_datas);
+            }
+        }
+        $ret['arr_datas'] = $arr_datas;
+        return $ret;
     }
 }

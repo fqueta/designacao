@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Mail;
 Route::prefix('/ajax')->group(function(){
     Route::post('/desigancao-remove',[designaController::class,'removeDesignacao'])->name('ajax.designacao.remove');
     Route::get('/list-participantes',[designaController::class,'get_participantes'])->name('ajax.get.participantes');
+    Route::post('/sinc-partes-jw',[designaController::class,'sinc_partes'])->name('ajax.sinc.partes');
 });
 Route::prefix('users')->group(function(){
     Route::get('/',[UserController::class,'index'])->name('users.index');

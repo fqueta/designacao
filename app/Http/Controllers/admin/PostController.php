@@ -681,6 +681,7 @@ class PostController extends Controller
                     }
                 }
 
+                $config['sinc_semanas'] = Qlib::encodeArray($ddo[$mes1]);
                 $config['semanas'] = $ddo;
                 $config['dsalv'] = $dsalv;
                 $config['co'] = $dados[0]['config'];  //dados de config
@@ -701,6 +702,7 @@ class PostController extends Controller
                 'campos'=>$campos,
                 'exec'=>true,
             ];
+            // dd($ret);
             return view($this->view.'.createedit',$ret);
         }else{
             $ret = [
