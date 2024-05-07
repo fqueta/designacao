@@ -67,7 +67,7 @@
                                         @endphp
                                         <tr class="col-12">
                                             <td style="width:20%"><b>{{$numero}} {{@$tipos[$parte['id_designacao']]}}</b></td>
-                                            <td style="width:55%"><span>{{@$parte['obs']}}</span></td>
+                                            <td style="width:55%"><span>{!!@$parte['obs']!!}</span></td>
                                             <td style="width:25%" class="text-right"><span>{{strtoupper(@$participantes[$parte['id_designado']])}}</span></td>
                                         </tr>
                                     @endforeach
