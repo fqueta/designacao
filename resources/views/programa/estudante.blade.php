@@ -55,7 +55,7 @@
                                     <tr>
                                         <td class="border-0" colspan="2">
                                             <div class="col-12">
-                                                <label> {{__('Obs')}}: </label>
+                                                {{-- <label> {{__('Obs')}}: </label> --}}
                                                 {{$parte['obs']}}
                                             </div>
                                         </td>
