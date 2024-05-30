@@ -109,8 +109,9 @@ class TesteController extends Controller
         //     'operador'=>'!=',
         // ]);
         // $ret = Qlib::getSundays(2024,02);
-        $ret = (new designaController)->add_designacao('2024-05-13');
+        // $ret = (new designaController)->add_designacao('2024-05-13');
         // dd($ret);
+
         return $ret;
     }
     public function getNumberRange($inic,$fim,$r='impar'){

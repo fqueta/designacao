@@ -2437,7 +2437,7 @@ function change_margin_b(obj,id){
     $('[data-id="'+id+'"]').css('margin-bottom',val+'vw');
 }
 
-function sinc_partes_jw(obj){
+function sinc_partes_jw(obj,type){
     var data = obj.getAttribute('data-semanas');
     if(typeof data =='string'){
         getAjax({
@@ -2446,13 +2446,16 @@ function sinc_partes_jw(obj){
             dataType: 'json',
             csrf: true,
             data:{
-                dados:data
+                dados:data,
+                type:type
             }
         },function(res){
             $('#preload').fadeOut("fast");
             $('.mes').html(res.mens);
             if(res.exec){
-                $('[data-li_id="'+id+'"]').remove();
+                location.reload();
+                // $('[data-li_id="'+id+'"]').remove();
+
             }
         },function(err){
             $('#preload').fadeOut("fast");

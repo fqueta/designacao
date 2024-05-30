@@ -17,7 +17,7 @@
     $arr_participantes = isset($des2['config']['participantes'])?$des2['config']['participantes']:[];
     $config['conf']['arr_desiganacao'] = isset($config['conf']['desiganations']['config']['tipos_designacao']) ? $config['conf']['desiganations']['config']['tipos_designacao'] : [];
     // dd($des2);
-    // dd($config['conf']);
+    // dd($sessoes);
     $sec = isset($config['conf']['sec']) ? $config['conf']['sec']: false;
 @endphp
 <table class="table">

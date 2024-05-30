@@ -151,6 +151,14 @@ class VmpController extends Controller
                 }
             }
         }
+        if($sessaoP=='tesouros' && isset($ret['sec']) && is_array($ret['sec'])){
+            //na api a ordem dos tesous está invertida
+            foreach ($ret['sec'] as $key => $value) {
+                if(isset($value['numero'])){
+                    $ret['sec'][$value['numero']-1] = $value;
+                }
+            };
+        }
         return $ret;
     }
     /**

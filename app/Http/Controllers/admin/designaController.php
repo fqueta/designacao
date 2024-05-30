@@ -412,40 +412,86 @@ class designaController extends Controller
     /**
      * Metodo para cadastrar designações automaticas.
      */
-    public function add_designacao($config) {
+    public function add_designacao($config,$type) {
         // $arr_partes = [
         //     ['numero'=>0,'data'=>$data,'token'=>uniqid(),'id_designacao'=>2,'sessao'=>'inicio','post_type'=>'meio-semana'], //presidencia
         // ];
         $ret['exec'] = false;
+        $arr_sessoes = ['tesouros','ministerio','vida'];
+        $arr_inicio =[
+            ['sessao'=>'inicio','tema'=>'','numero'=>'0','id_designacao'=>2,'tempo'=>'','obs'=>''],
+            ['sessao'=>'inicio','tema'=>'','numero'=>'0','id_designacao'=>3,'tempo'=>'','obs'=>''],
+        ];
+        $arr_fim = [
+            ['sessao'=>'vida','tema'=>'','numero'=>'0','id_designacao'=>18,'tempo'=>'','obs'=>''],
+            ['sessao'=>'vida','tema'=>'','numero'=>'0','id_designacao'=>19,'tempo'=>'','obs'=>''],
+            ['sessao'=>'final','tema'=>'','numero'=>'0','id_designacao'=>20,'tempo'=>'','obs'=>''],
+            ['sessao'=>'final','tema'=>'','numero'=>'0','id_designacao'=>22,'tempo'=>'','obs'=>''],
+            ['sessao'=>'final','tema'=>'','numero'=>'0','id_designacao'=>23,'tempo'=>'','obs'=>''],
+            ['sessao'=>'final','tema'=>'','numero'=>'0','id_designacao'=>24,'tempo'=>'','obs'=>''],
+        ];
+
         if(is_array($config)){
             foreach ($config as $k => $data) {
-                $link = Qlib::link_programacao_woljw($data);
-                $arr_partes = (new VmpController)->gera_api($link,$data);
-                if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
-                    $arr_sessoes = ['tesouros','ministerio','vida'];
-                    foreach ($arr_sessoes as $ks => $vs) {
-                        foreach ($arr_partes['partes'][$vs] as $kp => $vp) {
-                            //verifica se ja existe
-                            $vp['data'] = $data;
-                            $vp['token'] = uniqid();
-                            $vp['sessao'] = $vs;
-                            $vp['post_type'] = 'meio-semana';
-                            $vp['ativo'] = 's';
-                            // dump($vp);
-                            $salv = $this->inserir_parte($vp);
-                            $ret['exec'] = @$salv['exec'];
-                            $ret['salv_'.$vp['numero'].'_'.$vp['data']][$data] = $salv;
-                        }
-
+                if($type=='inic_fim'){
+                    //partes que não são da apostila do mes
+                    foreach ($arr_inicio as $ki => $vp) {
+                        $vp['data'] = $data;
+                        $vp['token'] = uniqid();
+                        // $vp['sessao'] = 'inicio';
+                        $vp['post_type'] = 'meio-semana';
+                        $vp['ativo'] = 's';
+                        $vp['ordem'] = ($ki+1);
+                        // dump($vp);
+                        $salv = $this->inserir_parte($vp,$type);
+                        $ret['exec'] = @$salv['exec'];
+                        $ret['salv_'.$vp['id_designacao'].'_'.$vp['data']][$data] = $salv;
                     }
+                    $ki = 30;
+                    foreach ($arr_fim as $kf => $vp) {
+                        $vp['data'] = $data;
+                        $vp['token'] = uniqid();
+                        // $vp['sessao'] = 'final';
+                        $vp['post_type'] = 'meio-semana';
+                        $vp['ativo'] = 's';
+                        $vp['ordem'] = ($ki+1);
+                        // dump($vp);
+                        $salv = $this->inserir_parte($vp,$type);
+                        $ret['exec'] = @$salv['exec'];
+                        $ret['salv_'.$vp['id_designacao'].'_'.$vp['data']][$data] = $salv;
+                    }
+                }else{
+                    //partes da apostila do mes
+                    $link = Qlib::link_programacao_woljw($data);
+                    $arr_partes = (new VmpController)->gera_api($link,$data);
+                    // dd($arr_partes);
+                    if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
+                        foreach ($arr_sessoes as $ks => $vs) {
+                            if(isset($arr_partes['partes'][$vs])){
+                                foreach ($arr_partes['partes'][$vs] as $kp => $vp) {
+                                    // dd($vp);
+                                    $vp['data'] = $data;
+                                    $vp['token'] = uniqid();
+                                    $vp['sessao'] = $vs;
+                                    $vp['post_type'] = 'meio-semana';
+                                    $vp['ativo'] = 's';
+                                    $vp['ordem'] = ($kp+1);
+                                    $salv = $this->inserir_parte($vp);
+                                    $ret['exec'] = @$salv['exec'];
+                                    $ret['salv_'.$vp['numero'].'_'.$vp['data']][$data] = $salv;
+                                }
+                            }
+
+                        }
+                    }
+                    sleep(2);
                 }
-                sleep(2);
             }
         }elseif(is_string($config) && ($data = $config)){
             $link = Qlib::link_programacao_woljw($data);
             $arr_partes = (new VmpController)->gera_api($link,$data);
             if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
-                $arr_sessoes = ['tesouros','ministerio','vida'];
+                // $arr_sessoes = ['tesouros','ministerio','vida'];
                 foreach ($arr_sessoes as $ks => $vs) {
                     foreach ($arr_partes['partes'][$vs] as $kp => $vp) {
                         //verifica se ja existe
@@ -455,6 +501,7 @@ class designaController extends Controller
                         $vp['post_type'] = 'meio-semana';
                         $vp['ativo'] = 's';
                         // dump($vp);
+                        $vp['ordem'] = ($kp+1);
                         $salv = $this->inserir_parte($vp);
                         $ret['exec'] = @$salv['exec'];
                         $ret['salv_'.$vp['numero'].'_'.$vp['data']] = $salv;
@@ -471,24 +518,48 @@ class designaController extends Controller
      * @param Array $dados
      * @return boolean true | false
      */
-    public function inserir_parte($dados) {
+    public function inserir_parte($dados,$type='jw') {
         $ret['exec'] = false;
-        if(isset($dados['data']) && isset($dados['numero']) && $dados['numero'] > 0) {
-            //se não encontrar salva
-            $ver = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->get();
-            // dump($dados,$ver);
-            if($ver->count() == 0){
-                $salv = designation::create($dados);
-                $ret['salv'] = $salv;
-            }else{
-                unset($dados['tema'],$dados['tempo']);
-                $salv = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->update($dados);
-                if($salv==1){
+        if($type=='jw'){
+            if(isset($dados['data']) && isset($dados['numero']) && $dados['numero'] > 0) {
+                //se não encontrar salva
+                $ver = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->get();
+                // dump($dados,$ver);
+                if($ver->count() == 0){
+                    $salv = designation::create($dados);
                     $ret['salv'] = $salv;
-                    $ret['exec'] = true;
+                }else{
+                    unset($dados['tema'],$dados['tempo']);
+                    $salv = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->update($dados);
+                    if($salv==1){
+                        $ret['salv'] = $salv;
+                        $ret['exec'] = true;
+                    }
                 }
             }
+        }else{
+            if(isset($dados['data']) && isset($dados['id_designacao']) && $dados['id_designacao'] > 0) {
+                //se não encontrar salva
+                $ver = designation::where('data', '=', $dados['data'])->where('id_designacao','=',$dados['id_designacao'])->get();
+                // dump($dados,$ver);
+                if($ver->count() == 0){
+                    $salv = designation::create($dados);
+                    $ret['salv'] = $salv;
+                }else{
+                    unset($dados['tema'],$dados['tempo']);
+                    $salv = designation::where('data', '=', $dados['data'])->where('id_designacao','=',$dados['id_designacao'])->update($dados);
+                    if($salv==1){
+                        $ret['salv'] = $salv;
+                        $ret['exec'] = true;
+                    }
+                }
+            }
+
         }
+        if($ret['exec']==true){
+            $ret['mes'] = Qlib::formatMensagemInfo('Atualizado com sucesso');
+        }
+        return $ret;
     }
     /**
      * Metodo para sincronizar partes da api do jw
@@ -499,14 +570,26 @@ class designaController extends Controller
         // $ret = (new designaController)->add_designacao('2024-05-13');
         $dados = $request->all();
         $arr_datas=[];
+        $sinc = [];
         if(isset($dados['dados']) && is_string($dados['dados'])){
 
             $arr_datas = Qlib::decodeArray($dados['dados']);
             if(is_array($arr_datas)){
-                $ret['sinc'] = $this->add_designacao($arr_datas);
+                $type = false;
+                if($request->has('type')){
+                    $type = $request->get('type');
+                }
+                $sinc = $this->add_designacao($arr_datas,$type);
             }
         }
+        // if(isset($ret['sinc']['exec']) && $ret['sinc']['exec']){
+        //     $ret['exec'] = true;
+        //     $ret['mes'] = true;
+        // }else{
+        //     $ret['exec'] = false;
+        // }
         $ret['arr_datas'] = $arr_datas;
+        $ret = $sinc;
         return $ret;
     }
 }

@@ -8,7 +8,6 @@
     }else{
         $mb='';
     }
-
 @endphp
 <div class="col-12 {{$mb}}" {!!$mbcard!!}>
     <div class="card mb-1 {{$vpint}}">

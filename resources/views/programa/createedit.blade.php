@@ -17,7 +17,8 @@
                 <h3 class="card-title">Informações</h3>
                 <div class="card-tools">
                     @if(isset($config['sinc_semanas']) && is_string($config['sinc_semanas']))
-                        <button type="button" data-semanas="{{$config['sinc_semanas']}}" class="btn btn-default" onclick="sinc_partes_jw(this)"> <i class="fa fa-refresh" aria-hidden="true"></i> Sincronizar com JW</button>
+                        <button type="button" data-semanas="{{$config['sinc_semanas']}}" class="btn btn-default" onclick="sinc_partes_jw(this,'inic_fim')"> <i class="fa fa-refresh" aria-hidden="true"></i> Adicionar outras partes</button>
+                        <button type="button" data-semanas="{{$config['sinc_semanas']}}" class="btn btn-default" onclick="sinc_partes_jw(this,'jw')"> <i class="fa fa-refresh" aria-hidden="true"></i> Sincronizar com JW</button>
                     @endif
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                       <i class="fas fa-minus"></i>
