@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             DocumentoSeeder::class,
             QoptionSeeder::class,
-            CongregacoesSeeder::class,
         ]);
 
     }

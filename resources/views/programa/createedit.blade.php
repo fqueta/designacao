@@ -17,8 +17,8 @@
                 <h3 class="card-title">Informações</h3>
                 <div class="card-tools">
                     @if(isset($config['sinc_semanas']) && is_string($config['sinc_semanas']))
-                        <button type="button" data-semanas="{{$config['sinc_semanas']}}" class="btn btn-default" onclick="sinc_partes_jw(this,'inic_fim')"> <i class="fa fa-refresh" aria-hidden="true"></i> Adicionar outras partes</button>
-                        <button type="button" data-semanas="{{$config['sinc_semanas']}}" class="btn btn-default" onclick="sinc_partes_jw(this,'jw')"> <i class="fa fa-refresh" aria-hidden="true"></i> Sincronizar com JW</button>
+                    <button type="button" data-semanas="{{$config['sinc_semanas']}}" class="btn btn-default" onclick="sinc_partes_jw(this,'jw')" title="Antes de prosseguir é necessário sincronizar as partes com o a apostila mais atualizado no jw.org"> <i class="fa fa-refresh" aria-hidden="true"></i> (1) Sincronizar com JW</button>
+                        <button type="button" data-semanas="{{$config['sinc_semanas']}}" class="btn btn-default" onclick="sinc_partes_jw(this,'inic_fim')"  title="Nessa opção é possivel adincinar as desiganções de partes mecanicas que não aparecem na apostila do mes"> <i class="fa fa-refresh" aria-hidden="true"></i> (2) Adicionar outras partes</button>
                     @endif
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                       <i class="fas fa-minus"></i>

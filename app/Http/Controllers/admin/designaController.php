@@ -13,6 +13,7 @@ use App\Qlib\Qlib;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\TryCatch;
 
 class designaController extends Controller
 {
@@ -431,85 +432,92 @@ class designaController extends Controller
             ['sessao'=>'final','tema'=>'','numero'=>'0','id_designacao'=>24,'tempo'=>'','obs'=>''],
         ];
 
-        if(is_array($config)){
-            foreach ($config as $k => $data) {
-                if($type=='inic_fim'){
-                    //partes que não são da apostila do mes
-                    foreach ($arr_inicio as $ki => $vp) {
-                        $vp['data'] = $data;
-                        $vp['token'] = uniqid();
-                        // $vp['sessao'] = 'inicio';
-                        $vp['post_type'] = 'meio-semana';
-                        $vp['ativo'] = 's';
-                        $vp['ordem'] = ($ki+1);
-                        // dump($vp);
-                        $salv = $this->inserir_parte($vp,$type);
-                        $ret['exec'] = @$salv['exec'];
-                        $ret['salv_'.$vp['id_designacao'].'_'.$vp['data']][$data] = $salv;
-                    }
-                    $ki = 30;
-                    foreach ($arr_fim as $kf => $vp) {
-                        $vp['data'] = $data;
-                        $vp['token'] = uniqid();
-                        // $vp['sessao'] = 'final';
-                        $vp['post_type'] = 'meio-semana';
-                        $vp['ativo'] = 's';
-                        $vp['ordem'] = ($ki+1);
-                        // dump($vp);
-                        $salv = $this->inserir_parte($vp,$type);
-                        $ret['exec'] = @$salv['exec'];
-                        $ret['salv_'.$vp['id_designacao'].'_'.$vp['data']][$data] = $salv;
-                    }
-                }else{
-                    //partes da apostila do mes
-                    $link = Qlib::link_programacao_woljw($data);
-                    $arr_partes = (new VmpController)->gera_api($link,$data);
-                    // dd($arr_partes);
-                    if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
-                        foreach ($arr_sessoes as $ks => $vs) {
-                            if(isset($arr_partes['partes'][$vs])){
-                                foreach ($arr_partes['partes'][$vs] as $kp => $vp) {
-                                    // dd($vp);
-                                    $vp['data'] = $data;
-                                    $vp['token'] = uniqid();
-                                    $vp['sessao'] = $vs;
-                                    $vp['post_type'] = 'meio-semana';
-                                    $vp['ativo'] = 's';
-                                    $vp['ordem'] = ($kp+1);
-                                    $salv = $this->inserir_parte($vp);
-                                    $ret['exec'] = @$salv['exec'];
-                                    $ret['salv_'.$vp['numero'].'_'.$vp['data']][$data] = $salv;
-                                }
-                            }
-
+        try {
+            //code...
+            if(is_array($config)){
+                foreach ($config as $k => $data) {
+                    if($type=='inic_fim'){
+                        //partes que não são da apostila do mes
+                        foreach ($arr_inicio as $ki => $vp) {
+                            $vp['data'] = $data;
+                            $vp['token'] = uniqid();
+                            // $vp['sessao'] = 'inicio';
+                            $vp['post_type'] = 'meio-semana';
+                            $vp['ativo'] = 's';
+                            $vp['ordem'] = ($ki+1);
+                            // dump($vp);
+                            $salv = $this->inserir_parte($vp,$type);
+                            $ret['exec'] = @$salv['exec'];
+                            $ret['salv_'.$vp['id_designacao'].'_'.$vp['data']][$data] = $salv;
                         }
-                    }
-                    sleep(2);
-                }
-            }
-        }elseif(is_string($config) && ($data = $config)){
-            $link = Qlib::link_programacao_woljw($data);
-            $arr_partes = (new VmpController)->gera_api($link,$data);
-            if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
-                // $arr_sessoes = ['tesouros','ministerio','vida'];
-                foreach ($arr_sessoes as $ks => $vs) {
-                    foreach ($arr_partes['partes'][$vs] as $kp => $vp) {
-                        //verifica se ja existe
-                        $vp['data'] = $data;
-                        $vp['token'] = uniqid();
-                        $vp['sessao'] = $vs;
-                        $vp['post_type'] = 'meio-semana';
-                        $vp['ativo'] = 's';
-                        // dump($vp);
-                        $vp['ordem'] = ($kp+1);
-                        $salv = $this->inserir_parte($vp);
-                        $ret['exec'] = @$salv['exec'];
-                        $ret['salv_'.$vp['numero'].'_'.$vp['data']] = $salv;
-                    }
+                        $ki = 30;
+                        foreach ($arr_fim as $kf => $vp) {
+                            $vp['data'] = $data;
+                            $vp['token'] = uniqid();
+                            // $vp['sessao'] = 'final';
+                            $vp['post_type'] = 'meio-semana';
+                            $vp['ativo'] = 's';
+                            $vp['ordem'] = ($ki+1);
+                            // dump($vp);
+                            $salv = $this->inserir_parte($vp,$type);
+                            $ret['exec'] = @$salv['exec'];
+                            $ret['salv_'.$vp['id_designacao'].'_'.$vp['data']][$data] = $salv;
+                        }
+                    }else{
+                        //partes da apostila do mes
+                        $link = Qlib::link_programacao_woljw($data);
+                        $arr_partes = (new VmpController)->gera_api($link,$data);
+                        // dd($arr_partes);
+                        if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
+                            foreach ($arr_sessoes as $ks => $vs) {
+                                if(isset($arr_partes['partes'][$vs])){
+                                    foreach ($arr_partes['partes'][$vs] as $kp => $vp) {
+                                        // dd($vp);
+                                        $vp['data'] = $data;
+                                        $vp['token'] = uniqid();
+                                        $vp['sessao'] = $vs;
+                                        $vp['post_type'] = 'meio-semana';
+                                        $vp['ativo'] = 's';
+                                        $vp['ordem'] = ($kp+1);
+                                        $salv = $this->inserir_parte($vp);
+                                        $ret['exec'] = @$salv['exec'];
+                                        $ret['salv_'.$vp['numero'].'_'.$vp['data']][$data] = $salv;
+                                    }
+                                }
 
+                            }
+                        }
+                        sleep(2);
+                    }
                 }
-            }
+            }elseif(is_string($config) && ($data = $config)){
+                $link = Qlib::link_programacao_woljw($data);
+                $arr_partes = (new VmpController)->gera_api($link,$data);
+                if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
+                    // $arr_sessoes = ['tesouros','ministerio','vida'];
+                    foreach ($arr_sessoes as $ks => $vs) {
+                        foreach ($arr_partes['partes'][$vs] as $kp => $vp) {
+                            //verifica se ja existe
+                            $vp['data'] = $data;
+                            $vp['token'] = uniqid();
+                            $vp['sessao'] = $vs;
+                            $vp['post_type'] = 'meio-semana';
+                            $vp['ativo'] = 's';
+                            // dump($vp);
+                            $vp['ordem'] = ($kp+1);
+                            $salv = $this->inserir_parte($vp);
+                            $ret['exec'] = @$salv['exec'];
+                            $ret['salv_'.$vp['numero'].'_'.$vp['data']] = $salv;
+                        }
 
+                    }
+                }
+
+            }
+            $ret['exec'] = true;
+        } catch (\Throwable $th) {
+            //throw $th;
+            $ret['exec'] = true;
         }
         return $ret;
     }

@@ -19,7 +19,7 @@
  <div class="row mb-5">
     <div class="col-md-12">
 
-        <h3>Seja bem vindo para ter acesso entre em contato com o suporte</h3>
+        <h3>Seja bem vindo ao programa de DVM</h3>
     </div>
   </div>
 @stop

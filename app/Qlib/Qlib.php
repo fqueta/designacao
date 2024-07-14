@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Permission;
 use App\Models\Qoption;
+use Illuminate\Support\Facades\Config;
+use DateTime;
 
 class Qlib
 {
@@ -1155,6 +1157,20 @@ class Qlib
      * @param int $post_id id do programa $data da semana
      * @return boolean true if successful
      */
+    static function tem_congresso($post_id,$data){
+        $res = self::get_postmeta($post_id,'congresso',true);
+        if($res){
+            if(strtotime($res) == strtotime($data)){
+                return $res;
+            }
+        }
+        return false;
+    }
+    /**
+     * Metodo para verificar se uma programção tem assemblei
+     * @param int $post_id id do programa $data da semana
+     * @return boolean true if successful
+     */
     static function tem_assembleia($post_id,$data){
         $res = self::get_postmeta($post_id,'assembleia',true);
         if($res){
@@ -1177,5 +1193,57 @@ class Qlib
             }
         }
         return false;
+    }
+    /**
+     * Metodo para retornar o nome do subdominio o vazio caso não seja um subdominio
+     */
+    static function is_subdominio(){
+        $ret = explode('.', request()->getHost())[0];
+        return $ret;
+    }
+    static function selectDefaultConnection($connection='mysql',$conn=false){
+        if($connection=='tenant'){
+            if(isset($conn['name']) && isset($conn['user']) && isset($conn['pass'])){
+                $db = isset($conn['name'])?$conn['name']:false;
+                $user = isset($conn['user'])?$conn['user']:false;
+                $pass = isset($conn['pass'])?$conn['pass']:false;
+                if($user && $db){
+                    Config::set('database.connections.tenant.database', trim($db));
+                    Config::set('database.connections.tenant.username', trim($user));
+                    Config::set('database.connections.tenant.password', trim($pass));
+                }
+            }else{
+                $arr_tenancy = session()->get('tenancy');
+                if(isset($arr_tenancy['config']) && Qlib::isJson($arr_tenancy['config'])){
+                    $arr_config=Qlib::lib_json_array($arr_tenancy['config']);
+                    $db = isset($arr_config['name'])?$arr_config['name']:false;
+                    $user = isset($arr_config['user'])?$arr_config['user']:false;
+                    $pass = isset($arr_config['pass'])?$arr_config['pass']:false;
+                    if($user && $db){
+                        Config::set('database.connections.tenant.database', trim($db));
+                        Config::set('database.connections.tenant.username', trim($user));
+                        Config::set('database.connections.tenant.password', trim($pass));
+                    }
+                }
+            }
+            // $clone = config('database.connections.mysql');
+            // $clone['database'] = $db;
+            // Config::set('database.connections.'.$connection, $clone);
+
+        }
+        Config::set('database.default', $connection);
+        return DB::getDefaultConnection();
+
+    }
+    /**
+     * Metodo que verifica se a conexão atual é de um tenant ou não
+     */
+    static function is_tenant(){
+        $conn = DB::getDefaultConnection();
+        if($conn == 'tenant'){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

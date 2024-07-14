@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLoteamentosTable extends Migration
+class CreateTagsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,22 +13,18 @@ class CreateLoteamentosTable extends Migration
      */
     public function up()
     {
-        Schema::create('lotes', function (Blueprint $table) {
+        Schema::create('tags', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('token','100')->nullable();
             $table->string('nome',300)->nullable();
-            $table->integer('quadra')->nullable();
-            $table->string('token',60)->nullable();
-            $table->string('cep','25')->nullable();
-            $table->string('endereco','250')->nullable();
-            $table->string('numero','100')->nullable();
-            $table->text('complemento')->nullable();
-            $table->string('cidade','100')->nullable();
-            $table->integer('bairro')->nullable();
-            $table->json('config')->nullable();
-            $table->integer('autor')->nullable();
+            $table->string('value',300)->nullable();
             $table->enum('ativo',['s','n']);
+            $table->integer('pai')->nullable();
+            $table->integer('ordem')->nullable();
+            $table->integer('autor')->nullable();
             $table->longText('obs')->nullable();
+            $table->json('config')->nullable();
             $table->enum('excluido',['n','s']);
             $table->text('reg_excluido')->nullable();
             $table->enum('deletado',['n','s']);
@@ -43,6 +39,6 @@ class CreateLoteamentosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lotes');
+        Schema::dropIfExists('tags');
     }
 }

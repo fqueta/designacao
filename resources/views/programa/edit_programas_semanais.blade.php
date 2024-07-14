@@ -51,6 +51,7 @@
                                                 {{App\Qlib\Qlib::dataExtensso($v1)}} {!!App\Qlib\Qlib::link_programacao_woljw($v1,'<div class=""><a class="underline" href="{link}" target="_BLANK">Acesso à Programação no Jw.ORG</a></div>')!!}
                                             </h3>
                                             @php
+                                                $checked_cong = false;
                                                 $checked_ass = false;
                                                 $checked_visita = false;
                                                 if(App\Qlib\Qlib::tem_assembleia($post_id,$v1)){
@@ -61,6 +62,9 @@
                                                 }
                                             @endphp
                                             <div class="card-tools d-print-none">
+                                                <label for="congresso_{{$k1}}">
+                                                    <input {{$checked_ass}} type="checkbox" name="des2[{{$v1}}][congresso]" id="congresso_{{$k1}}"> {{__('Congresso')}}
+                                                </label>
                                                 <label for="assembleia_{{$k1}}">
                                                     <input {{$checked_ass}} type="checkbox" name="des2[{{$v1}}][assembleia]" id="assembleia_{{$k1}}"> {{__('Assembléia')}}
                                                 </label>

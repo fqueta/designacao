@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEscolaridadesTable extends Migration
+class CreateUploadsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,15 @@ class CreateEscolaridadesTable extends Migration
      */
     public function up()
     {
-        Schema::create('escolaridades', function (Blueprint $table) {
+        Schema::create('_uploads', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('token_produto','100')->nullable();
+            $table->text('pasta')->nullable();
             $table->string('nome','150')->nullable();
-            $table->string('token','60')->nullable();
-            $table->enum('ativo',['s','n']);
-            $table->integer('autor')->nullable();
+            $table->integer('ordem')->nullable();
             $table->longText('obs')->nullable();
-            $table->enum('excluido',['n','s']);
-            $table->text('reg_excluido')->nullable();
-            $table->enum('deletado',['n','s']);
-            $table->text('reg_deletado')->nullable();
+            $table->longText('config')->nullable();
         });
     }
 
@@ -35,6 +32,6 @@ class CreateEscolaridadesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('escolaridades');
+        Schema::dropIfExists('_uploads');
     }
 }
