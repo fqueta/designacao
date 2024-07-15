@@ -139,6 +139,7 @@ class designaController extends Controller
         // dd($config,$id_designado,$id_designacao);
 
         if($id_designado && $id_designacao){
+
             if($ultima){
                 // DB::getQueryLog();
                 if($operador == '!=' && $type == 'id_ajudante'){
@@ -159,16 +160,26 @@ class designaController extends Controller
                     ->get();
                     // dd($d);
                 }else{
+                    if($id_designacao==28){
+                        $type = 'id_designado';
+                        // dd($id_designado,$type);
+                    }
+                    //verifica qual a ultima parte de todas
+
+                    //nesse momento conferimos se os dados da ultima parte estão sincronizados corretamento do a cadastro do publicador
+                    $conference = $this->confere_ultima_parte($config);
                     $d = designation::select('designations.*','tags.nome','tags.config')
-                    ->join('tags','tags.id','=','designations.id_designacao')
-                    ->where('designations.'.$type,'=',$id_designado)
-                    ->where('designations.post_type','=',$post_type)
-                    ->where('designations.id_designacao',$operador,$id_designacao)
-                    ->where('designations.excluido','=','n')
-                    ->orderBy('designations.data','desc')
-                    ->limit($limit)
-                    ->get();
+                                    ->join('tags','tags.id','=','designations.id_designacao')
+                                    ->where('designations.'.$type,'=',$id_designado)
+                                    ->where('designations.post_type','=',$post_type)
+                                    ->where('designations.id_designacao',$operador,$id_designacao)
+                                    ->where('designations.excluido','=','n')
+                                    ->orderBy('designations.data','desc')
+                                    ->limit($limit)
+                                    ->get();
+
                 }
+
             }else{
                 $d = designation::select('designations.*','tags.nome','tags.config')
                 ->join('tags','tags.id','=','designations.id_designacao')
@@ -222,6 +233,7 @@ class designaController extends Controller
                 if($d->count() > 0){
                     $ret['exec'] = true;
                     $d = $d->toArray();
+                    // dd($d);
                     foreach ($d as $kd => $vd) {
                         $ultima_desta = $this->arr_historico([
                             'post_type'=>$post_type,
@@ -326,6 +338,7 @@ class designaController extends Controller
 
                 }
             }else{
+
                 if($tipo=='id_ajudante'){
                     //id da desiganção de ajudante
                     $id_designacao = 28;
@@ -361,6 +374,7 @@ class designaController extends Controller
                 if($d->count() > 0){
                     $ret['exec'] = true;
                     $d = $d->toArray();
+                    // dump($tipo);
                     foreach ($d as $kd => $vd) {
                         $ultima_desta = $this->arr_historico([
                             'post_type'=>$post_type,
@@ -391,6 +405,51 @@ class designaController extends Controller
             $ret['data'] = $d;
         }
         return $ret;
+    }
+    /**
+     * Para conferir e acertar a ultima parte de um participante
+     * @param array $config dados da designação
+     * @return array $rey
+     */
+    public function confere_ultima_parte($config){
+        $ret['exec'] = false;
+        $ret['d'] = [];
+        $id_designado = isset($config['id_designado']) ? $config['id_designado'] : null; //id da parte
+        $id_designacao = isset($config['id_designacao']) ? $config['id_designacao'] : null;
+        $operador = isset($config['operador']) ? $config['operador'] : '=';
+        $ultima = isset($config['ultima']) ? $config['ultima'] : false;
+        $type = isset($config['type']) ? $config['type'] : 'id_designado';
+        $post_type = isset($config['post_type']) ? $config['post_type'] : '';
+        $limit = isset($config['limit']) ? $config['limit'] : 1;
+        $du = designation::select('designations.*','tags.nome','tags.config')
+        ->join('tags','tags.id','=','designations.id_designacao')
+        ->where('designations.id_designado','=',$id_designado)
+        ->where('designations.post_type','=',$post_type)
+        // ->where('designations.id_designacao','=',$id_designacao)
+        ->where('designations.excluido','=','n')
+        ->orderBy('designations.data','desc')
+        ->limit(1)
+        ->get();
+        if($du->count()>0){
+            $dta = $du->toArray();
+
+            // dd($operador,$limit,$dta);
+            $ultima_data_gravad = Qlib::buscaValorDb0('publicadores','id',$id_designado,'data_ultima');
+            if($ultima_data_gravad!=$dta[0]['data']){
+                $salv = Publicador::where('id','=',$id_designado)->update([
+                    'data_ultima' => $dta[0]['data'],
+                    'token_ultima' => $dta[0]['token'],
+                ]);
+                // if($salv){
+
+                // }
+            }
+        }else{
+            $salv = Publicador::where('id','=',$id_designado)->update([
+                'data_ultima' => '1971-01-01',
+                'token_ultima' => '',
+            ]);
+        }
     }
     /**
      * Metodos para consultar rotua get_participantes via ajax

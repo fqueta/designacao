@@ -5,9 +5,11 @@ namespace App\Console\Commands;
 use App\Models\congregacao;
 use App\Models\empresas;
 use App\Qlib\Qlib;
+use Database\Seeders\tagSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
 
 class TenancySeedCommand extends Command
 {
@@ -49,9 +51,15 @@ class TenancySeedCommand extends Command
         if(isset($arr_t['config']) && Qlib::isJson($arr_t['config'])){
             $arr_config = Qlib::lib_json_array($arr_t['config']);
             Qlib::selectDefaultConnection($connection,$arr_config);
+        }else{
+            return 0;
         }
         // // Run the migrations
-        $this->info("Semeando banco de dados do usuario: $user");
+
+        $currentConnection = Config::get('database.default');
+        $db = Config::get('database');
+        // dump($db);
+        $this->info("Semeando banco de dados  do usuario: $user na conexão $currentConnection ");
 
         // Artisan::call('migrate', [
         //     '--database' => $connection,
@@ -61,16 +69,19 @@ class TenancySeedCommand extends Command
         $arrSeed = [
             // PermissionSeeder::class,
             // UserSeederTenancy::class,
-            // MenuTenancySeeder::class,
+            // MenuTenancySeeder::clas,
             // QoptionSeeder ::class,
-             UserSeeder::class,
-            // tagSeeder::class,
+            ['path' => 'database/migrations/tenant/2022_02_15_144917_create_users_table','seed'=>UserSeeder::class],
+            ['path' => 'database/migrations/tenant/2022_03_15_150747_create_tags_table','seed'=>tagSeeder::class]
         ];
-        foreach ($arrSeed as $key => $value) {
+        foreach ($arrSeed as $key => $v) {
             # code...
-            $ret['2'][$key] = Artisan::call('db:seed', [
-                '--class' => $value,
-                // '--class' => UserSeeder::class,
+            dump($v);
+            Artisan::call('migrate:refresh', [
+                '--path' => $v['path'],
+            ]);
+            Artisan::call('db:seed', [
+                '--class' => $v['seed'],
             ]);
         }
         // Artisan::call('db:seed', [

@@ -893,7 +893,7 @@ class PostController extends Controller
                                     $dsa['id_designado'] = 0;
                                 }
                                 if($dsa['id_designado']>0 || $dsa['id_designacao']>0){
-                                    // dd($k,$dsa);
+                                    // dump($k,$dsa);
                                     if(isset($ddta['id']) && ($idReg=$ddta['id'])){
                                         $upn = designation::where('data','=',$data)->
                                         where('id','=',$idReg)->
@@ -907,6 +907,10 @@ class PostController extends Controller
                                     }
                                     $ret['da'][$ordem] = $dsa;
                                     // Qlib::lib_print($dsa);
+                                    //verificar e salvar um ajudante
+                                    if($dsa['id_ajudante']>0){
+                                        $ret['salvar_ajudante'] = $this->salvar_ajudante($dsa);
+                                    }
                                     if($upn==1){
                                         $ordem++;
                                         //salvar ultima desiganção para o designado
@@ -924,9 +928,7 @@ class PostController extends Controller
                                             'token_ultima' => $dsa['token'],
                                         ]);
                                     }
-
                                 }
-
                             }
                         }
                     }
@@ -936,6 +938,38 @@ class PostController extends Controller
         // dd($dataSalv);
         // $ret['config'] = $config;
         // $ret['dataSalv'] = $dataSalv;
+        return $ret;
+    }
+    public function salvar_ajudante($config=false){
+        $ret['exec'] = false;
+        $ret['mens'] = false;
+        try {
+            if(isset($config['id_ajudante']) && $config['id_ajudante']>0 && isset($config['id_designacao']) && $config['id_designacao']>0 && isset($config['data'])){
+                $config['id_designado'] = $config['id_ajudante'];
+                $config['id_ajudante']=0;
+                $config['token'] = uniqid();
+                $config['id_designacao'] = 28; //id da desigação ajudante
+                $verifica = designation::where('data','=',$config['data'])->where('id_designacao','=',$config['id_designacao'])->where('id_designado','=',$config['id_designado'])->get();
+                if($verifica->count() > 0){
+                    // dd($verifica[0]['id']);
+                    $upn = designation::where('id','=',$verifica[0]['id'])->
+                                        update($config);
+
+                }else{
+                    $upn = designation::create($config);
+                }
+                if($upn){
+                    $ret['salva_data'] = Publicador::where('id','=',$config['id_designado'])
+                                        ->update([
+                                            'data_ultima' => $config['data'],
+                                            'token_ultima' => $config['token'],
+                                        ]);
+                }
+            }
+            $ret['exec'] = true;
+        } catch (\Throwable $th) {
+            $ret['mens'] = $th->getMessage();
+        }
         return $ret;
     }
     public function destroy($id,Request $request)

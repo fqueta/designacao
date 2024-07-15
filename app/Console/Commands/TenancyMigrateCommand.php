@@ -61,7 +61,7 @@ class TenancyMigrateCommand extends Command
             '--database' => $connection,
             '--path' => 'database/migrations/'.$connection,
         ]);
-        Qlib::selectDefaultConnection('mysql');
+        // Qlib::selectDefaultConnection('mysql');
         //seed
         // if($seed){
         //     Artisan::call('db:seed', [
