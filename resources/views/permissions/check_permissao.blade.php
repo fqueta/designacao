@@ -1,11 +1,12 @@
 
-<!--
+{{--
 As permissões são salvas no campo id_menu
 são comparadas no metodo ver_permAdmin da class Qlib
-ela é usada na difição dos gates
--->
+ela é usada na difição dos gates --}}
+
 @php
     $value = App\Qlib\Qlib::lib_json_array($config['value']);
+    // dump($config['dados']);
 @endphp
 <div class="col-md-12">
     <form action="/" id="permissoes">
@@ -28,19 +29,19 @@ ela é usada na difição dos gates
                 </thead>
                 <tbody>
                     @if (isset($config['dados']) && $config['dados'])
-
                         @foreach ($config['dados'] as $k=>$v)
-                        <tr for="ver-{{$v->id}}">
+                        <tr for="ver-{{$v['id']}}">
                             <td>
-                                <label for="ver-{{$v->id}}">
-                                    <input id="ver-{{$v->id}}" type="checkbox" class="check-permission" name="id_menu[ler][{{$v->url}}]" id="ver_{{$v->id}}" @if (isset($value['ler'][$v->url] ) && $value['ler'][$v->url]=='s') checked @endif value="s" > {{$v->description}}
+                                <label for="ver-{{$v['id']}}">
+                                    <input id="ver-{{$v['id']}}" type="checkbox" class="check-permission" name="id_menu[ler][{{$v['url']}}]" id="ver_{{$v['id']}}" @if (isset($value['ler'][$v['url']] ) && $value['ler'][$v['url']]=='s') checked @endif value="s" > {{$v['description']}}
                                 </label>
                             </td>
                             <td>
 
-                                @if (!empty($v->submenu))
+                                @if (!empty($v['submenu']) && is_array($v['submenu']))
                                 <table class="table table-hover">
-                                    @foreach ($v->submenu as $val)
+                                    @foreach ($v['submenu'] as $kvs=> $val)
+
                                     <tr class="">
                                         <td class="d-flex">
                                             <div class="col-6 px-0">
@@ -50,10 +51,10 @@ ela é usada na difição dos gates
                                                     {{$val->description}}
                                                 </label>
                                             </div>
-                                            @if (!empty($v->roles))
+                                            @if (!empty($v['roles']))
                                             <div class="col-6 px-0 text-right">
 
-                                                @foreach ($v->roles as$kr=>$vr)
+                                                @foreach ($v['roles'] as $kr=>$vr)
                                                 <label for="{{$val->url}}-{{$kr}}">
                                                     <input type="checkbox" class="check-permission" name="id_menu[{{$kr}}][{{$val->url}}]" value="s" id="{{$val->url}}-{{$kr}}"  @if (isset($value[$kr][$val->url] ) && $value[$kr][$val->url]=='s') checked @endif > {{$vr}}
                                                 </label>
@@ -65,16 +66,15 @@ ela é usada na difição dos gates
                                     @endforeach
                                 </table>
                                 @else
-                                @if (!empty($v->roles))
-                                            <div class="col-6 px-0 text-right">
-
-                                                @foreach ($v->roles as$kr=>$vr)
-                                                <label for="{{$v->url}}-{{$kr}}">
-                                                    <input type="checkbox" class="check-permission" name="id_menu[{{$kr}}][{{$v->url}}]" value="s" id="{{$v->url}}-{{$kr}}"  @if (isset($value[$kr][$v->url] ) && $value[$kr][$v->url]=='s') checked @endif > {{$vr}}
-                                                </label>
-                                                @endforeach
-                                            </div>
-                                            @endif
+                                    @if (!empty($v['roles']) && $v['id']>1)
+                                    <div class="col-12 px-0 text-right">
+                                        @foreach ($v['roles'] as $kr=>$vr)
+                                        <label for="{{$v['url']}}-{{$kr}}">
+                                            <input type="checkbox" class="check-permission" name="id_menu[{{$kr}}][{{$v['url']}}]" value="s" id="{{$v['url']}}-{{$kr}}"  @if (isset($value[$kr][$v['url']] ) && $value[$kr][$v['url']]=='s') checked @endif > {{$vr}}
+                                        </label>
+                                        @endforeach
+                                    </div>
+                                    @endif
                                 @endif
                             </td>
                         </tr>

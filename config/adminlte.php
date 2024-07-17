@@ -1,5 +1,4 @@
 <?php
-
 $config = [
 
     /*
@@ -14,7 +13,7 @@ $config = [
     |
     */
 
-    'title' => 'Designações Bela Aurora 1.0',
+    'title' => 'Designações Vida e ministério 1.0',
     'title_prefix' => '',
     'title_postfix' => '',
 

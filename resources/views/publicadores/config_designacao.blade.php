@@ -1,5 +1,6 @@
 @php
     $aceita = isset($value['designacao']['aceita']) ? $value['designacao']['aceita'] : [];
+    $tipoDesigancao = isset($dados['tipoDesigancao']) ? $dados['tipoDesigancao'] : [];
 @endphp
 <div class="card card-secondary">
     <div class="card-header">
@@ -14,8 +15,8 @@
                         <th>#</th>
                         <th>{{__('Designação')}}</th>
                         <th>{{__('Ultima')}}</th>
-                        <th>{{__('Sala')}}</th>
-                        <th>{{__('Demora')}}</th>
+                        {{-- <th>{{__('Sala')}}</th>
+                        <th>{{__('Demora')}}</th> --}}
                     </tr>
                 </thead>
                 <tbody>
@@ -31,14 +32,11 @@
                             <td>{{$v->nome}}</td>
                             <td><input type="date" name="config[designacao][ultima_{{$v->id}}]" id="dat_ultima_{{$v->id}}"></td>
                             {{-- <td>{{__('Sala')}}</td> --}}
-                            <td>{{__('Demora')}}</td>
+                            {{-- <td>{{__('Demora')}}</td> --}}
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         @endif
-    </div>
-    <div class="card-footer text-muted">
-        Footer
     </div>
 </div>

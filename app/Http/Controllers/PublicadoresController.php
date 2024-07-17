@@ -236,15 +236,75 @@ class PublicadoresController extends Controller
         $ret['campos'] = $campos;
         return $ret;
     }
+    //Metodo para montar um array contendo os ddi que estão na api do aeroclubejf
+    public function get_ddi(){
+        $ret = false;
+        $link_ddi = 'https://api.aeroclubejf.com.br/api/ddi';
+		$js_ddi = file_get_contents($link_ddi);
+		$ret = Qlib::lib_json_array($js_ddi);
+        return $ret;
+    }
+    /**
+     * Metodo para gerar um select de ddi
+     * @return string $input_ddi em html
+     */
+    public function ger_select_ddi($config=false){
+        $arr_ddi = $this->get_ddi();
+        $label = isset($config['label']) ? $config['label'] : '';
+        $dados = isset($config['dados']) ? $config['dados'] : [];
+        $ddi = isset($dados['config']['ddi']) ? $dados['config']['ddi'] : 55;
+        $telefonezap = isset($dados['config']['telefonezap']) ? $dados['config']['telefonezap'] : '';
+        $tmsel1 = '<select name="{name}" class="{class}" {event} id="{id}">{option}</select>';
+		$tmsel2 = '<option value="{value}" {selected}>{option_label}</option>';
+        $class_form = 'form-control';
+		if($arr_ddi && is_array($arr_ddi)){
+            // self::lib_print($arr_ddi);
+            if($tmsel1 && $tmsel2){
+                $opt = false;
+                foreach ($arr_ddi as $ki => $vi) {
+                    $opt .= str_replace('{value}',$vi['ddi'],$tmsel2);
+                    $option_label = $vi['pais'].' +'.$vi['ddi'];
+                    $selected = false;
+                    if($vi['ddi']==$ddi){
+                        $selected = 'selected';
+                    }
+                    $opt = str_replace('{option_label}',$option_label,$opt);
+                    $opt = str_replace('{selected}',$selected,$opt);
+                }
+            }
+            $input_zap = str_replace('{option}',$opt,$tmsel1);
+            $input_zap = str_replace('{name}','config[ddi]',$input_zap);
+            $input_zap = str_replace('{id}','ddi',$input_zap);
+            $cont_tel = '<input type="tel" value="'.$telefonezap.'" name="config[telefonezap]" required onblur="mask(this,clientes_mascaraTelefone);" onkeypress="mask(this,clientes_mascaraTelefone);" class="form-control" placeholder="Whatsapp" />';
+            $tms = '<div class="row"><div class="col-12"><label>'.$label.'</label></div><div class="col-3 pr-0">{cont_ddi}</div><div class="col-9 pl-0">{cont_tel}</div></div>';
+            $input_zap = str_replace('{cont_ddi}',$input_zap,$tms);
+            $input_zap = str_replace('{cont_tel}',$cont_tel,$input_zap);
+            $input_zap = str_replace('{class}',$class_form,$input_zap);
+            $input_zap = str_replace('{event}','',$input_zap);
+        }else{
+            $input_zap = false;
+        }
+        return $input_zap;
+    }
     public function campos($dados=false,$tipoDesigancao=false){
+        $telddi = $this->ger_select_ddi([
+            'label' => 'Celular',
+            'dados' => $dados,
+        ]);
+        $ddi = isset($dados['config']['ddi']) ? $dados['config']['ddi'] : '';
+        $telefonezap = isset($dados['config']['telefonezap']) ? $dados['config']['telefonezap'] : '';
+
+        $telddi_show = '<div class="col-12"><label>Celular:</label> '.$ddi.''.$telefonezap.'</div>';
+
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2'],
-            'nome'=>['label'=>'Nome do Publicador(a)','active'=>true,'placeholder'=>'Ex.: Cadastrado','type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'12'],
-            'endereco'=>['label'=>'Endereço Completo','active'=>false,'placeholder'=>'Ex.: Rua Almir Sathler 01 Ap 25 N18 Teixeiras','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'data_nasci'=>['label'=>'Data de nascimento','cp_busca'=>'','active'=>false,'type'=>'date','tam'=>'3','exibe_busca'=>'d-none','event'=>''],
-            'data_batismo'=>['label'=>'Data de batismo','cp_busca'=>'','active'=>false,'type'=>'date','tam'=>'3','exibe_busca'=>'d-none','event'=>''],
-            'tel'=>['label'=>'Telefone','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-none','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
+            'nome'=>['label'=>'Nome do Publicador(a)','active'=>true,'placeholder'=>'Ex.: Jonh Bar','type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'12'],
+            // 'endereco'=>['label'=>'Endereço Completo','active'=>false,'placeholder'=>'Ex.: Rua Almir Sathler 01 Ap 25 N18 Teixeiras','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            // 'data_nasci'=>['label'=>'Data de nascimento','cp_busca'=>'','active'=>false,'type'=>'date','tam'=>'3','exibe_busca'=>'d-none','event'=>''],
+            // 'data_batismo'=>['label'=>'Data de batismo','cp_busca'=>'','active'=>false,'type'=>'date','tam'=>'3','exibe_busca'=>'d-none','event'=>''],
+            'telddi'=>['label'=>'Telefone com ddi','active'=>false,'tam'=>'9','script'=>$telddi,'script_show'=>$telddi_show,'type'=>'html_script','class_div'=>''],
+            // 'tel'=>['label'=>'Telefone','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-none','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
             'genero'=>[
                 'label'=>'Sexo',
                 'active'=>false,
@@ -256,40 +316,40 @@ class PublicadoresController extends Controller
                 'option_select'=>false,
                 'class'=>'',
             ],
-            'inativo'=>[
-                'label'=>'Situação',
-                'active'=>false,
-                'type'=>'select',
-                //'arr_opc'=>['n'=>'Ativo','s'=>'Inativo','i'=>'Inrregular'],
-                'arr_opc'=>['n'=>'Ativo','s'=>'Inativo'],
-                'event'=>'',
-                'tam'=>'3',
-                'exibe_busca'=>true,
-                'option_select'=>false,
-                'class'=>'',
-            ],
-            'id_grupo'=>[
-                'label'=>'Grupo de campo',
-                'active'=>false,
-                'type'=>'select',
-                'arr_opc'=>Qlib::sql_array("SELECT id,grupo FROM grupos WHERE ativo='s'",'grupo','id'),
-                'event'=>'',
-                'tam'=>'3',
-                'exibe_busca'=>true,
-                'option_select'=>false,
-                'class'=>'',
-            ],
-            'pioneiro'=>[
-                'label'=>'Privilêgio',
-                'active'=>true,
-                'type'=>'select',
-                'arr_opc'=>['p'=>'Publicador','pa'=>'P.Auxiliar','pr'=>'P.Regular',],
-                'event'=>'',
-                'tam'=>'3',
-                'exibe_busca'=>true,
-                'option_select'=>false,
-                'class'=>'',
-            ],
+            // 'inativo'=>[
+            //     'label'=>'Situação',
+            //     'active'=>false,
+            //     'type'=>'select',
+            //     //'arr_opc'=>['n'=>'Ativo','s'=>'Inativo','i'=>'Inrregular'],
+            //     'arr_opc'=>['n'=>'Ativo','s'=>'Inativo'],
+            //     'event'=>'',
+            //     'tam'=>'3',
+            //     'exibe_busca'=>true,
+            //     'option_select'=>false,
+            //     'class'=>'',
+            // ],
+            // 'id_grupo'=>[
+            //     'label'=>'Grupo de campo',
+            //     'active'=>false,
+            //     'type'=>'select',
+            //     'arr_opc'=>Qlib::sql_array("SELECT id,grupo FROM grupos WHERE ativo='s'",'grupo','id'),
+            //     'event'=>'',
+            //     'tam'=>'3',
+            //     'exibe_busca'=>true,
+            //     'option_select'=>false,
+            //     'class'=>'',
+            // ],
+            // 'pioneiro'=>[
+            //     'label'=>'Privilêgio',
+            //     'active'=>true,
+            //     'type'=>'select',
+            //     'arr_opc'=>['p'=>'Publicador','pa'=>'P.Auxiliar','pr'=>'P.Regular',],
+            //     'event'=>'',
+            //     'tam'=>'3',
+            //     'exibe_busca'=>true,
+            //     'option_select'=>false,
+            //     'class'=>'',
+            // ],
             'fun'=>[
                 'label'=>'Designação',
                 'active'=>false,
@@ -301,33 +361,33 @@ class PublicadoresController extends Controller
                 'option_select'=>true,
                 'class'=>'',
             ],
-            'tipo'=>[
-                'label'=>'Esperança',
-                'active'=>false,
-                'type'=>'select',
-                'arr_opc'=>['o.o'=>'Outras ovelhas','u'=>'Ungido',],
-                'event'=>'',
-                'tam'=>'2',
-                'exibe_busca'=>true,
-                'option_select'=>false,
-                'class'=>'',
-            ],
-            'tags[]'=>[
-                'label'=>'Etiqueta',
-                'active'=>false,
-                'type'=>'select_multiple',
-                //'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),
-                'arr_opc'=>[
-                    'inrregular'=>'Inrregular',
-                    'sem_revisitas_6meses'=>'Sem Revisitas a 6 meses',
-                ],
-                'exibe_busca'=>'d-block',
-                'event'=>'',
-                'class'=>'',
-                'option_select'=>false,
-                'tam'=>'10',
-                'cp_busca'=>'tags]['
-            ],
+            // 'tipo'=>[
+            //     'label'=>'Esperança',
+            //     'active'=>false,
+            //     'type'=>'select',
+            //     'arr_opc'=>['o.o'=>'Outras ovelhas','u'=>'Ungido',],
+            //     'event'=>'',
+            //     'tam'=>'2',
+            //     'exibe_busca'=>true,
+            //     'option_select'=>false,
+            //     'class'=>'',
+            // ],
+            // 'tags[]'=>[
+            //     'label'=>'Etiqueta',
+            //     'active'=>false,
+            //     'type'=>'select_multiple',
+            //     //'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),
+            //     'arr_opc'=>[
+            //         'inrregular'=>'Inrregular',
+            //         'sem_revisitas_6meses'=>'Sem Revisitas a 6 meses',
+            //     ],
+            //     'exibe_busca'=>'d-block',
+            //     'event'=>'',
+            //     'class'=>'',
+            //     'option_select'=>false,
+            //     'tam'=>'10',
+            //     'cp_busca'=>'tags]['
+            // ],
             'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'config[designacao]'=>['label'=>'Designação','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'publicadores.config_designacao','dados'=>['value'=>@$dados['config'],'tipoDesigancao'=>$tipoDesigancao],'script_show'=>'publicadores.show_config_designacao'],
@@ -458,6 +518,7 @@ class PublicadoresController extends Controller
             // $ret = (new TagsController($this->user))->queryTag($get);
             $ret = Tag::where('excluido','=','n')
             ->where('deletado','=','n')
+            ->where('ativo','=','s')
             ->where('config','LIKE','%"post_type":"meio-semana"%')
             ->orderBy('ordem','ASC');
             if($publicador){
@@ -586,12 +647,12 @@ class PublicadoresController extends Controller
         if(isset($dados['config'])){
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }
-        if(!$data['data_nasci']){
-            unset($data['data_nasci']);
-        }
-        if(!$data['data_batismo']){
-            unset($data['data_batismo']);
-        }
+        // if(!$data['data_nasci']){
+        //     unset($data['data_nasci']);
+        // }
+        // if(!$data['data_batismo']){
+        //     unset($data['data_batismo']);
+        // }
         $atualizar=false;
         if(!empty($data)){
             $atualizar=Publicador::where('id',$id)->update($data);

@@ -588,6 +588,21 @@ class UserController extends Controller
         $ret['exec']=true;
 		return $ret;
 	}
+    /**
+     * Metodo para gerencia o login dos clientes
+     * @param ['email' => $email, 'password' => $password, 'ativo' => 's', 'excluido' => 'n']
+     * @return boolean true|false
+     */
+    public function login($dados){
+        $email = isset($dados['email']) ? $dados['email'] : false;
+        $password = isset($dados['password']) ? $dados['password'] : false;
+
+        if (Auth::attempt(['email' => $email, 'password' => $password, 'ativo' => 's', 'excluido' => 'n'])) {
+            return true;
+        }else{
+            return false;
+        }
+    }
     public function suspenso()
     {
         return view('admin.suspenso');

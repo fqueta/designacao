@@ -76,7 +76,7 @@ class TenancySeedCommand extends Command
         ];
         foreach ($arrSeed as $key => $v) {
             # code...
-            dump($v);
+            // dump($v);
             Artisan::call('migrate:refresh', [
                 '--path' => $v['path'],
             ]);

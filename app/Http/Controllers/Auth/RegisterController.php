@@ -66,7 +66,7 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
          //REGISTRAR EVENTO
-        $regev = Qlib::regEvent(['action'=>'register','tab'=>'user','config'=>[
+        $regev = Qlib::regEvent(['tab'=>'user','config'=>[
             'obs'=>'Usuario se cadastro pelo site',
             'link'=>'',
                 ]
