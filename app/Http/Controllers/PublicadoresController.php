@@ -464,6 +464,7 @@ class PublicadoresController extends Controller
             'token'=>uniqid(),
         ];
         $campos = $this->campos();
+        // dump($this->view);
         return view($this->view.'.createedit',[
             'config'=>$config,
             'title'=>$title,
@@ -606,6 +607,7 @@ class PublicadoresController extends Controller
                 'campos'=>$campos,
                 'exec'=>true,
             ];
+            // dump($this->view);
             return view($this->view.'.createedit',$ret);
         }else{
             $ret = [

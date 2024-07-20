@@ -4,7 +4,7 @@
 @endphp
 <div class="card card-secondary">
     <div class="card-header">
-        {{__('Desiganção')}}
+        {{__('Designação')}}
     </div>
     <div class="card-body">
         @if (isset($tipoDesigancao) && is_object($tipoDesigancao))
