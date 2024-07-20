@@ -576,7 +576,8 @@ class designaController extends Controller
             $ret['exec'] = true;
         } catch (\Throwable $th) {
             //throw $th;
-            $ret['exec'] = true;
+            $ret['exec'] = false;
+            $ret['mens'] = $th->getMessage();
         }
         return $ret;
     }
