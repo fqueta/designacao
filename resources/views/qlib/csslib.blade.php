@@ -1,4 +1,5 @@
 <link rel="shortcut icon" href="{{url('/vendor/adminlte/dist/img/AdminLTELogo.png')}}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <link rel="stylesheet" href="{{url('/vendor/summernote/summernote.min.css')}}">
 <link rel="stylesheet" href="{{url('/vendor/venobox/venobox.min.css')}}">
 <link rel="stylesheet" href="{{url('/css/jquery-ui.min.css')}}">

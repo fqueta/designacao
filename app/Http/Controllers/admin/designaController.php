@@ -698,6 +698,9 @@ class designaController extends Controller
                 $traco = '-----------';
                 $titulo = '*'.__('DESIGNAÇÃO PARA A REUNIÃO NOSSA VIDA E MINISTÉRIO CRISTÃO').'*'.$enter.$traco;
                 $tema ="{link_zap}&text=$titulo$enter*Nome:*$espa$nome$enter";
+                if($ajudante){
+                    $tema .="*Ajudante:*$espa$ajudante$enter";
+                }
                 $tema .="*Semana:*$espa$semana$enter";
                 $tema .="*Número:*$espa$numero$enter";
                 $tema .=$obs.$enter;
@@ -709,5 +712,19 @@ class designaController extends Controller
             }
         }
         return $ret;
+    }
+    /**Metogo para gerar um link ajax do link_whatsapp
+     * @param int $id da parte
+     */
+    public function link_zap(Request $request){
+        $ret['exec'] = false;
+        $ret['link'] = false;
+        if($request->has('id')){
+            $ret['link'] = $this->link_whatsapp($request->get('id'));
+            if($ret['link']){
+                $ret['exec'] = true;
+            }
+        }
+        return response()->json($ret);;
     }
 }

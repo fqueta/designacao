@@ -28,6 +28,7 @@ class PostController extends Controller
     public $view;
     public $post_type;
     public $sec;
+    public $tab;
     public $i_wp;//integração com wp
     public $wp_api;//integração com wp
     public function __construct(User $user)

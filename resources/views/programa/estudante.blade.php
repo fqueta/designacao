@@ -7,7 +7,8 @@
             @foreach ($partes as $k_parte=>$parte)
                 @if (isset($parte['id_designado']) && $parte['id_designado']>0)
                     @php
-                        $link_zap = (new App\Http\Controllers\admin\designaController)->link_whatsapp($parte['id']);
+                        // $link_zap = (new App\Http\Controllers\admin\designaController)->link_whatsapp($parte['id']);
+                        $link_zap = true;
                     @endphp
                     <div class="col-6 pr-2 pl-2">
                         <table class="table mb-3">
@@ -15,11 +16,12 @@
                                 <tr class="text-right d-print-none">
                                     <td colspan="2" >
                                         @if ($link_zap)
-                                            <a href="{!!$link_zap!!}" class="btn btn-outline-success"><i class="fa fa-whatsapp"></i> Enviar</a>
+                                            {{-- <a href="{!!$link_zap!!}" class="btn btn-outline-success btn-sm" title="{{__('Enviar via whatsapp')}}"><i class="fa-brands fa-whatsapp"></i></a> --}}
+                                            <button type="button" class="btn btn-outline-success btn-sm" onclick="gerar_link_envia('{{$parte['id']}}')" title="{{__('Enviar via whatsapp')}}"><i class="fa-brands fa-whatsapp"></i></button>
                                         @endif
-                                            <a href="{!!$url!!}/publicadores/{{$parte['id_designado']}}/edit?redirect_base={{base64_encode(url()->current())}}" class="btn btn-outline-primary"> <i class="fa fa-pen" title="{{__('Editar')}}"></i></a>
-                                        </td>
-                                    </tr>
+                                        <button type="button" onclick="edit_designado('{{$parte['id_designado']}}');" class="btn btn-outline-primary btn-sm"> <i class="fa fa-pen" title="{{__('Editar cadastro do estudante')}}"></i></button>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <th class="text-center border-0" colspan="2"> {{__('DESIGNAÇÃO PARA A REUNIÃO NOSSA VIDA E MINISTÉRIO CRISTÃO')}} </th>
                                 </tr>

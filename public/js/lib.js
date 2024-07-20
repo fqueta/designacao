@@ -2425,7 +2425,7 @@ function expandeU4(obj){
     // obj.parent('ul').show();
 }
 function select_m_paraticipante(obj,campo,id_m){
-    var id_designado = obj.value,nome_designado = obj.getAttribute('nome'),sel_id='[name="' + campo + '"]',sel_nome='[data-campo="' + campo + '"]';
+    var id_designado = obj.value,nome_designado = obj.getAttribute('nome'),sel_id='[name="' + campo + '"]',sel_nome='[data-campo="' + campo + '"]',btn=' <button type="button" onclick="remove_designado(\''+id_m+'\',\''+nome_designado+'\');" class="btn btn-light"><i class="fa fa-trash"></i></button>';
     $(sel_id).val(id_designado);
     $(sel_nome).html(nome_designado);
     $('#'+id_m).modal('hide');
@@ -2463,4 +2463,27 @@ function sinc_partes_jw(obj,type){
             console.log(err);
         });
     }
+}
+function remove_designado(id,name){
+    var nome = 'Selecionar Participante';
+    $('[name="'+name+'"]').val(0);
+    $('[data-target="#'+id+'"]').html(nome);
+}
+function edit_designado(id){
+    let url = '/publicadores/'+id+'/edit?redirect='+lib_urlAtual();
+    // abrirjanelaPadraoConsulta(url,'pp');
+    window.location = url;
+}
+function gerar_link_envia(id_parte){
+    getAjax({
+        url:'/ajax/link-zap',
+        data:{
+            id:id_parte
+        }
+    },function(res){
+        $('#preload').fadeOut("fast");
+        if(res.exec && res.link){
+            abrirjanelaPadraoConsulta(res.link,'what');
+        }
+    });
 }

@@ -44,6 +44,7 @@
                 'data_extensso' => App\Qlib\Qlib::dataExtensso($v1),
                 'value'=>@$designacao['id_ajudante'],
                 'tipo'=>'id_ajudante',
+                'dados'=>@$designacao,
             ])
             </div>
             <div class="col-md-8">
