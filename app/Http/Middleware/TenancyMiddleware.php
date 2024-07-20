@@ -7,6 +7,8 @@ use App\Models\empresas;
 use App\Qlib\Qlib;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 class TenancyMiddleware
 {
@@ -34,12 +36,15 @@ class TenancyMiddleware
             $arr_t = $tenancy->toArray();
             session()->push('tenancy', $arr_t);
             if(isset($arr_t['config']) && Qlib::isJson($arr_t['config'])){
+                // dump($tenancy->toArray());
+                Config::set('adminlte.title', 'DVM - '.$tenancy['nome']);
                 $arr_config = Qlib::lib_json_array($arr_t['config']);
                 Qlib::selectDefaultConnection('tenant',$arr_config);
 
             }
             //carrega a nova coneaxao
             // (new Connect($tenancy))->setDefault();
+            // dump(Auth::user());
         }
         return $next($request);
     }

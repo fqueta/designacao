@@ -25,7 +25,7 @@ class HomeController extends Controller
     public $tab;
     public function __construct(User $user)
     {
-        $this->middleware('auth');
+        // $this->middleware('auth');
         $this->user = $user;
         $this->tab = 'home';
         $this->title = 'Dashboard';

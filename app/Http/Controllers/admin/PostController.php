@@ -32,7 +32,7 @@ class PostController extends Controller
     public $wp_api;//integração com wp
     public function __construct(User $user)
     {
-        $this->middleware('auth');
+        // $this->middleware('auth');
         $seg1 = request()->segment(1);
         $seg2 = request()->segment(2);
         $type = false;

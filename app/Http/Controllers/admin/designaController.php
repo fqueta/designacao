@@ -95,7 +95,8 @@ class designaController extends Controller
                                 ->where('sessao','=',$ks)->orderBy('ordem','asc')
                                 ->get();
                                 if($dt->count()){
-                                    $pr[$vd][$ks] = $dt->toArray();
+                                    $dpa = $dt->toArray();
+                                    $pr[$vd][$ks] = $dpa;
                                 }
                             }
                             // Qlib::lib_print($pr);
@@ -108,7 +109,6 @@ class designaController extends Controller
             $ret['programa'] = $pr;
             $ret['all'] = $d;
         }
-        // dd($ret);
         return $ret;
     }
     public function removeDesignacao(Request $request){
@@ -657,6 +657,57 @@ class designaController extends Controller
         // }
         $ret['arr_datas'] = $arr_datas;
         $ret = $sinc;
+        return $ret;
+    }
+    /**
+     * Metodo para gerar um link whatsapp da desiganção para ser colocado na tag a
+     * @param int $id da parte
+     */
+    public function link_whatsapp($id){
+        $ret = false;
+        if($id){
+            $dp = designation::select(
+                'designations.data',
+                'designations.numero',
+                'designations.id_designado',
+                'designations.id_ajudante',
+                'designations.obs',
+                'publicadores.nome','publicadores.config'
+            )->join('publicadores', 'publicadores.id', '=','designations.id_designado')
+            ->where('designations.id','=',$id)
+            ->get();
+            if($dp->count() > 0){
+                $dp = $dp[0]->toArray();
+                $arr_config = Qlib::lib_json_array($dp['config']);
+                $nome = $dp['nome'];
+                $numero = $dp['numero'];
+                $obs = $dp['obs'];
+                $obs1 = '*observação para o estudante* A lição e a fonte de matéria para a sua designação estão na Apostila da Reunião vida e Ministério. Veja as instruções para a parte que estão nas Instruções para a Reunão Nossa Vida e Ministério Cristão (S-38)';
+                $semana = Qlib::dataExtensso($dp['data']);
+                $local = 'Salão principal';
+                $ajudante = Qlib::buscaValorDb0('publicadores','id',$dp['id_ajudante'],'nome');
+                $celular_zap = '';
+                if(isset($arr_config['ddi']) && !empty($arr_config['ddi']) && isset($arr_config['telefonezap']) && !empty($arr_config['telefonezap'])){
+                    $celular_zap = $arr_config['ddi'].$arr_config['telefonezap'];
+                    $celular_zap = str_replace('(', '', $celular_zap);
+                    $celular_zap = str_replace(')', '', $celular_zap);
+                    $celular_zap = str_replace('-', '', $celular_zap);
+                }
+                $espa = '%20';
+                $enter = '%0A';
+                $traco = '-----------';
+                $titulo = '*'.__('DESIGNAÇÃO PARA A REUNIÃO NOSSA VIDA E MINISTÉRIO CRISTÃO').'*'.$enter.$traco;
+                $tema ="{link_zap}&text=$titulo$enter*Nome:*$espa$nome$enter";
+                $tema .="*Semana:*$espa$semana$enter";
+                $tema .="*Número:*$espa$numero$enter";
+                $tema .=$obs.$enter;
+                $tema .=$obs1;
+
+                $link_zap = 'https://api.whatsapp.com/send?phone='.$celular_zap;
+				$ret = str_replace('{link_zap}',$link_zap,$tema);
+                // dd($dp);
+            }
+        }
         return $ret;
     }
 }

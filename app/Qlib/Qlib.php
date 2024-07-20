@@ -1231,7 +1231,10 @@ class Qlib
             // Config::set('database.connections.'.$connection, $clone);
 
         }
-        Config::set('database.default', $connection);
+        DB::purge($connection);
+        DB::reconnect($connection);
+        DB::setDefaultConnection($connection);
+        // Config::set('database.default', $connection);
         return DB::getDefaultConnection();
 
     }

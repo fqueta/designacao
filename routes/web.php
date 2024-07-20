@@ -5,6 +5,7 @@ use App\Http\Controllers\admin\EventController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\admin\UserPermissions;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\GerenciarGrupo;
 use App\Http\Controllers\GerenciarUsuarios;
 use App\Http\Controllers\FamiliaController;
@@ -33,8 +34,14 @@ use Illuminate\Support\Facades\Mail;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::middleware(TenancyMiddleware::class)->group(function () {
-
+// Auth::routes([
+//     'register' => false, // Ou false para desabilitar o registro
+//     'reset' => false, // Ou false para desabilitar o reset de senha
+//     'verify' => false, // Ou false para desabilitar a verificação de email
+//     'login' => false, // Ou false para desabilitar a verificação de email
+// ]);
+Route::middleware(['web', TenancyMiddleware::class])->group(function () {
+    Auth::routes();
     Route::prefix('/ajax')->group(function(){
         Route::post('/desigancao-remove',[designaController::class,'removeDesignacao'])->name('ajax.designacao.remove');
         Route::get('/list-participantes',[designaController::class,'get_participantes'])->name('ajax.get.participantes');
@@ -117,10 +124,8 @@ Route::middleware(TenancyMiddleware::class)->group(function () {
         'fim-semana' => 'id'
     ]]);
 
-    Auth::routes();
-
     Route::get('/',function(){
-    return redirect()->route('login');
+        return redirect()->route('login');
     });
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('/transparencia', [App\Http\Controllers\HomeController::class, 'transparencia'])->name('transparencia');
@@ -150,4 +155,23 @@ Route::middleware(TenancyMiddleware::class)->group(function () {
         Route::get('/cards',[PublicadoresController::class,'cards'])->name('publicadores.cards');
     });
 });
+// Route::middleware(['guest', TenancyMiddleware::class])->group(function () {
+//     Route::get('login', [LoginController::class,'showLoginForm'])->name('login');
+//     Route::post('login', [LoginController::class,'login']);
+//     Route::post('password/email', [LoginController::class,'sendResetLinkEmail'])->name('password.email');
+//     Route::post('password/reset', [LoginController::class,'reset'])->name('password.update');
+//     Route::get('password/reset', [LoginController::class,'showLinkRequestForm'])->name('password.request');
+//     Route::get('password/reset/{token}', [LoginController::class,'showResetForm'])->name('password.reset');
+// });
+
+// Route::middleware(['auth', TenancyMiddleware::class])->group(function () {
+//     Route::post('logout', [LoginController::class,'logout'])->name('logout');
+//     Route::get('verify', [LoginController::class,'showRegistrationForm'])->name('register');
+//     Route::post('register', [LoginController::class,'register']);
+//     // Outras rotas protegidas por autenticação...
+// });
+// Route::middleware(TenancyMiddleware::class)->group(function () {
+
+
+// });
 

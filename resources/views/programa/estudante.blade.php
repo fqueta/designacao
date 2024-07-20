@@ -1,11 +1,25 @@
+    @php
+        $url = url('/');
+    @endphp
     @if($k_sessao=='tesouros' || $k_sessao=='ministerio')
         @if (is_array($partes))
         <div class="row">
             @foreach ($partes as $k_parte=>$parte)
                 @if (isset($parte['id_designado']) && $parte['id_designado']>0)
+                    @php
+                        $link_zap = (new App\Http\Controllers\admin\designaController)->link_whatsapp($parte['id']);
+                    @endphp
                     <div class="col-6 pr-2 pl-2">
                         <table class="table mb-3">
                             <thead>
+                                <tr class="text-right d-print-none">
+                                    <td colspan="2" >
+                                        @if ($link_zap)
+                                            <a href="{!!$link_zap!!}" class="btn btn-outline-success"><i class="fa fa-whatsapp"></i> Enviar</a>
+                                        @endif
+                                            <a href="{!!$url!!}/publicadores/{{$parte['id_designado']}}/edit?redirect_base={{base64_encode(url()->current())}}" class="btn btn-outline-primary"> <i class="fa fa-pen" title="{{__('Editar')}}"></i></a>
+                                        </td>
+                                    </tr>
                                 <tr>
                                     <th class="text-center border-0" colspan="2"> {{__('DESIGNAÇÃO PARA A REUNIÃO NOSSA VIDA E MINISTÉRIO CRISTÃO')}} </th>
                                 </tr>

@@ -40,6 +40,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    // protected $connection = 'tenant';
 
     /**
      * The attributes that should be cast.

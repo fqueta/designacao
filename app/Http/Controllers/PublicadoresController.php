@@ -21,7 +21,7 @@ class PublicadoresController extends Controller
     public $view;
     public function __construct(User $user)
     {
-        $this->middleware('auth');
+        // $this->middleware('auth');
         $this->user = $user;
         $this->routa = 'publicadores';
         $this->label = 'Publicador';

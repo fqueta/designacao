@@ -71,10 +71,14 @@ class LoginController extends Controller
             if (is_numeric($request->get('email'))) {
                 $key = 'mobile_no';
             }
-            $logar = (new UserController)->login([$key => $request->email, 'password' => $request->password, 'ativo' => 's', 'excluido' => 'n']);
+            // $credentials = $request->only('email', 'password');
+            $credentials = [$key => $request->email, 'password' => $request->password, 'ativo' => 's', 'excluido' => 'n'];
+            $logar = Auth::guard('web')->attempt($credentials, $request->filled('remember'));
+            // $logar = (new UserController)->login([$key => $request->email, 'password' => $request->password, 'ativo' => 's', 'excluido' => 'n']);
             if ($logar) {
                 $dUser =  Auth::user();
                 $id_cliente = 5;
+                // dd($dUser);
                 if($request->has('r')){
                     //nesse caso redirect ulr
                     return redirect($request->get('r'));
@@ -82,7 +86,10 @@ class LoginController extends Controller
 
                 if (isset($dUser['id_permission']) && $dUser['id_permission'] < $id_cliente) {
                     //login do administrado
-                    return redirect()->route('home');
+                    // return redirect()->route('home');
+                    // dump($dUser);
+                    // dd(url('/home'));
+                    return redirect(url('/home'));
                 } else {
                     //login do cliente
                     return redirect()->route('index');
@@ -110,5 +117,9 @@ class LoginController extends Controller
             return ['mobile_no' => $request->get('email'), 'password' => $request->get('password')];
         }
         return $request->only($this->username(), 'password');
+    }
+    public function showLoginForm()
+    {
+        return view('auth.login');
     }
 }
