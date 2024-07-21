@@ -1,5 +1,5 @@
 @php
-    $aceita = isset($value['designacao']['aceita']) ? $value['designacao']['aceita'] : [];
+    $aceita = isset($dados['value']['designacao']['aceita']) ? $dados['value']['designacao']['aceita'] : [];
     $tipoDesigancao = isset($dados['tipoDesigancao']) ? $dados['tipoDesigancao'] : [];
 @endphp
 <div class="card card-secondary">

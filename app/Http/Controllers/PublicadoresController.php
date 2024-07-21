@@ -607,7 +607,7 @@ class PublicadoresController extends Controller
                 'campos'=>$campos,
                 'exec'=>true,
             ];
-            // dump($this->view);
+            // dump($ret);
             return view($this->view.'.createedit',$ret);
         }else{
             $ret = [
