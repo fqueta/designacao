@@ -2487,3 +2487,29 @@ function gerar_link_envia(id_parte){
         }
     });
 }
+function trocar_designado(obj,ida,name){
+    var seletor = 'data-trocar="id"';
+    var veri = $('['+seletor+']').val();
+    if(typeof veri=='undefined'){
+        var idParicipante = $('[name="'+name+'"]').val();
+        // $().css('color', '#F00').attr('data-change="link"');
+        var alvo1 = document.querySelector('[data-target="#'+ida+'"]')
+        var alvo2 = document.querySelector('[name="'+name+'"]')
+        alvo1.setAttribute('data-trocar','link');
+        alvo2.setAttribute('data-trocar','id');
+        obj.setAttribute('data-trocar','btn');
+        alvo1.style.color = '#F00';
+        obj.classList.remove('btn-default'),obj.classList.add("btn-danger");
+    }else{
+        var idP = $('[name="'+name+'"]').val();
+        var idPa = $('[data-trocar="id"]').val(); //alvo
+        if(typeof idP!='undefined' && typeof idpa !='undefined'){
+            var alvo1 = document.querySelector('[data-target="#'+ida+'"]'),alvo2 = document.querySelector('[name="'+name+'"]'),alvo3 = document.querySelector('[data-trocar="id"]'),alvo4 = document.querySelector('[data-trocar="link"]'),btn=querySelector('[data-trocar="btn"]');
+            alvo1.value = alvo3.value,alvo2.value = alvo4.value;
+            btn.classList.remove('btn-danger'),btn.classList.add("btn-default");
+        }
+        console.log(idParicipante);
+
+
+    }
+}

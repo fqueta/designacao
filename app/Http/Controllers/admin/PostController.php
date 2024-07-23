@@ -520,8 +520,8 @@ class PostController extends Controller
             }
             if($this->sec=='programa' || $this->sec=='meio-semana' || $this->sec=='fim-semana'){
                 $this->view='programa';
-                $config['mbs1'] = Qlib::get_postmeta('mbs1')?Qlib::get_postmeta('mbs1'):7; //Margin bottom semana 1
-                $config['mbs2'] = Qlib::get_postmeta('mbs2')?Qlib::get_postmeta('mbs2'):25; //Margin bottom semana 2
+                $config['mbs1'] = Qlib::get_postmeta('mbs1')?Qlib::get_postmeta('mbs1'):5; //Margin bottom semana 1
+                $config['mbs2'] = Qlib::get_postmeta('mbs2')?Qlib::get_postmeta('mbs2'):5; //Margin bottom semana 2
             }
             //array de tipos de desiganações
             $ret = [

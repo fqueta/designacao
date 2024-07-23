@@ -81,22 +81,24 @@
                                 <tbody>
                                 @if (is_array($partes))
                                     @foreach ($partes as $k_parte=>$parte )
-                                        @php
-                                            $nome = strtoupper(@$participantes[$parte['id_designado']]);
-                                            if($parte['id_ajudante']>0){
-                                                $nome .= '/ '.strtoupper(@$participantes[$parte['id_ajudante']]);
-                                            }
-                                            if($parte['numero'] != 0){
-                                                $numero = @$parte['numero'];
-                                            }else{
-                                                $numero = '';
-                                            }
-                                        @endphp
+                                        @if($parte['id_designacao']!=28)
+                                            @php
+                                                $nome = strtoupper(@$participantes[$parte['id_designado']]);
+                                                if($parte['id_ajudante']>0){
+                                                    $nome .= '/ '.strtoupper(@$participantes[$parte['id_ajudante']]);
+                                                }
+                                                if($parte['numero'] != 0){
+                                                    $numero = @$parte['numero'];
+                                                }else{
+                                                    $numero = '';
+                                                }
+                                            @endphp
 
-                                        <tr class="col-12">
-                                            <td style="width:65%" class="text-left"><b>{{@$numero}} </b><b>{{@$tipos[$parte['id_designacao']]}}</b>: {{@$parte['obs']}} </td>
-                                            <td style="width:35%" class="text-right"><span>{{$nome}}</span></td>
-                                        </tr>
+                                            <tr class="col-12">
+                                                <td style="width:65%" class="text-left"><b>{{@$numero}} </b><b>{{@$tipos[$parte['id_designacao']]}}</b>: {{@$parte['obs']}} </td>
+                                                <td style="width:35%" class="text-right"><span>{{$nome}}</span></td>
+                                            </tr>
+                                        @endif
                                     @endforeach
                                 @endif
                                 </tbody>
@@ -143,6 +145,5 @@
     @endphp
     <div class="row d-flex justify-content-center d-print-none mb-4 pb-3">
         <label for="">Margem</label>: <input type="number" class="text-center" value="{{$mb}}" onchange="change_margin_b(this,'{{$id_mb}}')" name="" id="{{$id_mb}}">
-        {{-- <button type="button" class="btn btn-secondary" onclick="change_margin_b(this)"> <i class="fas fa-check"></i>  </button> --}}
     </div>
 @endif
