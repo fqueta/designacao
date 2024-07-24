@@ -1,3 +1,4 @@
+@if($designacao['id_designacao']!=28)
 <li class="list-group-item" id="{{$v1}}_{{$k_sessao}}_{{$ordem}}" data-li_id="{{@$designacao['id']}}">
     @php
         $name = 'des2['.$v1.'][partes][' . $k_sessao . '][' . $ordem . ']';
@@ -54,3 +55,4 @@
         </div>
     </div>
 </li>
+@endif
