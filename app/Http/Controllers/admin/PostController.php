@@ -909,6 +909,7 @@ class PostController extends Controller
                                     $ret['da'][$ordem] = $dsa;
                                     // Qlib::lib_print($dsa);
                                     //verificar e salvar um ajudante
+
                                     if($dsa['id_ajudante']>0){
                                         $ret['salvar_ajudante'] = $this->salvar_ajudante($dsa);
                                     }
@@ -950,9 +951,11 @@ class PostController extends Controller
                 $config['id_ajudante']=0;
                 $config['token'] = uniqid();
                 $config['id_designacao'] = 28; //id da desigação ajudante
-                $verifica = designation::where('data','=',$config['data'])->where('id_designacao','=',$config['id_designacao'])->where('id_designado','=',$config['id_designado'])->get();
+                $verifica = designation::where('data','=',$config['data'])->where('id_designacao','=',$config['id_designacao'])->where('numero','=',$config['numero'])->get();
+                // dump($config);
+                // $verifica = designation::where('data','=',$config['data'])->where('id_designacao','=',$config['id_designacao'])->get();
+                // dd($verifica->count());
                 if($verifica->count() > 0){
-                    // dd($verifica[0]['id']);
                     $upn = designation::where('id','=',$verifica[0]['id'])->
                                         update($config);
 

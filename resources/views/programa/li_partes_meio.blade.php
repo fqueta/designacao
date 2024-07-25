@@ -1,4 +1,4 @@
-@if($designacao['id_designacao']!=28)
+@if(isset($designacao['id_designacao']) && $designacao['id_designacao']!=28)
 <li class="list-group-item" id="{{$v1}}_{{$k_sessao}}_{{$ordem}}" data-li_id="{{@$designacao['id']}}">
     @php
         $name = 'des2['.$v1.'][partes][' . $k_sessao . '][' . $ordem . ']';
@@ -36,18 +36,21 @@
         <div class="col-md-1 text-right pt-3 mt-3">
             <button type="button" onclick="remove_designacao('{{@$designacao['id']}}');" class="btn btn-danger btn-block"><i class="fas fa-times"></i></button>
         </div>
+
         <div class="row w-100 mr-0 ml-0">
-            <div class="col-md-4">
-                <label>Ajudante</label>
-            @include('programa.select_participantes',[
-                'arr' => $arr_participantes,
-                'name' => $name.'[id_ajudante]',
-                'data_extensso' => App\Qlib\Qlib::dataExtensso($v1),
-                'value'=>@$designacao['id_ajudante'],
-                'tipo'=>'id_ajudante',
-                'dados'=>@$designacao,
-            ])
-            </div>
+            @if($k_sessao!='tesouros' && $k_sessao!='inicio' && $k_sessao!='vida')
+                <div class="col-md-4">
+                        <label>Ajudante</label>
+                        @include('programa.select_participantes',[
+                            'arr' => $arr_participantes,
+                            'name' => $name.'[id_ajudante]',
+                            'data_extensso' => App\Qlib\Qlib::dataExtensso($v1),
+                            'value'=>@$designacao['id_ajudante'],
+                            'tipo'=>'id_ajudante',
+                            'dados'=>@$designacao,
+                        ])
+                </div>
+            @endif
             <div class="col-md-8">
                 <label for="tema">Tema</label>
                 <input class="form-control" type="text" name="{{$name}}[obs]" value="{{@$designacao['obs']}}" id="">
