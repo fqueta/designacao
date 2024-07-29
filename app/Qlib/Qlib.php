@@ -105,6 +105,7 @@ class Qlib
                         'url'=>$f,
                         'valor'=>$v,
                         'created_at'=>self::dataBanco(),
+                        'token'=>uniqid(),
                     ]);
                 }
                 $ret['exec'] = $exec;
