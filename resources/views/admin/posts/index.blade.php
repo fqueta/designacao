@@ -31,7 +31,7 @@
                         <label for=""> Todo com {{ $k }}</label> = {{ $pTitulo }}, e
                     @endforeach
                 @else
-                    {{ $titulo_tabela }}
+                    {!! $titulo_tabela !!}
                 @endif
             </h4>
             @can('is_admin')

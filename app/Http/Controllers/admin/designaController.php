@@ -728,4 +728,23 @@ class designaController extends Controller
         }
         return response()->json($ret);;
     }
+    /**
+     * metodo para pegar desiganções de fim de semana
+     *
+     */
+    public function get_partes_fim_semana(){
+        $tipos_designacao_fim = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1' AND config LIKE '%\"post_type\":\"fim-semana\"%'",'nome','id');
+        return $tipos_designacao_fim;
+    }
+    /**
+     * Metodo para exibir opçoes d
+     */
+    public function arr_dias_fim_semana($val=false){
+        $arr = ['s'=>'Sábado','d'=>'Domingo'];
+        if($val){
+            return $arr[$val];
+        }
+        return $arr;
+
+    }
 }

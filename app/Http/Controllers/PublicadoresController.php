@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\admin\designaController;
 use App\Http\Controllers\admin\TagsController;
 use stdClass;
 use Illuminate\Http\Request;
@@ -295,7 +296,7 @@ class PublicadoresController extends Controller
         $telefonezap = isset($dados['config']['telefonezap']) ? $dados['config']['telefonezap'] : '';
 
         $telddi_show = '<div class="col-12"><label>Celular:</label> '.$ddi.''.$telefonezap.'</div>';
-
+        $partes_fim_semana = (new designaController)->get_partes_fim_semana();
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2'],
@@ -390,7 +391,7 @@ class PublicadoresController extends Controller
             // ],
             'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'config[designacao]'=>['label'=>'Designação','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'publicadores.config_designacao','dados'=>['value'=>@$dados['config'],'tipoDesigancao'=>$tipoDesigancao],'script_show'=>'publicadores.show_config_designacao'],
+            'config[designacao]'=>['label'=>'Designação','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'publicadores.config_designacao','dados'=>['value'=>@$dados['config'],'tipoDesigancao'=>$tipoDesigancao,'d'=>$dados,'partes_fim_semana'=>$partes_fim_semana],'script_show'=>'publicadores.show_config_designacao'],
 
         ];
     }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\admin\designaController;
 use App\Http\Controllers\admin\EventController;
+use App\Http\Controllers\admin\QoptionsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\admin\UserPermissions;
@@ -48,6 +49,7 @@ Route::middleware(['web', TenancyMiddleware::class])->group(function () {
             Route::get('/list-participantes',[designaController::class,'get_participantes'])->name('ajax.get.participantes');
             Route::post('/sinc-partes-jw',[designaController::class,'sinc_partes'])->name('ajax.sinc.partes');
             Route::get('/link-zap',[designaController::class,'link_zap'])->name('ajax.link.zap');
+            Route::post('/edit_options',[QoptionsController::class,'edit_options'])->name('ajax.edit_options');
         });
         Route::prefix('users')->group(function(){
             Route::get('/',[UserController::class,'index'])->name('users.index');

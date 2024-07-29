@@ -79,10 +79,16 @@ class PostController extends Controller
             $post =  Post::where('post_status','!=','inherit')->orderBy('id',$config['order']);
         }
         //$post =  DB::table('posts')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        $config['dia_reuniao_fim_semana'] = Qlib::qoption('dia_reuniao_fim_semana');
+        $config['dia_reuniao_fim_semana_extensso'] = Qlib::get_reuniao_fim_semana($config['dia_reuniao_fim_semana']);
+        $dia_reuniao_fim_semana = $config['dia_reuniao_fim_semana_extensso'];
 
         $post_totais = new stdClass;
         $campos = isset($_SESSION['campos_posts_exibe']) ? $_SESSION['campos_posts_exibe'] : $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
+        if($this->sec=='fim-semana'){
+            $tituloTabela .= '<br><small>Dia da reunão de fim de semana: <b class="d-r-f-semana">'.$dia_reuniao_fim_semana.'</b> </small><button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#opcoes" title="Editar dia"><i class="fas fa-pen "></i></button>';
+        }
         $arr_titulo = false;
         if(isset($get['filter'])){
                 $titulo_tab = false;
@@ -170,7 +176,7 @@ class PostController extends Controller
         if($route_name=="programa.create" || $route_name=="meio-semana.create" || $route_name=="fim-semana.create"){
             $fd = Qlib::arr_month(date('Y'));
             $fd2 = Qlib::arr_month2(date('Y'));
-            // dd($fd,$fd2);
+            // dump($fd,$fd2);
             $arr_datas = [];
             $arr_datas2 = [];
             if($fd2 && is_array($fd)){
@@ -319,7 +325,6 @@ class PostController extends Controller
         ];
         //REGISTRAR EVENTOS
         // (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
-
         return view($this->view.'.index',$ret);
     }
     public function create(User $user)
@@ -347,6 +352,7 @@ class PostController extends Controller
             'token'=>uniqid(),
         ];
         $campos = $this->campos();
+        // dump($campos);
          //REGISTRAR EVENTO CADASTRO
         //  $regev = Qlib::regEvent(['action'=>'create','tab'=>$this->tab,'config'=>[
         //     'obs'=>'Abriu tela de cadastro',
@@ -523,6 +529,12 @@ class PostController extends Controller
                 $config['mbs1'] = Qlib::get_postmeta('mbs1')?Qlib::get_postmeta('mbs1'):5; //Margin bottom semana 1
                 $config['mbs2'] = Qlib::get_postmeta('mbs2')?Qlib::get_postmeta('mbs2'):5; //Margin bottom semana 2
             }
+            $config['label_semana'] = 'Semana:';
+            if($this->sec=='fim-semana'){
+                //Pedagar configuração de dia do final de semana
+                $config['label_semana'] = Qlib::get_reuniao_fim_semana();
+            }
+
             //array de tipos de desiganações
             $ret = [
                 'value'=>$dados,
@@ -690,10 +702,17 @@ class PostController extends Controller
                 if($this->sec=='meio-semana' || $this->sec=='fim-semana'){
                     $this->view = 'programa';
                 }
+
             }
             //REGISTRAR EVENTOS
             // (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
             $config['arr_desiganacao'] = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1' ORDER BY nome ASC",'nome','id');
+            //Label para o titulo da pagina de designações
+            $config['label_semana'] = 'Semana:';
+            if($this->sec=='fim-semana'){
+                //Pedagar configuração de dia do final de semana
+                $config['label_semana'] = Qlib::get_reuniao_fim_semana();
+            }
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,

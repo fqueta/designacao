@@ -2,9 +2,53 @@
     <div class="card">
         <form action="" id="frm-consulta" method="GET">
             <div class="row mr-0 ml-0">
+            <!-- Button trigger modal -->
+            {{-- <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#opcoes">
+              Launch
+            </button> --}}
+            <!-- Modal -->
+            <div class="modal fade" id="opcoes" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{__('Editar Opções')}}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-12">
+                                        {{App\Qlib\Qlib::qForm([
+                                            'type'=>'select',
+                                            'campo'=>'limit',
+                                            'placeholder'=>'',
+                                            'label'=>'Dia da reunião de fim de semana',
+                                            'ac'=>'alt',
+                                            'value'=>@$config['dia_reuniao_fim_semana'],
+                                            'tam'=>'12',
+                                            'arr_opc'=>['s'=>'Sábado','d'=>'Domingo'],
+                                            'event'=>'onchange=edit_dia_fim_semana(this);',
+                                            'option_select'=>false,
+                                            'class'=>'text-left',
+                                            'class_div'=>'text-left',
+                                        ])}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Fechar')}}</button>
+                            {{-- <button type="button" class="btn btn-primary">Save</button> --}}
+                        </div>
+                    </div>
+                </div>
+            </div>
                 <div class="col-md-4 pt-4 pl-2">
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#opcoes" title="{{__('Configurar')}}"><i class="fas fa-cogs    "></i></button>
                     <a class="btn @if(isset($_GET['filter'])) btn-link @else btn-default @endif" data-toggle="collapse" href="#busca-id" aria-expanded="false" aria-controls="busca-id">
-                        <i class="fas fa-search-location    "></i> @if(isset($_GET['filter'])) Mostrar Critérios de pesquisa @else Pesquisar @endif
+                        <i class="fas fa-search-location"></i> @if(isset($_GET['filter'])) Mostrar Critérios de pesquisa @else Pesquisar @endif
                     </a>
                 </div>
                 {{App\Qlib\Qlib::qForm([

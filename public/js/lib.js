@@ -2513,3 +2513,33 @@ function trocar_designado(obj,ida,name){
 
     }
 }
+function modal_pg_config(){
+    var cont = document.querySelector('.cont_optins');
+    var msg = '<form id="frm-options" action="/familias/ajax"><div class="row"><div id="exibe_options" class="col-md-12">'+cont+'</div></div></form>',btnsub = '<button type="button" id="submit-frm-options" class="btn btn-primary">Salvar</button>',m='modal-option';
+    alerta(msg,m,'Editar Opções');
+    $(btnsub).insertAfter('#'+m+' .modal-footer button');
+
+}
+function edit_dia_fim_semana(obj){
+    // alerta(obj.value);
+    getAjax({
+        url:'/ajax/edit_options',
+        type: 'POST',
+        dataType: 'json',
+        csrf: true,
+        data:{
+            f: 'dia_reuniao_fim_semana',
+            v: obj.value,
+        }
+    },function(res){
+        $('#preload').fadeOut("fast");
+        $('.mes').html(res.mens);
+        if(res.exec){
+            $('.d-r-f-semana').html(res.dia_reuniao_fim_semana_extensso);
+            // $('[data-li_id="'+id+'"]').remove();
+        }
+    },function(err){
+        $('#preload').fadeOut("fast");
+        console.log(err);
+    });
+}

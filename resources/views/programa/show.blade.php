@@ -18,6 +18,7 @@
     $quadro = 1;
     $mbcard = '';
     $q = 1;
+    $label_semana = isset($config['label_semana']) ? $config['label_semana'] : 'Semana:';
 @endphp
 @section('content')
 <div class="row mt-0 pt-0 table-responsive">
@@ -54,7 +55,7 @@
                                             @php
                                                 $partes = isset($semana[$k_sessao])?$semana[$k_sessao]:false;
                                                 if($k_sessao=='inicio'){
-                                                    $title = 'Dominigo: '. App\Qlib\Qlib::dataExtensso($d_semana);
+                                                    $title = $label_semana.' '. App\Qlib\Qlib::dataExtensso($d_semana);
                                                     $mbcard = '';
                                                 }
                                             @endphp

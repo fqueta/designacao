@@ -108,6 +108,7 @@ class TesteController extends Controller
         //     'limit'=>4,
         //     'operador'=>'!=',
         // ]);
+        $ret = Qlib::getSaturdays(2024,07);
         // $ret = Qlib::getSundays(2024,02);
         // dd($ret);
         // $ret = (new designaController)->link_whatsapp((isset($_GET['id']) ? $_GET['id'] : 718));

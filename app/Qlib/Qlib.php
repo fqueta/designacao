@@ -77,7 +77,45 @@ class Qlib
 		}
 		return $ret;
 	}
-  static function dtBanco($data) {
+    /**
+     * Metodo para atualizar uma configuração
+     * @param string $f é campo de configuração e $v = valor assumido pelo campo
+     * @return array $ret
+     */
+    static function update_option($f,$v){
+        $ret['exec'] = false;
+        $ret['mens'] = false;
+        if($f & $v){
+            try {
+                if(is_array($v)){
+                    $v = self::lib_array_json($v);
+                }
+                $tab = 'qoptions';
+                //verificar se essa configuração ja existe
+                $verf = Qlib::totalReg($tab,"WHERE url='$f' AND excluido='n' AND deletado='n'");
+                if($verf){
+                    //atualizar se existe
+                    $exec=DB::table($tab)->where('url',$f)->update([
+                        'valor'=>$v,
+                        'updated_at'=>self::dataBanco(),
+                    ]);
+                }else{
+                    //criar se não existe
+                    $exec=DB::table($tab)->insert([
+                        'url'=>$f,
+                        'valor'=>$v,
+                        'created_at'=>self::dataBanco(),
+                    ]);
+                }
+                $ret['exec'] = $exec;
+                $ret['mens'] = 'Salvo com sucesso';
+            } catch (\Throwable $e) {
+                $ret['mens'] = $e->getMessage();
+            }
+        }
+        return $ret;
+    }
+    static function dtBanco($data) {
 			$data = trim($data);
 			if (strlen($data) != 10)
 			{
@@ -917,6 +955,18 @@ class Qlib
         }
         return  $days;
     }
+    static function getSaturdays($y,$m){
+        $date = "$y-$m-01";
+        $first_day = date('N',strtotime($date));
+        $first_day = 7 - $first_day;
+        $last_day =  date('t',strtotime($date));
+        $days = array();
+        for($i=$first_day; $i<=$last_day; $i=$i+7 ){
+            //$days[] = $i;  //this will give days of sundays
+            $days[] = "$y-".self::zerofill($m,2)."-".self::zerofill($i,2);  //dates of sundays
+        }
+        return  $days;
+    }
     public static function getAllDaysInAMonth($year, $month, $day = 'Monday', $daysError = 3) {
         $month = (int)$month;
         $dateString = 'first '.$day.' of '.$year.'-'.$month;
@@ -991,6 +1041,11 @@ class Qlib
         $year_e = $s_year+$limt;
         $ret = [];
         $local = request()->segment(1);
+        $dia = request()->get('dia');
+        $dia_reuniao = $dia ? $dia : null;
+        if(!$dia_reuniao){
+            $dia_reuniao = 1;
+        }
         foreach (range($s_year,$year_e) as $key => $value) {
             $meses = self::getNumberRange(1,12,'todos');
             $ml = [];
@@ -998,7 +1053,13 @@ class Qlib
                 foreach ($meses as $km => $vm) {
                     $ml[$vm] = self::getAllDaysInAMonth($value,$vm);
                     if($local=='fim-semana'){
-                        $ret[$value][$vm] = self::getSundays($value,$vm);
+                        if($dia_reuniao=='s'){
+                            //sabado
+                            $ret[$value][$vm] = self::getSaturdays($value,$vm);
+                        }else{
+                            //domingo
+                            $ret[$value][$vm] = self::getSundays($value,$vm);
+                        }
                     }else{
                         $ret[$value][$vm] = self::getAllDaysInAMonth($value,$vm);
                     }
@@ -1248,5 +1309,18 @@ class Qlib
         }else{
             return false;
         }
+    }
+    /**
+     * Metodo que retorna o dia da reunião de fim de semana
+     */
+    static function get_reuniao_fim_semana(){
+        $ret = '';
+        $dia_reuniao = Qlib::qoption('dia_reuniao_fim_semana')?Qlib::qoption('dia_reuniao_fim_semana'):'d';
+        if($dia_reuniao=='s'){
+            $ret = __('Sábado');
+        }else{
+            $ret = __('Domingo');
+        }
+        return $ret;
     }
 }

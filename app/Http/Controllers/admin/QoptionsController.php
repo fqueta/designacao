@@ -322,4 +322,20 @@ class QoptionsController extends Controller
         }
         return $ret;
     }
+    /**
+     * Metodo para salvar todos as opções
+     */
+    public function edit_options(request $request){
+        $d = $request->all();
+        $ret = [];
+        if($d['f'] && $d['v']){
+            $ret = Qlib::update_option($d['f'],$d['v']);
+            if($ret['exec']){
+                $ret['dia_reuniao_fim_semana'] = Qlib::qoption('dia_reuniao_fim_semana');
+                $ret['dia_reuniao_fim_semana_extensso'] = Qlib::get_reuniao_fim_semana($ret['dia_reuniao_fim_semana']);
+                // $ret['dia'] =
+            }
+        }
+        return $ret;
+    }
 }
