@@ -956,17 +956,32 @@ class Qlib
         }
         return  $days;
     }
-    static function getSaturdays($y,$m){
-        $date = "$y-$m-01";
-        $first_day = date('N',strtotime($date));
-        $first_day = 7 - $first_day;
-        $last_day =  date('t',strtotime($date));
-        $days = array();
-        for($i=$first_day; $i<=$last_day; $i=$i+7 ){
-            //$days[] = $i;  //this will give days of sundays
-            $days[] = "$y-".self::zerofill($m,2)."-".self::zerofill($i,2);  //dates of sundays
+    static function getSaturdays($year,$month){
+        // Cria uma data no primeiro dia do mês
+        $startDate = new \DateTime("$year-$month-01");
+
+        // Define o último dia do mês
+        $endDate = clone $startDate;
+        $endDate->modify('last day of this month');
+
+        // Cria um intervalo de 1 dia
+        $interval = new \DateInterval('P1D');
+
+        // Cria o período de datas
+        $datePeriod = new \DatePeriod($startDate, $interval, $endDate);
+
+        // Array para armazenar os sábados
+        $saturdays = [];
+
+        // Itera sobre cada data no período
+        foreach ($datePeriod as $date) {
+            // Verifica se é sábado (6 é o índice do sábado)
+            if ($date->format('N') == 6) {
+                $saturdays[] = $date->format('Y-m-d');
+            }
         }
-        return  $days;
+        // dd($saturdays);
+        return $saturdays;
     }
     public static function getAllDaysInAMonth($year, $month, $day = 'Monday', $daysError = 3) {
         $month = (int)$month;
@@ -1042,7 +1057,7 @@ class Qlib
         $year_e = $s_year+$limt;
         $ret = [];
         $local = request()->segment(1);
-        $dia = request()->get('dia');
+        $dia = Qlib::qoption('dia_reuniao_fim_semana');// request()->get('dia');
         $dia_reuniao = $dia ? $dia : null;
         if(!$dia_reuniao){
             $dia_reuniao = 1;
