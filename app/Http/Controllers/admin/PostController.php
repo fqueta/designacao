@@ -603,7 +603,7 @@ class PostController extends Controller
         $routa = 'posts';
         $this->authorize('ler', $this->routa);
         if(!empty($dados)){
-            $title = 'Editar Cadastro de posts';
+            $title = __('Editar programa');
             $titulo = $title;
             $dados[0]['ac'] = 'alt';
             if(isset($dados[0]['config'])){
