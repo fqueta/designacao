@@ -36,7 +36,7 @@ class PublicadoresController extends Controller
         $mes = date('m');
         //$todasFamilias = Familia::where('excluido','=','n')->where('deletado','=','n');
         $config = [
-            'limit'=>isset($get['limit']) ? $get['limit']: 50,
+            'limit'=>isset($get['limit']) ? $get['limit']: 150,
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
 

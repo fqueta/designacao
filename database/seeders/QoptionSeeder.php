@@ -26,6 +26,11 @@ class QoptionSeeder extends Seeder
                     'vida'=>['label'=>'Nossa vida cristã','color'=>'color4'],
                     'final'=>['label'=>'Partes mecânicas','color'=>'color5'],
                 ]),
+            ],
+            [
+                'nome'=>'Dia da reunião do fim de semana',
+                'url'=>'dia_reuniao_fim_semana',
+                'valor'=>'s',
             ]
         ]);
     }
