@@ -27,6 +27,13 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        Gate::define('is_dev', function ($user) {
+            if(($user->id_permission==1) && $user->ativo=='s'){
+                return Response::allow();
+            }else{
+                return Response::deny('Você deve ser um administrador.');
+            }
+        });
         Gate::define('is_admin', function ($user) {
             if(($user->id_permission==1 || $user->id_permission==2) && $user->ativo=='s'){
                 return Response::allow();

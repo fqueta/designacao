@@ -10,6 +10,9 @@
         <input type="hidden" name="{{$name.'[id]'}}" value="{{@$designacao['id']}}">
         <input type="hidden" name="{{$name.'[ordem]'}}" value="{{$ordem}}">
         <div class="col-md-2">
+            @can('is_dev')
+               #{{$designacao['id']}}&nbsp;
+            @endcan
             <label>Numero</label>
             <input type="number" value="{{@$designacao['numero']}}" class="form-control" name="{{$name.'[numero]'}}" id="">
         </div>

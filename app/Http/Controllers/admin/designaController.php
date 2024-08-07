@@ -588,17 +588,21 @@ class designaController extends Controller
      */
     public function inserir_parte($dados,$type='jw') {
         $ret['exec'] = false;
+        //id padrão da designação de ajudante
+        $id_ajudante = 28;
         if($type=='jw'){
             if(isset($dados['data']) && isset($dados['numero']) && $dados['numero'] > 0) {
+                //não pode gravar em uma desiganão de ajudante
                 //se não encontrar salva
-                $ver = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->get();
+                $ver = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->where('id_designacao','!=',$id_ajudante)->get();
                 // dump($dados,$ver);
                 if($ver->count() == 0){
+                    dd($ver);
                     $salv = designation::create($dados);
                     $ret['salv'] = $salv;
                 }else{
                     unset($dados['tema'],$dados['tempo']);
-                    $salv = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->update($dados);
+                    $salv = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->where('id_designacao','!=',$id_ajudante)->update($dados);
                     if($salv==1){
                         $ret['salv'] = $salv;
                         $ret['exec'] = true;
@@ -608,14 +612,14 @@ class designaController extends Controller
         }else{
             if(isset($dados['data']) && isset($dados['id_designacao']) && $dados['id_designacao'] > 0) {
                 //se não encontrar salva
-                $ver = designation::where('data', '=', $dados['data'])->where('id_designacao','=',$dados['id_designacao'])->get();
+                $ver = designation::where('data', '=', $dados['data'])->where('id_designacao','=',$dados['id_designacao'])->where('id_designacao','!=',$id_ajudante)->get();
                 // dump($dados,$ver);
                 if($ver->count() == 0){
                     $salv = designation::create($dados);
                     $ret['salv'] = $salv;
                 }else{
                     unset($dados['tema'],$dados['tempo']);
-                    $salv = designation::where('data', '=', $dados['data'])->where('id_designacao','=',$dados['id_designacao'])->update($dados);
+                    $salv = designation::where('data', '=', $dados['data'])->where('id_designacao','=',$dados['id_designacao'])->where('id_designacao','!=',$id_ajudante)->update($dados);
                     if($salv==1){
                         $ret['salv'] = $salv;
                         $ret['exec'] = true;
