@@ -597,7 +597,7 @@ class designaController extends Controller
                 $ver = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->where('id_designacao','!=',$id_ajudante)->get();
                 // dump($dados,$ver);
                 if($ver->count() == 0){
-                    dd($ver);
+                    // dd($ver);
                     $salv = designation::create($dados);
                     $ret['salv'] = $salv;
                 }else{

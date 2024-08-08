@@ -9,10 +9,14 @@
         <input type="hidden" name="{{$name.'[token]'}}" inp="token" value="{{$token}}">
         <input type="hidden" name="{{$name.'[id]'}}" value="{{@$designacao['id']}}">
         <input type="hidden" name="{{$name.'[ordem]'}}" value="{{$ordem}}">
+        @can('is_dev')
+            <div class="" style="position: absolute;right: 10px;top: 2px;">
+                <small>
+                    #{{$designacao['id']}}&nbsp;
+                </small>
+            </div>
+        @endcan
         <div class="col-md-2">
-            @can('is_dev')
-               #{{$designacao['id']}}&nbsp;
-            @endcan
             <label>Numero</label>
             <input type="number" value="{{@$designacao['numero']}}" class="form-control" name="{{$name.'[numero]'}}" id="">
         </div>
