@@ -22,6 +22,7 @@ class designaController extends Controller
         $ret['exec'] = false;
         if($design_id){
             $d = Post::FindOrFail($design_id);
+            $id_ajudante = Qlib::qoption('id_ajudante')?Qlib::qoption('id_ajudante') : 28;
             if(isset($d['config']) && ($arr=Qlib::lib_json_array($d['config'])))
             if(isset($arr['des']) && is_array($arr['des'])){
                 foreach ($arr['des'] as $k => $va) {
@@ -44,11 +45,13 @@ class designaController extends Controller
                                     ]);
                                 }else{
                                     //salva se não existir
-                                    $ret['save'][$k][$val['id']] = designation::create([
+                                    if($val['id'] != $id_ajudante){
+                                        $ret['save'][$k][$val['id']] = designation::create([
                                         'data' => $k,
                                         'id_designacao' => $val['id'],
                                         'ordem' => $k1,
-                                    ]);
+                                        ]);
+                                    }
                                 }
                             }
                         }
@@ -589,14 +592,14 @@ class designaController extends Controller
     public function inserir_parte($dados,$type='jw') {
         $ret['exec'] = false;
         //id padrão da designação de ajudante
-        $id_ajudante = 28;
+        $id_ajudante = Qlib::qoption('id_ajudante')?Qlib::qoption('id_ajudante') : 28;
         if($type=='jw'){
             if(isset($dados['data']) && isset($dados['numero']) && $dados['numero'] > 0) {
                 //não pode gravar em uma desiganão de ajudante
                 //se não encontrar salva
                 $ver = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->where('id_designacao','!=',$id_ajudante)->get();
                 // dump($dados,$ver);
-                if($ver->count() == 0){
+                if($ver->count() == 0 && $dados['id_designacao']!=$id_ajudante){
                     // dd($ver);
                     $salv = designation::create($dados);
                     $ret['salv'] = $salv;
@@ -614,7 +617,7 @@ class designaController extends Controller
                 //se não encontrar salva
                 $ver = designation::where('data', '=', $dados['data'])->where('id_designacao','=',$dados['id_designacao'])->where('id_designacao','!=',$id_ajudante)->get();
                 // dump($dados,$ver);
-                if($ver->count() == 0){
+                if($ver->count() == 0 && $dados['id_designacao']!=$id_ajudante){
                     $salv = designation::create($dados);
                     $ret['salv'] = $salv;
                 }else{

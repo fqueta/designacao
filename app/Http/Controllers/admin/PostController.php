@@ -827,6 +827,7 @@ class PostController extends Controller
     {
         $ret['exec'] = false;
         $ret['dataSalv'] = false;
+        $id_ajudante = Qlib::qoption('id_ajudante')?Qlib::qoption('id_ajudante') : 28;
         if(is_array($config)){
             foreach ($config as $data => $des) {
                 if(is_array($des)){
@@ -850,7 +851,7 @@ class PostController extends Controller
                         where('id_designado','=',$dsa['id_designado'])->
                         update($dsa);
                         // dd($upn);
-                        if($upn!=1){
+                        if($upn!=1 && $dsa['id_designacao'] != $id_ajudante){
                             $sv[$data][$k] = designation::create($dsa);
                             $ret['sv'] = $sv[$data][$k];
                         }
@@ -869,6 +870,7 @@ class PostController extends Controller
         $ret['dataSalv'] = false;
         // dd($config);
         if(is_array($config)){
+            $id_ajudante = Qlib::qoption('id_ajudante')?Qlib::qoption('id_ajudante') : 28;
             $post_type = request()->segment(1);
             $post_id = request()->segment(2);
             $ordem = 0;
@@ -936,11 +938,13 @@ class PostController extends Controller
                                         $ordem++;
                                         //salvar ultima desiganção para o designado
                                     }else{
-                                        $sv[$data][$k] = designation::create($dsa);
-                                        // dd($dsa,$sv[$data][$k]);
-                                        $upn = $sv[$data][$k];
-                                        $ret['sv'] = $upn;
-                                        $ordem++;
+                                        if(@$dsa['id_designacao'] != $id_ajudante){
+                                            $sv[$data][$k] = designation::create($dsa);
+                                            // dd($dsa,$sv[$data][$k]);
+                                            $upn = $sv[$data][$k];
+                                            $ret['sv'] = $upn;
+                                            $ordem++;
+                                        }
                                     }
                                     if($upn && $dsa['id_designado']){
                                         $ret['sultma'][$k] = Publicador::where('id','=',$dsa['id_designado'])
@@ -969,7 +973,7 @@ class PostController extends Controller
                 $config['id_designado'] = $config['id_ajudante'];
                 $config['id_ajudante']=0;
                 $config['token'] = uniqid();
-                $config['id_designacao'] = 28; //id da desigação ajudante
+                $config['id_designacao'] = Qlib::qoption('id_ajudante')?Qlib::qoption('id_ajudante') : 28; //id da desigação ajudante
                 $verifica = designation::where('data','=',$config['data'])->where('id_designacao','=',$config['id_designacao'])->where('numero','=',$config['numero'])->get();
                 // dump($config);
                 // $verifica = designation::where('data','=',$config['data'])->where('id_designacao','=',$config['id_designacao'])->get();
