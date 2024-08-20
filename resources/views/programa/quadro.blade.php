@@ -95,7 +95,7 @@
                                             @endphp
 
                                             <tr class="col-12">
-                                                <td style="width:65%" class="text-left"><b>{{@$numero}} </b><b>{{@$tipos[$parte['id_designacao']]}}</b>: {{@$parte['obs']}} </td>
+                                                <td style="width:65%" class="text-left"><b>{{@$numero}} </b><b>{{@$tipos[$parte['id_designacao']]}}</b>: {{substr(@$parte['obs'],0,125)}} </td>
                                                 <td style="width:35%" class="text-right"><span>{{$nome}}</span></td>
                                             </tr>
                                         @endif
@@ -111,17 +111,20 @@
                                 <tbody>
                                 @if (is_array($partes))
                                     @foreach ($partes as $k_parte=>$parte )
-                                        @php
-                                            $nome = strtoupper(@$participantes[$parte['id_designado']]);
-                                            if($parte['id_ajudante']>0){
-                                                $nome .= '/ '.strtoupper(@$participantes[$parte['id_ajudante']]);
-                                            }
-                                        @endphp
+                                        @if ($parte['id_designacao']!=28)
 
-                                        <tr class="col-12">
-                                            <td style="width:35%" class="text-right"><b> {{@$tipos[$parte['id_designacao']]}}</b>:</td>
-                                            <td style="width:65%" class="text-right"><span>{{$nome}}</span></td>
-                                        </tr>
+                                            @php
+                                                $nome = strtoupper(@$participantes[$parte['id_designado']]);
+                                                if($parte['id_ajudante']>0){
+                                                    $nome .= '/ '.strtoupper(@$participantes[$parte['id_ajudante']]);
+                                                }
+                                            @endphp
+
+                                            <tr class="col-12">
+                                                <td style="width:35%" class="text-right"><b> {{@$tipos[$parte['id_designacao']]}}</b>:</td>
+                                                <td style="width:65%" class="text-right"><span>{{$nome}}</span></td>
+                                            </tr>
+                                        @endif
                                     @endforeach
                                 @endif
                                 </tbody>
