@@ -40,6 +40,10 @@ class UploadController extends Controller
 
     public function store(Request $request)
     {
+        $arquivos = isset($request->arquivos) ? $request->arquivos : 'jpg,jpeg,png,zip,pdf,PDF';
+        $request->validate([
+            'file' => 'required|file|mimes:'.$arquivos.'|max:2048', // Max 2MB
+        ]);
         $file = $request->file('file');
         $filenameWithExt = $file->getClientOriginalName();
         // Get just filename
@@ -53,7 +57,6 @@ class UploadController extends Controller
         }else{
             $fileNameToStore= $filename.'.'.$extension;
         }
-        $arquivos = isset($request->arquivos) ? $request->arquivos : 'jpg,jpeg,png,zip,pdf,PDF';
         if($arquivos){
             $arr_extension = explode(',',$arquivos);
         }

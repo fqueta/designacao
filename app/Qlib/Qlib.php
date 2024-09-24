@@ -486,6 +486,9 @@ class Qlib
     }
     static function ver_PermAdmin($perm=false,$url=false){
         $ret = false;
+        // dump(DB::getDefaultConnection());
+        // dump(Auth::check(),Auth::user());
+
         if(!$url){
             $url = URL::current();
             $arr_url = explode('/',$url);
