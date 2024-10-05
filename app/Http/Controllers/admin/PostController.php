@@ -892,7 +892,7 @@ class PostController extends Controller
                         }
                     }
                     foreach ($de['partes'] as $k => $ddta0) {
-                        if(is_array($ddta0)){
+                        if(isset($ddta0) && is_array($ddta0)){
                             foreach ($ddta0 as $k1 => $ddta) {
                                 $dataSalv[$data][$k]['numero'] = $ddta['numero'];
                                 $dataSalv[$data][$k]['token'] = $ddta['token'];
