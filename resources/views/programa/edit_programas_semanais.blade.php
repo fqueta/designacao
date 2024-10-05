@@ -55,7 +55,7 @@
                                                     $checked_ass = 'checked';
                                                 }
                                                 if(App\Qlib\Qlib::tem_congresso($post_id,$v1)){
-                                                    $checked_con = 'checked';
+                                                    $checked_cong = 'checked';
                                                 }
                                                 if(App\Qlib\Qlib::tem_visita($post_id,$v1)){
                                                     $checked_visita = 'checked';
@@ -63,7 +63,7 @@
                                             @endphp
                                             <div class="card-tools d-print-none">
                                                 <label for="congresso_{{$k1}}">
-                                                    <input {{$checked_con}} type="checkbox" name="des2[{{$v1}}][congresso]" id="congresso_{{$k1}}"> {{__('Congresso')}}
+                                                    <input {{$checked_cong}} type="checkbox" name="des2[{{$v1}}][congresso]" id="congresso_{{$k1}}"> {{__('Congresso')}}
                                                 </label>
                                                 <label for="assembleia_{{$k1}}">
                                                     <input {{$checked_ass}} type="checkbox" name="des2[{{$v1}}][assembleia]" id="assembleia_{{$k1}}"> {{__('Assembléia')}}
