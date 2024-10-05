@@ -875,7 +875,7 @@ class PostController extends Controller
             $post_id = request()->segment(2);
             $ordem = 0;
             foreach ($config as $data => $de) {
-                if(is_array($de)){
+                if(is_array($de) && isset($de['partes'])){
                     if(isset($de['visita']) && !empty($post_id)){
                         $ret['sa_visita'] = Qlib::update_postmeta($post_id,'visita',$data);
                         // dd($de['visita'],$data,$post_id);
