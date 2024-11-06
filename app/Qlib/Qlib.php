@@ -1152,6 +1152,11 @@ class Qlib
         $ret = '';
         if(isset($d[0]) && strlen($d[0])==4){
             $ano = $d[0];
+            if(isset($d[2])){
+                if($d[2]>24){
+                    $ano++;
+                }
+            }
             $tl = 'https://wol.jw.org/pt/wol/meetings/r5/lp-t/{ano}/{semana}';
             $semana = self::numero_semana($data);
             if(!$semana){
