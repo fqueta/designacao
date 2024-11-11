@@ -599,7 +599,7 @@ class designaController extends Controller
                 //se não encontrar salva
                 $ver = designation::where('data', '=', $dados['data'])->where('numero','=',$dados['numero'])->where('id_designacao','!=',$id_ajudante)->get();
                 // dump($dados,$ver);
-                if($ver->count() == 0 && $dados['id_designacao']!=$id_ajudante){
+                if($ver->isEmpty() && $dados['id_designacao']!=$id_ajudante){
                     $salv = designation::create($dados);
                     $ret['salv'] = $salv;
                 }else{

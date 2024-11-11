@@ -558,7 +558,7 @@ class PostController extends Controller
                 $mes2 = (int)$dt[1]+1;
 
                 $ddo[$mes1] = $fd[$dt[0]][$mes1];
-                $ddo[$mes2] = $fd[$dt[0]][$mes2];
+                $ddo[$mes2] = isset($fd[$dt[0]][$mes2]) ? $fd[$dt[0]][$mes2] : null;
                 $datai = $ddo[$mes1][0];
                 $dataf = end($ddo[$mes1]);
                 $ret['designations'] = (new designaController)->get_desiganations($datai,$dataf);
