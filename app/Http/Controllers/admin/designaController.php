@@ -646,6 +646,7 @@ class designaController extends Controller
         $dados = $request->all();
         $arr_datas=[];
         $sinc = [];
+        // dd($dados);
         if(isset($dados['dados']) && is_string($dados['dados'])){
 
             $arr_datas = Qlib::decodeArray($dados['dados']);

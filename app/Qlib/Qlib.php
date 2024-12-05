@@ -1153,7 +1153,7 @@ class Qlib
         if(isset($d[0]) && strlen($d[0])==4){
             $ano = $d[0];
             if(isset($d[2])){
-                if($d[2]>24){
+                if($d[2]>29){
                     $ano++;
                 }
             }
