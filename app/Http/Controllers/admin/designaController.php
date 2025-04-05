@@ -75,7 +75,11 @@ class designaController extends Controller
             $d = designation::whereBetween('data', [$dataI, $dataF])->orderBy('data','ASC')->where('post_type','=',$post_type)
             ->orderBy('ordem', 'ASC')->get();
             $pr = [];
-            $ret['config']['tipos_designacao'] = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1' AND config LIKE '%\"post_type\":\"$post_type\"%'",'nome','id');
+            $tipos_designacao = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1' AND config LIKE '%\"post_type\":\"$post_type\"%'",'nome','id');
+            if(isset($tipos_designacao['17']) && $tipos_designacao['17']=='Estudo bíblico de congregação'){
+                $tipos_designacao['17'] = 'Estudo bíblico';
+            }
+            $ret['config']['tipos_designacao'] = $tipos_designacao;
             $ret['config']['participantes'] = Qlib::sql_array("SELECT id,nome FROM publicadores WHERE ativo='s' AND excluido='n' AND deletado='n' ORDER BY nome asc",'nome','id');
             if($d->count() > 0){
                 $monthI = Carbon::createFromFormat('Y-m-d', $dataI)->month;
