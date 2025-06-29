@@ -1,6 +1,6 @@
 @php
     $vpint = false;
-    if($assembleia && $k_sessao!='inicio'){
+    if(($assembleia || $congresso) && $k_sessao!='inicio'){
        $vpint = 'd-none d-print-none';
     }
     if ($routa=='fim-semana'){

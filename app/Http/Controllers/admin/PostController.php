@@ -884,6 +884,14 @@ class PostController extends Controller
                             $ret['sa_visita'] = Qlib::remove_postmeta($post_id,'visita');
                         }
                     }
+                    // dump($de);
+                    if(isset($de['congresso']) && !empty($post_id)){
+                        $ret['sa_congresso'] = Qlib::update_postmeta($post_id,'congresso',$data);
+                    }else{
+                        if(Qlib::get_postmeta($post_id,'congresso',true)==$data){
+                            $ret['sa_congresso'] = Qlib::remove_postmeta($post_id,'congresso');
+                        }
+                    }
                     if(isset($de['assembleia']) && !empty($post_id)){
                         $ret['sa_assembleia'] = Qlib::update_postmeta($post_id,'assembleia',$data);
                     }else{
