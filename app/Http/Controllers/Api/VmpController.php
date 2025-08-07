@@ -34,6 +34,7 @@ class VmpController extends Controller
         $dom = new Dom;
         $dom->loadFromUrl($link);
         // $html = $dom->outerHtml;
+        dd($link,$dom);
         $ret['exec'] = false;
         if($dom){
             $ret['exec'] = true;
