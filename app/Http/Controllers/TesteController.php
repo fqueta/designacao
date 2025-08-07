@@ -112,10 +112,11 @@ class TesteController extends Controller
         // $ret = (new VmpController)->gera_api2(06,2025);
         // $ret = (new ApostilaController)->extract('novembro-dezembro','2025');
         // dd($ret);
-        $post_id = request()->get('post_id');
-        // $ret = (new ApostilaController)->save_stract_link($post_id);
-        // $ret = (new ApostilaController)->get_links($post_id);
-        $ret = (new ApostilaController)->extract_programa($link='/pt/biblioteca/jw-apostila-do-mes/setembro-outubro-2025-mwb/Programa%C3%A7%C3%A3o-da-Reuni%C3%A3o-Vida-e-Minist%C3%A9rio-para-1-7-de-setembro-de-2025/');
+        $ret = (new VmpController)->gera_api('https://wol.jw.org/pt/wol/meetings/r5/lp-t/2025/36');
+        // $post_id = request()->get('post_id');
+        // // $ret = (new ApostilaController)->save_stract_link($post_id);
+        // // $ret = (new ApostilaController)->get_links($post_id);
+        // $ret = (new ApostilaController)->extract_programa($link='/pt/biblioteca/jw-apostila-do-mes/setembro-outubro-2025-mwb/Programa%C3%A7%C3%A3o-da-Reuni%C3%A3o-Vida-e-Minist%C3%A9rio-para-1-7-de-setembro-de-2025/');
         // $ret = Qlib::getSundays(2024,02);
         // dd($ret);
         // $ret = (new designaController)->link_whatsapp((isset($_GET['id']) ? $_GET['id'] : 718));
