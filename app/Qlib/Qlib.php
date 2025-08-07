@@ -1148,6 +1148,36 @@ class Qlib
      * @return string $ret
      */
     static function link_programacao_woljw($data,$html=false){
+        // dd($data);
+        $d = explode("-",$data);
+        $ret = '';
+        if(isset($d[0]) && strlen($d[0])==4){
+            $ano = $d[0];
+            $semana = self::numero_semana($data);
+            if(isset($d[2])){
+                if($d[2]>29 && $semana>50){
+                    $ano++;
+                }
+            }
+            $tl = 'https://wol.jw.org/pt/wol/meetings/r5/lp-t/{ano}/{semana}';
+            // dump($semana);
+            if(!$semana){
+                return $ret;
+            }
+            $ret = str_replace('{ano}',$ano,$tl);
+            $ret = str_replace('{semana}',$semana,$ret);
+            if($html){
+                $ret = str_replace('{link}',$ret,$html);
+            }
+        }
+        return $ret;
+    }
+    /**
+     * Metodo para retornar um link do programa da semana no jw.org
+     * @parmat data $data formato Y-m-d, string $html ex.: <a href="{link}">Apostila</a>
+     * @return string $ret
+     */
+    static function link_programacao_jworg($data,$html=false){
         $d = explode("-",$data);
         $ret = '';
         if(isset($d[0]) && strlen($d[0])==4){
