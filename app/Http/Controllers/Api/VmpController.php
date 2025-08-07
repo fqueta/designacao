@@ -34,12 +34,12 @@ class VmpController extends Controller
         $dom = new Dom;
         $dom->loadFromUrl($link);
         // $html = $dom->outerHtml;
-        dd($link,$dom);
         $ret['exec'] = false;
         if($dom){
             $ret['exec'] = true;
         }
-        $ret['semana'] = $dom->find('#p1')->text;
+        $ret['semana'] = isset($dom->find('#p1')->text) ? $dom->find('#p1')->text : '';
+        // dd($ret,$dom);
         $ret['total'] = 0;
         $link_semana_atual = $dom->find('#navigationDailyTextToday a')->getAttribute('href');
         $ret['link_semana_atual'] = $link_semana_atual;
