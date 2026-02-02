@@ -38,11 +38,12 @@ class VmpController extends Controller
         if($dom){
             $ret['exec'] = true;
         }
+        // dd($data);
         $ret['semana'] = isset($dom->find('#p1')->text) ? $dom->find('#p1')->text : '';
         // dd($ret,$dom);
         $ret['total'] = 0;
-        $link_semana_atual = $dom->find('#navigationDailyTextToday a')->getAttribute('href');
-        $ret['link_semana_atual'] = $link_semana_atual;
+        // $link_semana_atual = $dom->find('#navigationDailyTextToday a')->getAttribute('href');
+        // $ret['link_semana_atual'] = $link_semana_atual;
         $ret['data_programa'] = $data;
         $arr_partes = [
             'tesouros'=>['seletor'=>'h3.du-color--teal-700'],
@@ -118,6 +119,7 @@ class VmpController extends Controller
         $ret['exec'] = false;
         $ret['total'] = 0;
         // $ret = [];
+        // dd($seletor);
         if($dom && $seletor && $sessaoP){
             $sec_sessao = $dom->find($seletor);
             if(is_object($sec_sessao)){

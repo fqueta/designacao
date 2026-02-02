@@ -500,6 +500,7 @@ class designaController extends Controller
 
         try {
             //code...
+            // dd($config);
             if(is_array($config)){
                 foreach ($config as $k => $data) {
                     if($type=='inic_fim'){
@@ -532,6 +533,7 @@ class designaController extends Controller
                     }else{
                         //partes da apostila do mes
                         $link = Qlib::link_programacao_woljw($data);
+                        // dd($data,$link);
                         $arr_partes = (new VmpController)->gera_api($link,$data);
                         // dd($arr_partes);
                         if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
@@ -650,10 +652,10 @@ class designaController extends Controller
         $dados = $request->all();
         $arr_datas=[];
         $sinc = [];
-        // dd($dados);
         if(isset($dados['dados']) && is_string($dados['dados'])){
 
             $arr_datas = Qlib::decodeArray($dados['dados']);
+            // dd($arr_datas);
             if(is_array($arr_datas)){
                 $type = false;
                 if($request->has('type')){

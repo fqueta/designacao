@@ -656,6 +656,8 @@ class PostController extends Controller
                     $datai = $ddo[$mes1][0];
                     $dataf = end($ddo[$mes1]);
                     $config['desiganations'] = (new designaController)->get_desiganations($datai,$dataf);
+                    // dd($ddo);
+                    // dd($config['desiganations']);
                     if($config['desiganations']){
 
                     }else{

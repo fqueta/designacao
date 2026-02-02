@@ -1159,7 +1159,13 @@ class Qlib
                     $ano++;
                 }
             }
-            $tl = 'https://wol.jw.org/pt/wol/meetings/r5/lp-t/{ano}/{semana}';
+            $tl = '';
+            if($data){
+                $tl = self::buscaValorDb0('links_semanas','data',$data,'link');
+                // dd($tl,$data);
+            }else{
+                $tl = 'https://wol.jw.org/pt/wol/meetings/r5/lp-t/{ano}/{semana}';
+            }
             // dump($semana);
             if(!$semana){
                 return $ret;
