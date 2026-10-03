@@ -285,8 +285,12 @@
 {{-- {{dd($sem)}} --}}
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        $('.designation-template-wrapper input, .designation-template-wrapper select, .designation-template-wrapper textarea').prop('disabled', true);
+    // Vanilla (sem jQuery): este trecho fica no meio do body e o jQuery
+    // só carrega no fim da página (causava "$ is not defined")
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.designation-template-wrapper input, .designation-template-wrapper select, .designation-template-wrapper textarea').forEach(function(el) {
+            el.disabled = true;
+        });
     });
 </script>
 @endif
