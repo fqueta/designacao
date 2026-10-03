@@ -175,7 +175,10 @@ class designaController extends Controller
                     //verifica qual a ultima parte de todas
 
                     //nesse momento conferimos se os dados da ultima parte estão sincronizados corretamento do a cadastro do publicador
-                    $conference = $this->confere_ultima_parte($config);
+                    // (pulamos no modo resumido do designar_auto: sync já feito nas listagens e pelo atualizaUltima)
+                    if(empty($config['sem_confere'])){
+                        $conference = $this->confere_ultima_parte($config);
+                    }
                     $d = designation::select('designations.*','tags.nome','tags.config')
                                     ->join('tags','tags.id','=','designations.id_designacao')
                                     ->where('designations.'.$type,'=',$id_designado)
@@ -215,9 +218,22 @@ class designaController extends Controller
      * @param integer $id_designado,string $tipo = tipos de campo de consulta do participante, string $sessao
      * @return array $ret
      */
-    public function list_participants($id_designacao, $tipo,$post_type, $sessao=false) {
+    public function list_participants($id_designacao, $tipo,$post_type, $sessao=false, $data_ref=null, $resumido=false) {
         //Listar dados da parte
         $dp = Tag::where('id', $id_designacao)->get();
+        // Normaliza tipo cedo para a chave do cache
+        $tipo = $tipo ? $tipo : 'id_designado';
+        // Cache por request: designar_auto chama 1x por parte + Nx para ajudante (28);
+        // sem cache, cada chamada refaz centenas de queries (timeout no auto).
+        // Quando tipo=id_ajudante fora dos ramos especial/instrucao/mecanica, o id
+        // efetivo é 28 (mesma regra do ramo else abaixo) — chave usa o efetivo.
+        static $cache_lista = [];
+        $tip_pre = isset($dp[0]['config']['t_p']) ? $dp[0]['config']['t_p'] : false;
+        $id_efetivo = ($tipo == 'id_ajudante' && $tip_pre != 'especial' && $tip_pre != 'instrucao' && $tip_pre != 'mecanica') ? 28 : $id_designacao;
+        $cache_key = $id_efetivo . '|' . $tipo . '|' . $post_type . '|' . $data_ref . '|' . ($resumido ? 'R' : 'C');
+        if(isset($cache_lista[$cache_key])){
+            return $cache_lista[$cache_key];
+        }
         $ret['exec'] = false;
         if($dp->count() > 0) {
             $dp = $dp->toArray();
@@ -228,6 +244,9 @@ class designaController extends Controller
             //Listar dados dos participantes eligiveis para essa parte
             $ret['tip_parte'] = $tip_parte;
             $d = [];
+            // Mapas bulk (1 query cada): contagem p/ variedade + ocupação da data
+            $mapVezes = $this->contaVezesParte($id_efetivo, $tipo, $post_type, $data_ref);
+            $mapData = ($data_ref && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$data_ref)) ? $this->mapOcupacaoData($data_ref, $post_type) : [];
             if($tip_parte=='especial'){
                 //Somento varao ancião
                 $d = Publicador::where('fun','=','anc')
@@ -249,6 +268,7 @@ class designaController extends Controller
                             'type'=>$tipo,
                             'id_designacao'=>$id_designacao,
                             'ultima'=>true,
+                            'sem_confere'=>$resumido,
                         ]);
                         $ultima_outra = $this->arr_historico([
                             'post_type'=>$post_type,
@@ -256,14 +276,26 @@ class designaController extends Controller
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
+                            'sem_confere'=>$resumido,
                             'operador'=>'!=',
-                            'limit'=>4,
+                            'limit'=>$resumido?1:4,
                         ]);
                         //Adicionar historico desta parte
                         $d[$kd]['ultima_desta'] = isset($ultima_desta['d'][0])?$ultima_desta['d'][0]:[];
                         //Adicionar historico de outras partes
                         $d[$kd]['ultima_outra'] = isset($ultima_outra['d'][0])?$ultima_outra['d'][0]:[];
                         $d[$kd]['ultimas_quatro'] = isset($ultima_outra['d'])?$ultima_outra['d']:[];
+                        // Regra de intervalo mínimo entre partes (config do publicador)
+                        $infoInt = $this->verificaIntervalo(isset($vd['config']) ? $vd['config'] : [], isset($ultima_desta['d'][0]) ? $ultima_desta['d'][0] : null, $data_ref, $id_designacao);
+                        $d[$kd]['em_intervalo'] = $infoInt['em_intervalo'];
+                        $d[$kd]['intervalo_ate'] = $infoInt['intervalo_ate'];
+                        // Alternância: repetição recente da mesma parte
+                        $repInfo = $this->verificaRepeticao(isset($ultima_desta['d'][0]) ? $ultima_desta['d'][0] : null, $data_ref);
+                        $d[$kd]['repetiu_recente'] = $repInfo['repetiu_recente'];
+                        $d[$kd]['repetiu_ha'] = $repInfo['repetiu_ha'];
+                        // Variedade (vezes nesta parte em 6m) e ocupação na data
+                        $d[$kd]['vezes_6m'] = isset($mapVezes[$vd['id']]) ? (int)$mapVezes[$vd['id']] : 0;
+                        $d[$kd]['ja_nesta_data'] = isset($mapData[$vd['id']]) ? $mapData[$vd['id']] : false;
                     }
                 }
             }elseif($tip_parte == 'instrucao'){
@@ -289,6 +321,7 @@ class designaController extends Controller
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
+                            'sem_confere'=>$resumido,
                         ]);
                         $ultima_outra = $this->arr_historico([
                             'post_type'=>$post_type,
@@ -296,14 +329,26 @@ class designaController extends Controller
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
+                            'sem_confere'=>$resumido,
                             'operador'=>'!=',
-                            'limit'=>4,
+                            'limit'=>$resumido?1:4,
                         ]);
                         //Adicionar historico desta parte
                         $d[$kd]['ultima_desta'] = isset($ultima_desta['d'][0])?$ultima_desta['d'][0]:[];
                         //Adicionar historico de outras partes
                         $d[$kd]['ultima_outra'] = isset($ultima_outra['d'][0])?$ultima_outra['d'][0]:[];
                         $d[$kd]['ultimas_quatro'] = isset($ultima_outra['d'])?$ultima_outra['d']:[];
+                        // Regra de intervalo mínimo entre partes (config do publicador)
+                        $infoInt = $this->verificaIntervalo(isset($vd['config']) ? $vd['config'] : [], isset($ultima_desta['d'][0]) ? $ultima_desta['d'][0] : null, $data_ref, $id_designacao);
+                        $d[$kd]['em_intervalo'] = $infoInt['em_intervalo'];
+                        $d[$kd]['intervalo_ate'] = $infoInt['intervalo_ate'];
+                        // Alternância: repetição recente da mesma parte
+                        $repInfo = $this->verificaRepeticao(isset($ultima_desta['d'][0]) ? $ultima_desta['d'][0] : null, $data_ref);
+                        $d[$kd]['repetiu_recente'] = $repInfo['repetiu_recente'];
+                        $d[$kd]['repetiu_ha'] = $repInfo['repetiu_ha'];
+                        // Variedade (vezes nesta parte em 6m) e ocupação na data
+                        $d[$kd]['vezes_6m'] = isset($mapVezes[$vd['id']]) ? (int)$mapVezes[$vd['id']] : 0;
+                        $d[$kd]['ja_nesta_data'] = isset($mapData[$vd['id']]) ? $mapData[$vd['id']] : false;
                     }
 
                 }
@@ -326,6 +371,7 @@ class designaController extends Controller
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
+                            'sem_confere'=>$resumido,
                             'operador'=>'='
                         ]);
                         $ultima_outra = $this->arr_historico([
@@ -334,14 +380,26 @@ class designaController extends Controller
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
+                            'sem_confere'=>$resumido,
                             'operador'=>'!=',
-                            'limit'=>4,
+                            'limit'=>$resumido?1:4,
                         ]);
                         //Adicionar historico desta parte
                         $d[$kd]['ultima_desta'] = isset($ultima_desta['d'][0])?$ultima_desta['d'][0]:[];
                         //Adicionar historico de outras partes
                         $d[$kd]['ultima_outra'] = isset($ultima_outra['d'][0])?$ultima_outra['d'][0]:[];
                         $d[$kd]['ultimas_quatro'] = isset($ultima_outra['d'])?$ultima_outra['d']:[];
+                        // Regra de intervalo mínimo entre partes (config do publicador)
+                        $infoInt = $this->verificaIntervalo(isset($vd['config']) ? $vd['config'] : [], isset($ultima_desta['d'][0]) ? $ultima_desta['d'][0] : null, $data_ref, $id_designacao);
+                        $d[$kd]['em_intervalo'] = $infoInt['em_intervalo'];
+                        $d[$kd]['intervalo_ate'] = $infoInt['intervalo_ate'];
+                        // Alternância: repetição recente da mesma parte
+                        $repInfo = $this->verificaRepeticao(isset($ultima_desta['d'][0]) ? $ultima_desta['d'][0] : null, $data_ref);
+                        $d[$kd]['repetiu_recente'] = $repInfo['repetiu_recente'];
+                        $d[$kd]['repetiu_ha'] = $repInfo['repetiu_ha'];
+                        // Variedade (vezes nesta parte em 6m) e ocupação na data
+                        $d[$kd]['vezes_6m'] = isset($mapVezes[$vd['id']]) ? (int)$mapVezes[$vd['id']] : 0;
+                        $d[$kd]['ja_nesta_data'] = isset($mapData[$vd['id']]) ? $mapData[$vd['id']] : false;
                     }
 
                 }
@@ -390,6 +448,7 @@ class designaController extends Controller
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
+                            'sem_confere'=>$resumido,
                             'operador'=>'='
                         ]);
                         $ultima_outra = $this->arr_historico([
@@ -398,21 +457,245 @@ class designaController extends Controller
                             'id_designado'=>$vd['id'],
                             'type'=>$tipo,
                             'ultima'=>true,
+                            'sem_confere'=>$resumido,
                             'operador'=>'!=',
-                            'limit'=>4,
+                            'limit'=>$resumido?1:4,
                         ]);
                         //Adicionar historico desta parte
                         $d[$kd]['ultima_desta'] = isset($ultima_desta['d'][0])?$ultima_desta['d'][0]:[];
                         //Adicionar historico de outras partes
                         $d[$kd]['ultima_outra'] = isset($ultima_outra['d'][0])?$ultima_outra['d'][0]:[];
                         $d[$kd]['ultimas_quatro'] = isset($ultima_outra['d'])?$ultima_outra['d']:[];
+                        // Regra de intervalo mínimo entre partes (config do publicador)
+                        $infoInt = $this->verificaIntervalo(isset($vd['config']) ? $vd['config'] : [], isset($ultima_desta['d'][0]) ? $ultima_desta['d'][0] : null, $data_ref, $id_designacao);
+                        $d[$kd]['em_intervalo'] = $infoInt['em_intervalo'];
+                        $d[$kd]['intervalo_ate'] = $infoInt['intervalo_ate'];
+                        // Alternância: repetição recente da mesma parte
+                        $repInfo = $this->verificaRepeticao(isset($ultima_desta['d'][0]) ? $ultima_desta['d'][0] : null, $data_ref);
+                        $d[$kd]['repetiu_recente'] = $repInfo['repetiu_recente'];
+                        $d[$kd]['repetiu_ha'] = $repInfo['repetiu_ha'];
+                        // Variedade (vezes nesta parte em 6m) e ocupação na data
+                        $d[$kd]['vezes_6m'] = isset($mapVezes[$vd['id']]) ? (int)$mapVezes[$vd['id']] : 0;
+                        $d[$kd]['ja_nesta_data'] = isset($mapData[$vd['id']]) ? $mapData[$vd['id']] : false;
                     }
 
                 }
             }
+            // Ordena pelo mais antigo NESTA parte (nunca fez primeiro).
+            // Elegibilidade (aceita/fun/genero) já foi filtrada nas queries acima.
+            $d = $this->ordenarPorAntiguidade($d);
             $ret['data'] = $d;
         }
+        $cache_lista[$cache_key] = $ret;
         return $ret;
+    }
+    /**
+     * Verifica se o participante está dentro do intervalo mínimo desta parte.
+     * Lê config.designacao.intervalo_{id} (0-4 meses) e compara
+     * ultima_desta.data + N meses com a data de referência (semana preenchida).
+     * @return array ['em_intervalo'=>bool,'intervalo_ate'=>d/m/Y|null]
+     */
+    public function verificaIntervalo($config_pub, $ultima_desta, $data_ref, $id_designacao){
+        $ret = ['em_intervalo' => false, 'intervalo_ate' => null];
+        $meses = isset($config_pub['designacao']['intervalo_' . $id_designacao]) ? (int)$config_pub['designacao']['intervalo_' . $id_designacao] : 0;
+        if($meses <= 0 || empty($data_ref) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$data_ref)){
+            return $ret;
+        }
+        $ultima = null;
+        if(is_array($ultima_desta) && isset($ultima_desta['data'])){
+            $ultima = $ultima_desta['data'];
+        }elseif($ultima_desta instanceof \ArrayAccess && isset($ultima_desta['data'])){
+            $ultima = $ultima_desta['data'];
+        }elseif(is_object($ultima_desta) && isset($ultima_desta->data)){
+            $ultima = $ultima_desta->data;
+        }
+        if(!$ultima || !preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$ultima)){
+            return $ret; // nunca fez: sempre livre
+        }
+        $limite = date('Y-m-d', strtotime($ultima . ' +' . $meses . ' months'));
+        if($data_ref < $limite){
+            $ret['em_intervalo'] = true;
+            $ret['intervalo_ate'] = Qlib::dataExibe($limite);
+        }
+        return $ret;
+    }
+    /**
+     * Verifica repetição recente da mesma parte (alternância).
+     * Janela configurável via qoption('alternancia_semanas'), padrão 4 semanas.
+     * @return array ['repetiu_recente'=>bool,'repetiu_ha'=>string|null ex.: "2 sem"]
+     */
+    public function verificaRepeticao($ultima_desta, $data_ref){
+        $ret = ['repetiu_recente' => false, 'repetiu_ha' => null];
+        $semanas = (int)(Qlib::qoption('alternancia_semanas') ?: 4);
+        if($semanas <= 0 || empty($data_ref) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$data_ref)){
+            return $ret;
+        }
+        $ultima = null;
+        if(is_array($ultima_desta) && isset($ultima_desta['data'])){
+            $ultima = $ultima_desta['data'];
+        }elseif($ultima_desta instanceof \ArrayAccess && isset($ultima_desta['data'])){
+            $ultima = $ultima_desta['data'];
+        }elseif(is_object($ultima_desta) && isset($ultima_desta->data)){
+            $ultima = $ultima_desta->data;
+        }
+        if(!$ultima || !preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$ultima)){
+            return $ret; // nunca fez: sempre livre
+        }
+        $diff = (strtotime($data_ref) - strtotime($ultima)) / 86400;
+        if($diff >= 0 && $diff < $semanas * 7){
+            $ret['repetiu_recente'] = true;
+            $s = (int)floor($diff / 7);
+            $ret['repetiu_ha'] = $s <= 0 ? 'esta semana' : ($s == 1 ? '1 sem' : $s . ' sem');
+        }
+        return $ret;
+    }
+    /**
+     * Conta execuções desta parte por participante nos últimos 6 meses (variedade).
+     * 1 query bulk; retorna [id_publicador => total].
+     */
+    protected function contaVezesParte($id_designacao, $tipo, $post_type, $data_ref){
+        $map = [];
+        try {
+            // Espelha arr_historico: espelho 28 guarda a pessoa em id_designado
+            $col = ($tipo == 'id_ajudante' && (int)$id_designacao !== 28) ? 'id_ajudante' : 'id_designado';
+            $desde = ($data_ref && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$data_ref))
+                ? date('Y-m-d', strtotime($data_ref . ' -6 months'))
+                : date('Y-m-d', strtotime('-6 months'));
+            $rows = \Illuminate\Support\Facades\DB::table('designations')
+                ->select($col . ' as pid', \Illuminate\Support\Facades\DB::raw('COUNT(*) as total'))
+                ->where('post_type', '=', $post_type)
+                ->where('excluido', '=', 'n')
+                ->where('id_designacao', '=', (int)$id_designacao)
+                ->where($col, '>', 0)
+                ->where('data', '>=', $desde)
+                ->groupBy($col)
+                ->get();
+            foreach($rows as $r){
+                $map[(int)$r->pid] = (int)$r->total;
+            }
+        } catch (\Throwable $e) {
+            // Sem contagem = sem viés de variedade
+        }
+        return $map;
+    }
+    /**
+     * Mapeia quem já tem parte na data (ambos os papéis, inclusive espelhos 28).
+     * 1 query bulk; retorna [id_publicador => ['numero'=>N,'parte'=>Nome]].
+     */
+    protected function mapOcupacaoData($data, $post_type){
+        $map = [];
+        try {
+            $rows = \Illuminate\Support\Facades\DB::table('designations')
+                ->select('id_designacao', 'numero', 'id_designado', 'id_ajudante')
+                ->where('data', '=', $data)
+                ->where('post_type', '=', $post_type)
+                ->where('excluido', '=', 'n')
+                ->get();
+            $nomes = [];
+            foreach($rows as $r){
+                foreach(['id_designado', 'id_ajudante'] as $campo){
+                    $pid = (int)$r->$campo;
+                    if($pid > 0 && !isset($map[$pid])){
+                        $tid = (int)$r->id_designacao;
+                        if(!isset($nomes[$tid])){
+                            $nomes[$tid] = Qlib::buscaValorDb0('tags', 'id', $tid, 'nome') ?: ('parte ' . $tid);
+                        }
+                        $map[$pid] = ['numero' => $r->numero, 'parte' => $nomes[$tid]];
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Sem mapa = sem selo
+        }
+        return $map;
+    }
+    /**
+     * Ordena participantes pelo mais antigo nesta parte.
+     * Critério: 1) livres primeiro (em_intervalo, repetiu_recente e ja_nesta_data
+     * vão para o fim, continuando clicáveis no manual);
+     * 2) nunca fez esta parte (ultima_desta vazia) primeiro;
+     * 3) ultima_desta.data asc; 4) desempate vezes_6m asc (variedade);
+     * 5) desempate ultima_outra.data asc; 6) data_ultima asc; 7) nome asc.
+     * @param array $d lista de participantes com ultima_desta/ultima_outra
+     * @return array $d ordenado
+     */
+    public function ordenarPorAntiguidade($d){
+        if(!is_array($d) || empty($d)){
+            return $d;
+        }
+        // ultima_desta/outra podem vir como array ou Model (ArrayAccess)
+        $getData = function($v){
+            if(is_array($v) && isset($v['data'])){
+                return $v['data'];
+            }
+            if($v instanceof \ArrayAccess && isset($v['data'])){
+                return $v['data'];
+            }
+            if(is_object($v) && isset($v->data)){
+                return $v->data;
+            }
+            return null;
+        };
+        usort($d, function($a, $b) use ($getData){
+            // Intervalo, repetição recente ou já ocupado na data: fim da lista
+            $low = function($x){
+                return !empty(@$x['em_intervalo']) || !empty(@$x['repetiu_recente']) || !empty(@$x['ja_nesta_data']);
+            };
+            $la = $low($a);
+            $lb = $low($b);
+            if($la && !$lb){
+                return 1;
+            }
+            if($lb && !$la){
+                return -1;
+            }
+            $da = $getData(@$a['ultima_desta']);
+            $db = $getData(@$b['ultima_desta']);
+            // Nunca fez esta parte vai para o topo
+            if($da === null && $db !== null){
+                return -1;
+            }
+            if($db === null && $da !== null){
+                return 1;
+            }
+            if($da !== null && $db !== null && $da !== $db){
+                return $da < $db ? -1 : 1;
+            }
+            // Desempate: variedade — quem fez menos vezes esta parte (6m) primeiro
+            $va = isset($a['vezes_6m']) ? (int)$a['vezes_6m'] : 0;
+            $vb = isset($b['vezes_6m']) ? (int)$b['vezes_6m'] : 0;
+            if($va !== $vb){
+                return $va < $vb ? -1 : 1;
+            }
+            // Desempate: última de outra parte (mais antiga primeiro)
+            $oa = $getData(@$a['ultima_outra']);
+            $ob = $getData(@$b['ultima_outra']);
+            if($oa === null && $ob !== null){
+                return -1;
+            }
+            if($ob === null && $oa !== null){
+                return 1;
+            }
+            if($oa !== null && $ob !== null && $oa !== $ob){
+                return $oa < $ob ? -1 : 1;
+            }
+            // Desempate final: data_ultima e nome
+            $ua = isset($a['data_ultima']) ? $a['data_ultima'] : null;
+            $ub = isset($b['data_ultima']) ? $b['data_ultima'] : null;
+            if($ua !== $ub){
+                if($ua === null){
+                    return -1;
+                }
+                if($ub === null){
+                    return 1;
+                }
+                return $ua < $ub ? -1 : 1;
+            }
+            $na = isset($a['nome']) ? mb_strtolower($a['nome']) : '';
+            $nb = isset($b['nome']) ? mb_strtolower($b['nome']) : '';
+            return $na <=> $nb;
+        });
+        return $d;
     }
     /**
      * Para conferir e acertar a ultima parte de um participante
@@ -429,6 +712,15 @@ class designaController extends Controller
         $type = isset($config['type']) ? $config['type'] : 'id_designado';
         $post_type = isset($config['post_type']) ? $config['post_type'] : '';
         $limit = isset($config['limit']) ? $config['limit'] : 1;
+        // Trava por request: arr_historico chama 2x por participante por parte;
+        // sem isso o designar_auto refaz o mesmo sync centenas de vezes.
+        static $conf_sync = [];
+        $ck_sync = $post_type . '|' . $id_designado;
+        if($id_designado && isset($conf_sync[$ck_sync])){
+            $ret['exec'] = true;
+            return $ret;
+        }
+        $conf_sync[$ck_sync] = true;
         $du = designation::select('designations.*','tags.nome','tags.config')
         ->join('tags','tags.id','=','designations.id_designacao')
         ->where('designations.id_designado','=',$id_designado)
@@ -470,9 +762,10 @@ class designaController extends Controller
         $tipo = isset($dr['tipo']) ? $dr['tipo'] : false;
         $post_type = isset($dr['post_type']) ? $dr['post_type'] : request()->segment(1);
         $sessao = isset($dr['sessao']) ? $dr['sessao'] : false;
+        $data_ref = isset($dr['data']) && is_string($dr['data']) ? trim($dr['data']) : null;
         //Verificar se na requesição tem um id da parte
         if($id_designacao){
-            $ret = $this->list_participants($id_designacao,$tipo,$post_type,$sessao);
+            $ret = $this->list_participants($id_designacao,$tipo,$post_type,$sessao,$data_ref);
         }
         //trazer arry das partes
         return response()->json($ret);
@@ -686,6 +979,203 @@ class designaController extends Controller
         $ret['arr_datas'] = $arr_datas;
         $ret = $sinc;
         return $ret;
+    }
+    /**
+     * Designa automaticamente participantes para as partes VAZIAS de uma semana.
+     * Regras: elegibilidade idêntica ao modal (list_participants: aceita + fun/genero),
+     * ordem por antiguidade (nunca fez primeiro), sem repetir pessoa na semana,
+     * ajudante com preferência de mesmo sexo. Nunca troca escolha manual.
+     * @param Request $request dados=base64(json([Y-m-d])), post_type=meio-semana|fim-semana
+     * @return array resumo {exec, mens, designadas, puladas, avisos}
+     */
+    public function designar_auto(Request $request){
+        if(function_exists('set_time_limit')){
+            @set_time_limit(180);
+        }
+        $ret = ['exec' => false, 'designadas' => 0, 'puladas' => 0, 'avisos' => []];
+        $dados = $request->all();
+        $arr_datas = isset($dados['dados']) && is_string($dados['dados']) ? Qlib::decodeArray($dados['dados']) : false;
+        if(!is_array($arr_datas)){
+            // Aceita data única Y-m-d também
+            $uma = isset($dados['dados']) && is_string($dados['dados']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($dados['dados'])) ? [trim($dados['dados'])] : [];
+            $arr_datas = $uma;
+        }
+        $post_type = isset($dados['post_type']) && in_array($dados['post_type'], ['meio-semana', 'fim-semana']) ? $dados['post_type'] : 'meio-semana';
+        if(empty($arr_datas)){
+            $ret['mens'] = 'Nenhuma data informada';
+            return $ret;
+        }
+        $id_ajudante_tag = Qlib::qoption('id_ajudante') ? Qlib::qoption('id_ajudante') : 28;
+        // Sessoes que pedem ajudante (mesma regra da view li_partes_meio)
+        $sessao_sem_ajudante = ['tesouros', 'inicio', 'vida'];
+        try {
+            foreach($arr_datas as $data){
+                $data = trim((string)$data);
+                if(!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data)){
+                    continue;
+                }
+                $partes = designation::where('data', '=', $data)
+                    ->where('post_type', '=', $post_type)
+                    ->where('excluido', '=', 'n')
+                    ->orderBy('ordem', 'asc')
+                    ->get();
+                // Pessoas já ocupadas na semana (manuais ou não): não repetir
+                $usados = [];
+                foreach($partes as $p){
+                    if(!empty($p->id_designado)){
+                        $usados[(int)$p->id_designado] = true;
+                    }
+                    if(!empty($p->id_ajudante)){
+                        $usados[(int)$p->id_ajudante] = true;
+                    }
+                }
+                foreach($partes as $parte){
+                    // Pula linha-espelho de ajudante (gerada no save) e partes já preenchidas
+                    if((int)$parte->id_designacao === (int)$id_ajudante_tag){
+                        continue;
+                    }
+                    if(!empty($parte->id_designado)){
+                        continue;
+                    }
+                    if(empty($parte->id_designacao)){
+                        $ret['puladas']++;
+                        $ret['avisos'][] = $data . ': parte sem tipo de designação';
+                        continue;
+                    }
+                    $lista = $this->list_participants($parte->id_designacao, 'id_designado', $post_type, false, $data, true);
+                    $cands = isset($lista['data']) && is_array($lista['data']) ? $lista['data'] : [];
+                    $escolhido = $this->primeiroLivre($cands, $usados);
+                    if(!$escolhido){
+                        $ret['puladas']++;
+                        $ret['avisos'][] = $data . ': sem elegível livre para ' . $this->nomeParte($parte->id_designacao) . $this->textoMotivos($this->motivosBloqueio($cands, $usados));
+                        continue;
+                    }
+                    $upd = ['id_designado' => (int)$escolhido['id']];
+                    $usados[(int)$escolhido['id']] = true;
+                    // Ajudante: só onde a tela pede (meio-semana/ministerio) e se vazio
+                    if(empty($parte->id_ajudante) && !in_array($parte->sessao, $sessao_sem_ajudante)){
+                        $ajud = $this->escolheAjudante($parte->id_designacao, $post_type, $usados, @$escolhido['genero'], $data, true);
+                        if($ajud){
+                            $upd['id_ajudante'] = (int)$ajud['id'];
+                            $usados[(int)$ajud['id']] = true;
+                        }else{
+                            $ret['avisos'][] = $data . ': estudante ' . @$escolhido['nome'] . ' sem ajudante livre';
+                        }
+                    }
+                    designation::where('id', $parte->id)->update($upd);
+                    $this->atualizaUltima($upd, $data, $parte->token);
+                    $ret['designadas']++;
+                }
+            }
+            $ret['exec'] = true;
+            $ret['mens'] = $ret['designadas'] . ' parte(s) preenchida(s)' . ($ret['puladas'] ? ', ' . $ret['puladas'] . ' pulada(s)' : '');
+        } catch (\Throwable $th) {
+            $ret['exec'] = false;
+            $ret['mens'] = $th->getMessage();
+        }
+        return $ret;
+    }
+    /**
+     * Primeiro da lista (já ordenada) livre para a semana: pula ocupados na data,
+     * em intervalo, com repetição recente ou que já têm parte nesta reunião.
+     */
+    protected function primeiroLivre($lista, $usados){
+        if(!is_array($lista)){
+            return false;
+        }
+        foreach($lista as $c){
+            $id = is_array($c) ? @$c['id'] : (@$c->id);
+            $bloq = is_array($c)
+                ? (!empty(@$c['em_intervalo']) || !empty(@$c['repetiu_recente']) || !empty(@$c['ja_nesta_data']))
+                : (!empty(@$c->em_intervalo) || !empty(@$c->repetiu_recente) || !empty(@$c->ja_nesta_data));
+            if($id && !isset($usados[(int)$id]) && !$bloq){
+                return is_array($c) ? $c : (array)$c;
+            }
+        }
+        return false;
+    }
+    /**
+     * Conta bloqueios da lista para aviso específico (intervalo/repetição/ocupados).
+     */
+    protected function motivosBloqueio($lista, $usados){
+        $m = ['ocupados' => 0, 'intervalo' => 0, 'repetidos' => 0, 'ja_data' => 0];
+        if(!is_array($lista)){
+            return $m;
+        }
+        foreach($lista as $c){
+            $id = is_array($c) ? @$c['id'] : (@$c->id);
+            if(!$id){
+                continue;
+            }
+            if(isset($usados[(int)$id])){
+                $m['ocupados']++;
+                continue;
+            }
+            $g = function($k) use ($c){
+                return is_array($c) ? !empty(@$c[$k]) : (!empty(@$c->$k));
+            };
+            if($g('ja_nesta_data')){
+                $m['ja_data']++;
+            }elseif($g('em_intervalo')){
+                $m['intervalo']++;
+            }elseif($g('repetiu_recente')){
+                $m['repetidos']++;
+            }
+        }
+        return $m;
+    }
+    /**
+     * Escolhe ajudante: elegíveis da parte 28, prefere mesmo sexo do estudante.
+     */
+    protected function escolheAjudante($id_designacao, $post_type, $usados, $genero_estudante = null, $data = null, $resumido = false){
+        $lista = $this->list_participants($id_designacao, 'id_ajudante', $post_type, false, $data, $resumido);
+        $candidatos = isset($lista['data']) && is_array($lista['data']) ? $lista['data'] : [];
+        if($genero_estudante){
+            $mesmo = $this->primeiroLivre(array_values(array_filter($candidatos, function($c) use ($genero_estudante){
+                $g = is_array($c) ? @$c['genero'] : (@$c->genero);
+                return $g === $genero_estudante;
+            })), $usados);
+            if($mesmo){
+                return $mesmo;
+            }
+        }
+        return $this->primeiroLivre($candidatos, $usados);
+    }
+    protected function textoMotivos($m){
+        $t = [];
+        if(!empty($m['ja_data'])){
+            $t[] = $m['ja_data'] . ' já com parte na reunião';
+        }
+        if(!empty($m['intervalo'])){
+            $t[] = $m['intervalo'] . ' em intervalo';
+        }
+        if(!empty($m['repetidos'])){
+            $t[] = $m['repetidos'] . ' repetiram há menos de 4 sem';
+        }
+        if(!empty($m['ocupados'])){
+            $t[] = $m['ocupados'] . ' ocupados na semana';
+        }
+        return $t ? ' (' . implode(', ', $t) . ')' : '';
+    }
+    protected function nomeParte($id_designacao){
+        $n = Qlib::buscaValorDb0('tags', 'id', (int)$id_designacao, 'nome');
+        return $n ? $n : ('parte ' . $id_designacao);
+    }
+    /**
+     * Sincroniza data_ultima/token_ultima dos designados (igual ao save manual).
+     */
+    protected function atualizaUltima($upd, $data, $token){
+        foreach(['id_designado', 'id_ajudante'] as $campo){
+            if(!empty($upd[$campo])){
+                $atual = Qlib::buscaValorDb0('publicadores', 'id', (int)$upd[$campo], 'data_ultima');
+                if(!$atual || $data > $atual){
+                    \App\Models\Publicador::where('id', '=', (int)$upd[$campo])->update([
+                        'data_ultima' => $data,
+                        'token_ultima' => $token,
+                    ]);
+                }
+            }
+        }
     }
     /**
      * Metodo para gerar um link whatsapp da desiganção para ser colocado na tag a

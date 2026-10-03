@@ -62,6 +62,9 @@
                                                 }
                                             @endphp
                                             <div class="card-tools d-print-none">
+                                                <button type="button" data-semanas="{{App\Qlib\Qlib::encodeArray([$v1])}}" data-post_type="{{$sec}}" class="btn btn-sm btn-outline-primary" onclick="designar_auto(this)" title="Preenche as partes vazias desta semana com os participantes elegíveis mais antigos (suas escolhas manuais são mantidas, você ajusta depois)">
+                                                    <i class="fa fa-magic" aria-hidden="true"></i> (3) Designar automaticamente
+                                                </button>
                                                 <label for="congresso_{{$k1}}">
                                                     <input {{$checked_cong}} type="checkbox" name="des2[{{$v1}}][congresso]" id="congresso_{{$k1}}"> {{__('Congresso')}}
                                                 </label>

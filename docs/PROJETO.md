@@ -68,6 +68,10 @@ programa/createedit.blade.php (botão 1)
 
 - **Tabela:** `id, data DATE, link VARCHAR(255)`. Sem timestamps, sem `excluido/deletado/ativo`.
 - **CRUD:** `/links-semanas` (menu Configurações → "Links JW (Semanas)"). Arquivos: `app/Models/LinkSemana.php`, `app/Http/Controllers/LinksSemanasController.php`, rota resource em `routes/web.php`, migrations `2026_10_03_000001_add_links_semanas_menu` (central + tenant).
+- **Intervalo mínimo por parte:** tela do publicador (`config_designacao.blade.php`) tem coluna "Intervalo" (`config.designacao.intervalo_{id}`, 0–4 meses; a antiga coluna "Ultima" foi removida — valores `ultima_*` nunca eram lidos). `list_participants(..., $data_ref)` marca `em_intervalo`/`intervalo_ate` comparando `ultima_desta.data + N meses` com a data da semana (modal mostra selo amarelo, manual continua liberado); `ordenarPorAntiguidade()` joga intervalados para o fim; `designar_auto` pula intervalados. A data chega via `GET /ajax/list-participantes?data=Y-m-d` (JS extrai de `des2[DATA]...`).
+- **Alternância e ocupação:** `list_participants` marca `repetiu_recente`/`repetiu_ha` (mesma parte dentro de `qoption('alternancia_semanas')`, padrão 4 semanas), `vezes_6m` (COUNT bulk por parte, desempate de variedade) e `ja_nesta_data` {numero, parte} (bulk em `designations` data=X, ambos os papéis + espelhos 28). Ordenação: livres → nunca-fez → antiguidade → variedade → tiebreaks; bloqueados no fim. Modal: selos vermelho/azul + `confirm()` em `select_m_paraticipante` via `data-avisos`. `designar_auto` pula bloqueados com aviso motivado (`motivosBloqueio`/`textoMotivos`).
+- **Performance do auto:** `list_participants` tem cache estático por request (chave com id efetivo — ajudante 28 reaproveita), `confere_ultima_parte` sincroniza 1x por pessoa, modo `$resumido` no auto (sem confere, `limit` 1) e `set_time_limit(180)` no endpoint. Medido no tenant ba: 41s → ~24s por semana cheia.
+- **Designação automática:** botão "(3) Designar automaticamente" no card de cada semana (`edit_programas_semanais.blade.php` + `designar_auto()` em `lib.js`) → `POST /ajax/designar-auto` → `designaController@designar_auto` (só vagas vazias da semana, sem repetir pessoa, ajudante pref. mesmo sexo, espelhos 28 gerados no save).
 - **Resolver** (`app/Services/LinkSemanaResolver.php::resolve($data Y-m-d): ?string`):
   1. Banco primeiro — só link contendo `/wol/d/` vale como cache (manual tem prioridade; links `/meetings/` legados são ignorados e regravados).
   2. Data passada sem link → não inventa (retorna banco/fallback).
@@ -89,10 +93,10 @@ php artisan tinker --execute='...'           # cuidado: aspas no PowerShell; pre
 
 Logs de falha do resolver: `storage/logs/laravel.log` (`LinkSemanaResolver: ...`).
 
-## 8. Pegadinhas conhecidas
+## 8. Pegadinhas — status (03/10/2026: quase todas resolvidas)
 
-- `Qlib.php:540,620` emitem `DEPRECATED` (parâmetro opcional antes de obrigatório) — pré-existente, inofensivo.
-- `Qlib::link_programacao_woljw` faz `str_replace('{ano}/{semana}')` inútil p/ links `/d/` — só repassa o cadastrado. Não mexer.
-- Virada de ano: `numero_semana()` + regra `dia>29 && semana>50 => ano++` (ex.: `2025-12-29` cai em semana 1 sem virar o ano no candidato). Links `/d/` manuais cobrem esses casos.
-- WOL pode throttlear: manter `sleep`, timeouts 15–20s, no máximo 2 páginas por sync. Nada de cron agressivo.
-- `TesteController@index` tem chamadas comentadas de debug (`ApostilaController@extract`, `VmpController@gera_api`) — útil como referência, não expor em produção.
+- [x] `Qlib.php` emitia `DEPRECATED` (parâmetro opcional antes de obrigatório em `dados_tab()` e `valorTabDb()`). **Resolvido:** defaults `= null` adicionados — chamadas existentes passam todos os args, comportamento idêntico.
+- [x] `link_programacao_woljw()` fazia `str_replace('{ano}/{semana}')` inútil p/ links `/d/`. **Resolvido:** early-return quando o link contém `/wol/d/` (+ guard `is_string` p/ `$tl=false` do banco vazio).
+- [x] Virada de ano (`dia>29 && semana>50 => ano++` errava ex.: `2025-12-29` → `/2025/1`). **Resolvido:** usa `date('o', strtotime($data))` (ano ISO-8601) em `link_programacao_woljw()` e `link_programacao_jworg()` — verificado: `2025-12-29 → /2026/1`, `2021-01-01 → /2020/53`. (Na prática o Resolver nem usa esse template, só a página da biblioteca.)
+- [x] Throttle da WOL em syncs de N semanas. **Amenizadado:** página mensal cacheada em arquivo por 12h (`wol_lib_{ano}_{mes}`); sync de 8 semanas do mesmo mês = 1 download. Falhas 404 (apostila não publicada) **não** são cacheadas. Mantidos `sleep()` e timeouts.
+- [ ] `TesteController@index` tem chamadas comentadas de debug — inofensivo (rota exige auth `tenant.auth`), manter como referência.

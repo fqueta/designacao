@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\LinkSemana;
 use App\Qlib\Qlib;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -102,11 +103,24 @@ class LinkSemanaResolver
         $url = "https://wol.jw.org/pt/wol/library/r5/lp-t/todas-as-publicações/apostilas/apostila-vida-e-ministério-{$ano}/{$slug}";
 
         try {
-            $response = self::http()->get($url);
-            if ($response->getStatusCode() !== 200) {
+            // Cache de 12h: o conteúdo da apostila mensal não muda; num sync de N
+            // semanas do mesmo mês, baixa a página 1x em vez de Nx (menos throttle).
+            // Conteúdo global (não é por tenant), chave sem tenant é intencional.
+            // Falhas (404 = apostila ainda não publicada) NÃO são cacheadas.
+            $key = "wol_lib_{$ano}_{$mes}";
+            $html = Cache::get($key);
+            if ($html === null) {
+                $response = self::http()->get($url);
+                if ($response->getStatusCode() !== 200) {
+                    return null;
+                }
+                $html = (string) $response->getBody();
+                Cache::put($key, $html, 43200);
+            }
+            if (!$html) {
                 return null;
             }
-            $crawler = new Crawler((string) $response->getBody(), $url);
+            $crawler = new Crawler($html, $url);
 
             $achados = $crawler->filter('a')->each(function (Crawler $node) {
                 $href = $node->attr('href');

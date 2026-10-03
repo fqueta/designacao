@@ -537,7 +537,7 @@ class Qlib
         }
         return $ret;
     }
-    static public function dados_tab($tab = null,$config)
+    static public function dados_tab($tab = null,$config = null)
     {
         $ret = false;
         if($tab){
@@ -617,7 +617,7 @@ class Qlib
         }
         return $ret;
     }
-    static public function valorTabDb($tab = false,$campo_bus,$valor,$select,$compleSql=false)
+    static public function valorTabDb($tab = false,$campo_bus = null,$valor = null,$select = null,$compleSql=false)
     {
 
         $ret=false;
@@ -1152,19 +1152,24 @@ class Qlib
         $d = explode("-",$data);
         $ret = '';
         if(isset($d[0]) && strlen($d[0])==4){
-            $ano = $d[0];
+            // Ano ISO-8601 (semana): trata a virada de ano corretamente
+            // (ex.: 2025-12-29 é semana 1 de 2026; 2021-01-01 é semana 53 de 2020)
+            $ano = date('o', strtotime($data));
             $semana = self::numero_semana($data);
-            if(isset($d[2])){
-                if($d[2]>29 && $semana>50){
-                    $ano++;
-                }
-            }
             $tl = '';
             if($data){
                 $tl = self::buscaValorDb0('links_semanas','data',$data,'link');
                 // dd($tl,$data);
             }else{
                 $tl = 'https://wol.jw.org/pt/wol/meetings/r5/lp-t/{ano}/{semana}';
+            }
+            // Link /d/ já é final: devolve direto sem str_replace
+            if(is_string($tl) && $tl !== '' && str_contains($tl, '/wol/d/')){
+                $ret = $tl;
+                if($html){
+                    $ret = str_replace('{link}',$ret,$html);
+                }
+                return $ret;
             }
             // dump($semana);
             if(!$semana){
@@ -1187,13 +1192,9 @@ class Qlib
         $d = explode("-",$data);
         $ret = '';
         if(isset($d[0]) && strlen($d[0])==4){
-            $ano = $d[0];
+            // Ano ISO-8601 (semana): trata a virada de ano corretamente
+            $ano = date('o', strtotime($data));
             $semana = self::numero_semana($data);
-            if(isset($d[2])){
-                if($d[2]>29 && $semana>50){
-                    $ano++;
-                }
-            }
             $tl = 'https://wol.jw.org/pt/wol/meetings/r5/lp-t/{ano}/{semana}';
             // dump($semana);
             if(!$semana){

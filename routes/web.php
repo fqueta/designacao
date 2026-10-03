@@ -48,6 +48,7 @@ Route::middleware(['web', TenancyMiddleware::class])->group(function () {
             Route::post('/desigancao-remove',[designaController::class,'removeDesignacao'])->name('ajax.designacao.remove');
             Route::get('/list-participantes',[designaController::class,'get_participantes'])->name('ajax.get.participantes');
             Route::post('/sinc-partes-jw',[designaController::class,'sinc_partes'])->name('ajax.sinc.partes');
+            Route::post('/designar-auto',[designaController::class,'designar_auto'])->name('ajax.designar.auto');
             Route::get('/link-zap',[designaController::class,'link_zap'])->name('ajax.link.zap');
             Route::post('/edit_options',[QoptionsController::class,'edit_options'])->name('ajax.edit_options');
         });

@@ -2318,6 +2318,12 @@ function select_parcipante(obj){
         alert('Designação não encontrada entre em contato com o suporte');
         return
     }
+    // Data da semana (des2[YYYY-MM-DD][...]) para regra de intervalo entre partes
+    var data_semana = '';
+    var mdata = campo.match(/des2\[(\d{4}-\d{2}-\d{2})\]/);
+    if(mdata && mdata[1]){
+        data_semana = mdata[1];
+    }
     // var arr = decodeArray(json_arr);
     getAjax({
         url:'/ajax/list-participantes',
@@ -2328,6 +2334,7 @@ function select_parcipante(obj){
             id_designacao: id_designacao,
             tipo: tipo,
             post_type: post_type,
+            data: data_semana
         }
     },function(res){
         $('#preload').fadeOut("fast");
@@ -2353,7 +2360,7 @@ function select_parcipante(obj){
                 var tr = '';
                 for (let i = 0; i < d.length; i++) {
                     const el = d[i];
-                    var r = '<input type="radio" onclick="select_m_paraticipante(this,\''+campoi+'\',\''+id_m+'\');" nome="'+el.nome+'" value="'+el.id+'"/>';
+                    var r = '<input type="radio" onclick="select_m_paraticipante(this,\''+campoi+'\',\''+id_m+'\');" nome="'+el.nome+'" value="'+el.id+'"'+avisosParticipante(el)+'/>';
                     var desta = el.ultima_desta.data_ex,outra=el.ultima_outra.data_ex;
                     var u4 = el.ultimas_quatro,reg_id = el.id;
                     if(typeof desta=='undefined'){
@@ -2378,7 +2385,7 @@ function select_parcipante(obj){
                         outra = '<a class="underline" title="ver ultimas 4" href="#" d-ult-ck td-id="{reg_id}">'+outra+'</a>';
                         outra += noli;
                     }
-                    tr += tm2.replaceAll('{nome}', el.nome.toUpperCase());
+                    tr += tm2.replaceAll('{nome}', nomeParticipante(el));
                     tr = tr.replaceAll('{radio}', r);
                     tr = tr.replaceAll('{ultima_desta}', desta);
                     tr = tr.replaceAll('{ultima_outra}', outra);
@@ -2436,6 +2443,11 @@ function expandeU4(obj){
 }
 function select_m_paraticipante(obj,campo,id_m){
     var id_designado = obj.value,nome_designado = obj.getAttribute('nome'),sel_id='[name="' + campo + '"]',sel_nome='[data-campo="' + campo + '"]',btn=' <button type="button" onclick="remove_designado(\''+id_m+'\',\''+nome_designado+'\');" class="btn btn-light"><i class="fa fa-trash"></i></button>';
+    var av = obj.getAttribute('data-avisos');
+    if(av && !confirm(av + ' Deseja confirmar ' + nome_designado + '?')){
+        obj.checked = false;
+        return;
+    }
     $(sel_id).val(id_designado);
     $(sel_nome).html(nome_designado);
     $('#'+id_m).modal('hide');
@@ -2448,6 +2460,40 @@ function change_margin_b(obj,id){
     $('[data-id="'+id+'"]').css('margin-bottom',val+'vw');
 }
 
+function nomeParticipante(el){
+    var nome = (el.nome || '').toUpperCase();
+    if(el.em_intervalo){
+        var ate = el.intervalo_ate ? ' até ' + el.intervalo_ate : '';
+        nome += ' <span class="badge badge-warning" title="Dentro do intervalo mínimo desta parte' + ate + ' (escolha manual liberada)">em intervalo' + ate + '</span>';
+    }
+    if(el.repetiu_recente){
+        var ha = el.repetiu_ha ? ' há ' + el.repetiu_ha : '';
+        var vz = (typeof el.vezes_6m !== 'undefined') ? ' (' + el.vezes_6m + 'x em 6m)' : '';
+        nome += ' <span class="badge badge-danger" title="Fez esta parte recentemente' + ha + vz + ' (escolha manual liberada)">repetiu' + ha + '</span>';
+    }
+    if(el.ja_nesta_data){
+        var jd = 'Nº ' + (el.ja_nesta_data.numero || '?') + (el.ja_nesta_data.parte ? ' | ' + el.ja_nesta_data.parte : '');
+        nome += ' <span class="badge badge-info" title="Já tem parte nesta reunião: ' + jd + ' (escolha manual liberada)">já nesta reunião</span>';
+    }
+    return nome;
+}
+function avisosParticipante(el){
+    var av = [];
+    if(el.em_intervalo){
+        av.push('Em intervalo' + (el.intervalo_ate ? ' até ' + el.intervalo_ate : ''));
+    }
+    if(el.repetiu_recente){
+        av.push('Repetiu esta parte' + (el.repetiu_ha ? ' há ' + el.repetiu_ha : ' recentemente'));
+    }
+    if(el.ja_nesta_data){
+        av.push('Já tem a parte Nº ' + (el.ja_nesta_data.numero || '?') + ' nesta reunião');
+    }
+    if(!av.length){
+        return '';
+    }
+    // Aspas simples escapadas para o atributo HTML
+    return ' data-avisos="' + av.join(' | ').replaceAll("'", "&#39;") + '"';
+}
 function sinc_partes_jw(obj,type){
     var data = obj.getAttribute('data-semanas');
     if(typeof data =='string'){
@@ -2473,6 +2519,39 @@ function sinc_partes_jw(obj,type){
             console.log(err);
         });
     }
+}
+function designar_auto(obj){
+    var data = obj.getAttribute('data-semanas');
+    var post_type = obj.getAttribute('data-post_type') || 'meio-semana';
+    if(typeof data !='string'){
+        return;
+    }
+    if(!confirm('Preencher automaticamente as partes vazias desta semana? Suas escolhas manuais serão mantidas.')){
+        return;
+    }
+    getAjax({
+        url:'/ajax/designar-auto',
+        type: 'POST',
+        dataType: 'json',
+        csrf: true,
+        data:{
+            dados:data,
+            post_type:post_type
+        }
+    },function(res){
+        $('#preload').fadeOut("fast");
+        var html = res.mens || '';
+        if(res.avisos && res.avisos.length){
+            html += '<br><small>' + res.avisos.join('<br>') + '</small>';
+        }
+        $('.mes').html(html);
+        if(res.exec && res.designadas > 0){
+            location.reload();
+        }
+    },function(err){
+        $('#preload').fadeOut("fast");
+        console.log(err);
+    });
 }
 function remove_designado(id,name){
     var nome = 'Selecionar Participante';
