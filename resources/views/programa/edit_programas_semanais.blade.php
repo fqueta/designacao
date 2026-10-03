@@ -74,6 +74,21 @@
                                             </div>
                                         </div>
                                         <div class="card-body" id="car-{{$v1}}">
+                                            <div style="display: none;" class="d-none designation-template-wrapper">
+                                                <ul id="template-{{$v1}}">
+                                                    @php
+                                                        $ordem = 0;
+                                                        $k_sessao = 'inicio';
+                                                        $name = 'des2['.$v1.'][partes][' . $k_sessao . '][' . $ordem . ']';
+                                                        $designacao = ['id' => '', 'id_designacao' => '', 'id_designado' => '', 'id_ajudante' => '', 'numero' => '', 'obs' => '', 'token' => ''];
+                                                    @endphp
+                                                    @if ($sec=='fim-semana')
+                                                        @include('programa.li_partes_fim')
+                                                    @else
+                                                        @include('programa.li_partes_meio')
+                                                    @endif
+                                                </ul>
+                                            </div>
                                             @if(isset($des2['programa']) && is_array($des2['programa']))
                                                 @php
                                                     $prg = isset($des2['programa'][$v1])?$des2['programa'][$v1]:false;
@@ -266,4 +281,9 @@
 </table>
 {{-- {{dd($sem)}} --}}
 
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.designation-template-wrapper input, .designation-template-wrapper select, .designation-template-wrapper textarea').prop('disabled', true);
+    });
+</script>
 @endif

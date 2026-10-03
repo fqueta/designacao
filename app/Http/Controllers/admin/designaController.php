@@ -9,6 +9,7 @@ use App\Models\Post;
 use App\Models\Publicador;
 use App\Models\Tag;
 use App\Models\User;
+use App\Services\LinkSemanaResolver;
 use App\Qlib\Qlib;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -532,7 +533,13 @@ class designaController extends Controller
                         }
                     }else{
                         //partes da apostila do mes
-                        $link = Qlib::link_programacao_woljw($data);
+                        //Auto-resolve: usa links_semanas se existir, senão gera+valida+salva automaticamente (só futuras)
+                        $link = LinkSemanaResolver::resolve($data) ?: Qlib::link_programacao_woljw($data);
+                        if (empty($link)) {
+                            $ret['sem_link_'.$data][$data] = ['exec' => false, 'mens' => 'Sem link JW para a data '.$data.' (cadastre em Links JW ou tente novamente)'];
+                            sleep(2);
+                            continue;
+                        }
                         // dd($data,$link);
                         $arr_partes = (new VmpController)->gera_api($link,$data);
                         // dd($arr_partes);
@@ -559,7 +566,13 @@ class designaController extends Controller
                     }
                 }
             }elseif(is_string($config) && ($data = $config)){
-                $link = Qlib::link_programacao_woljw($data);
+                //Auto-resolve: usa links_semanas se existir, senão gera+valida+salva automaticamente (só futuras)
+                $link = LinkSemanaResolver::resolve($data) ?: Qlib::link_programacao_woljw($data);
+                if (empty($link)) {
+                    $ret['exec'] = false;
+                    $ret['mens'] = 'Sem link JW para a data '.$data.' (cadastre em Links JW ou tente novamente)';
+                    return $ret;
+                }
                 $arr_partes = (new VmpController)->gera_api($link,$data);
                 if(is_array($arr_partes) && isset($arr_partes['partes']) && is_array($arr_partes['partes'])){
                     // $arr_sessoes = ['tesouros','ministerio','vida'];

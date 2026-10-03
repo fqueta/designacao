@@ -109,6 +109,9 @@ Route::middleware(['web', TenancyMiddleware::class])->group(function () {
         Route::resource('documentos','\App\Http\Controllers\DocumentosController',['parameters' => [
             'documentos' => 'id'
         ]]);
+        Route::resource('links-semanas','\App\Http\Controllers\LinksSemanasController',['parameters' => [
+            'links-semanas' => 'id'
+        ]]);
         Route::resource('qoptions','\App\Http\Controllers\admin\QoptionsController',['parameters' => [
             'qoptions' => 'id'
         ]]);

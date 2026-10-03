@@ -19,11 +19,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('links_semanas', function (Blueprint $table): void {
-            $table->id();
-            $table->date('data');
-            $table->string('link');
-        });
+        if (!Schema::hasTable('links_semanas')) {
+            Schema::create('links_semanas', function (Blueprint $table): void {
+                $table->id();
+                $table->date('data');
+                $table->string('link');
+            });
+        }
     }
 
     /**

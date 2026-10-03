@@ -2220,6 +2220,10 @@ function add_designation(dt){
 function add_designation2(data,sessao){
     if(data && sessao){
         let tli = document.getElementById(data+'_inicio_0');
+        if (!tli) {
+            console.error('Template element not found: ' + data + '_inicio_0');
+            return;
+        }
         var tem = tli.cloneNode(true);
         let seloc = document.getElementById('car-'+data).querySelector('.card-sessao-'+sessao).querySelector('ul.ui-sortable');
         try {
@@ -2233,6 +2237,12 @@ function add_designation2(data,sessao){
         var tok = uniqid();
         tem.setAttribute('id',atr_li);
         tem.setAttribute('data-token',tok);
+
+        // Remove disabled attribute from cloned inputs/selects/textareas so they can be submitted
+        tem.querySelectorAll('input, select, textarea').forEach(function(val) {
+            val.removeAttribute('disabled');
+        });
+
         tem.querySelectorAll('input[type="hidden"]').forEach(function(val) {
             val.value = '';
         });
