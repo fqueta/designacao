@@ -10,7 +10,7 @@
     $id_parte = isset($designacao['id']) ? $designacao['id'] : 0;
     if(isset($arr[@$value])){
         $nome_select = $arr[@$value] . ' ';
-        // $btn_troca = '<button type="button" title="'.__('Trocar ').'" onclick="trocar_designado(this,\''.@$id_m.'\',\''.$name.'\');" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>';
+        $btn_troca = '<button type="button" title="'.__('Trocar com outro participante').'" onclick="trocar_designado(this,\''.@$id_m.'\',\''.$name.'\');" class="btn btn-default btn-sm btn-troca"><i class="fa fa-refresh"></i></button>';
         $btn_remove = '<button type="button" title="'.__('Remover designado').'" onclick="remove_designado(\''.@$id_m.'\',\''.$name.'\');" class="btn btn-default btn-sm"><i class="fa fa-trash"></i></button>';
         $btn_edit_paticipante = '<button type="button" title="'.__('Editar participante').'" onclick="edit_designado(\''.@$value.'\');" class="btn btn-default btn-sm"><i class="fa fa-user"></i></button>';
         $btn_envia = '<button type="button" title="'.__('Enviar designação para whatsapp').'" onclick="gerar_link_envia(\''.$id_parte.'\')" class="btn btn-default btn-sm"><i class="fa-brands fa-whatsapp"></i></button>';

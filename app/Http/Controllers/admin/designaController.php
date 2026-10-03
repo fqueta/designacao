@@ -1178,6 +1178,53 @@ class designaController extends Controller
         }
     }
     /**
+     * Valida troca rápida entre dois participantes: cada um precisa aceitar
+     * a parte do outro (config.designacao.aceita). Leve: 2 reads + 2 nomes.
+     */
+    public function validar_troca(Request $request){
+        $ret = ['exec' => false, 'mens' => ''];
+        $a_pub = (int)$request->get('a_pub');
+        $a_parte = (int)$request->get('a_parte');
+        $b_pub = (int)$request->get('b_pub');
+        $b_parte = (int)$request->get('b_parte');
+        if(!$a_pub || !$a_parte || !$b_pub || !$b_parte){
+            $ret['mens'] = 'Dados incompletos para validar a troca';
+            return $ret;
+        }
+        if($a_pub === $b_pub){
+            $ret['mens'] = 'Selecione outro participante';
+            return $ret;
+        }
+        try {
+            $pa = Publicador::find($a_pub);
+            $pb = Publicador::find($b_pub);
+            if(!$pa || !$pb){
+                $ret['mens'] = 'Participante não encontrado';
+                return $ret;
+            }
+            $cfgA = is_array(@$pa->config) ? $pa->config : [];
+            $cfgB = is_array(@$pb->config) ? $pb->config : [];
+            $aa = isset($cfgA['designacao']['aceita']) && is_array($cfgA['designacao']['aceita']) ? array_map('strval', $cfgA['designacao']['aceita']) : [];
+            $ab = isset($cfgB['designacao']['aceita']) && is_array($cfgB['designacao']['aceita']) ? array_map('strval', $cfgB['designacao']['aceita']) : [];
+            $falta = [];
+            if(!in_array((string)$b_parte, $aa)){
+                $falta[] = $pa->nome . ' não aceita ' . $this->nomeParte($b_parte);
+            }
+            if(!in_array((string)$a_parte, $ab)){
+                $falta[] = $pb->nome . ' não aceita ' . $this->nomeParte($a_parte);
+            }
+            if($falta){
+                $ret['mens'] = implode('; ', $falta);
+                return $ret;
+            }
+            $ret['exec'] = true;
+            $ret['mens'] = 'Troca liberada';
+        } catch (\Throwable $th) {
+            $ret['mens'] = $th->getMessage();
+        }
+        return $ret;
+    }
+    /**
      * Metodo para gerar um link whatsapp da desiganção para ser colocado na tag a
      * @param int $id da parte
      */

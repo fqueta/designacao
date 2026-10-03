@@ -2582,31 +2582,90 @@ function gerar_link_envia(id_parte){
         }
     });
 }
-function trocar_designado(obj,ida,name){
-    var seletor = 'data-trocar="id"';
-    var veri = $('['+seletor+']').val();
-    if(typeof veri=='undefined'){
-        var idParicipante = $('[name="'+name+'"]').val();
-        // $().css('color', '#F00').attr('data-change="link"');
-        var alvo1 = document.querySelector('[data-target="#'+ida+'"]')
-        var alvo2 = document.querySelector('[name="'+name+'"]')
-        alvo1.setAttribute('data-trocar','link');
-        alvo2.setAttribute('data-trocar','id');
-        obj.setAttribute('data-trocar','btn');
-        alvo1.style.color = '#F00';
-        obj.classList.remove('btn-default'),obj.classList.add("btn-danger");
-    }else{
-        var idP = $('[name="'+name+'"]').val();
-        var idPa = $('[data-trocar="id"]').val(); //alvo
-        if(typeof idP!='undefined' && typeof idpa !='undefined'){
-            var alvo1 = document.querySelector('[data-target="#'+ida+'"]'),alvo2 = document.querySelector('[name="'+name+'"]'),alvo3 = document.querySelector('[data-trocar="id"]'),alvo4 = document.querySelector('[data-trocar="link"]'),btn=querySelector('[data-trocar="btn"]');
-            alvo1.value = alvo3.value,alvo2.value = alvo4.value;
-            btn.classList.remove('btn-danger'),btn.classList.add("btn-default");
-        }
-        console.log(idParicipante);
-
-
+function campoParaParte(campo){
+    var sel = campo.replace(/\[id_designado\]$/, '[id_designacao]').replace(/\[id_ajudante\]$/, '[id_designacao]');
+    var el = document.querySelector('[name="' + sel + '"]');
+    return el ? el.value : '';
+}
+function desarmar_troca(){
+    var armed = document.querySelector('[data-troca-armado="1"]');
+    if(armed){
+        armed.removeAttribute('data-troca-armado');
+        armed.removeAttribute('data-troca-campo');
+        armed.removeAttribute('data-troca-id');
+        armed.classList.remove('btn-danger');
+        armed.classList.add('btn-default');
     }
+}
+// Troca rápida: 1º clique no ⇄ arma (vermelho), 2º clique em outro ⇄ valida e troca
+function trocar_designado(obj,ida,name){
+    var armed = document.querySelector('[data-troca-armado="1"]');
+    // Clicou no mesmo botão: desarma
+    if(armed && armed === obj){
+        desarmar_troca();
+        return;
+    }
+    var meuId = $('[name="'+name+'"]').val();
+    if(!meuId || meuId == '0'){
+        alert('Escolha primeiro um participante neste campo');
+        return;
+    }
+    // Segundo clique: valida elegibilidade cruzada e troca
+    if(armed){
+        var campoA = armed.getAttribute('data-troca-campo');
+        var idA = armed.getAttribute('data-troca-id');
+        var campoB = name;
+        var idB = meuId;
+        var parteA = campoParaParte(campoA);
+        var parteB = campoParaParte(campoB);
+        if(!parteA || !parteB){
+            alert('Não foi possível identificar as partes');
+            desarmar_troca();
+            return;
+        }
+        getAjax({
+            url:'/ajax/validar-troca',
+            type: 'POST',
+            dataType: 'json',
+            csrf: true,
+            data:{
+                a_pub:idA,
+                a_parte:parteA,
+                b_pub:idB,
+                b_parte:parteB
+            }
+        },function(res){
+            $('#preload').fadeOut("fast");
+            if(res.exec){
+                var selA = '[name="'+campoA+'"]', selB = '[name="'+campoB+'"]';
+                var rotA = document.querySelector('[data-campo="'+campoA+'"]');
+                var rotB = document.querySelector('[data-campo="'+campoB+'"]');
+                var nomeA = rotA ? rotA.textContent : '', nomeB = rotB ? rotB.textContent : '';
+                $(selA).val(idB);
+                $(selB).val(idA);
+                if(rotA){ rotA.textContent = nomeB; }
+                if(rotB){ rotB.textContent = nomeA; }
+                desarmar_troca();
+                document.querySelector('[btn="permanecer"]').click();
+            }else{
+                $('.mes').html(res.mens || 'Troca não permitida');
+                desarmar_troca();
+            }
+        },function(err){
+            $('#preload').fadeOut("fast");
+            console.log(err);
+            desarmar_troca();
+        });
+        return;
+    }
+    // Primeiro clique: arma
+    desarmar_troca();
+    obj.setAttribute('data-troca-armado','1');
+    obj.setAttribute('data-troca-campo',name);
+    obj.setAttribute('data-troca-id',meuId);
+    obj.classList.remove('btn-default');
+    obj.classList.add('btn-danger');
+    $('.mes').html('Troca armada: clique no botão de outro participante');
 }
 function modal_pg_config(){
     var cont = document.querySelector('.cont_optins');
