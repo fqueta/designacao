@@ -2409,6 +2409,12 @@ function select_parcipante(obj){
                 // }
                 $('#table-'+id_m).dataTable({
                     'paging': false,
+                    // Preserva a ordem do backend (antiguidade); sem isso o
+                    // DataTables reordena pela 1a coluna (radio), sem sentido
+                    'order': [],
+                    'language': {
+                        'searchPlaceholder': 'Buscar nome...'
+                    }
                 });
                 $('[d-ult-ck]').on('click', function (e) {
                     e.preventDefault();

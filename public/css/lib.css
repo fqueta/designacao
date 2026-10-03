@@ -161,3 +161,131 @@ ul.timeline > li:before {
       transform: rotate(360deg);
     }
 }
+/* ===== Modal Selecionar Participante no mobile (<=767px) ===== */
+@media (max-width: 767.98px) {
+    /* Modal ocupa a tela cheia */
+    .modal .modal-dialog.modal-full-mobile {
+        max-width: 100%;
+        margin: 0;
+        min-height: 100%;
+    }
+    .modal .modal-dialog.modal-full-mobile .modal-content {
+        min-height: 100vh;
+        border: 0;
+        border-radius: 0;
+    }
+    /* Tabela vira lista de cards */
+    table.table-des thead {
+        display: none;
+    }
+    table.table-des,
+    table.table-des tbody,
+    table.table-des tr,
+    table.table-des td {
+        display: block;
+        width: 100%;
+    }
+    table.table-des tr {
+        border: 1px solid #dee2e6;
+        border-radius: .35rem;
+        margin-bottom: .6rem;
+        padding: .6rem .7rem .6rem 3rem;
+        position: relative;
+        background: #fff;
+    }
+    /* Radio grande a esquerda, facil de tocar */
+    table.table-des tr td:first-child {
+        position: absolute;
+        left: .6rem;
+        top: .8rem;
+        border: 0;
+        padding: 0;
+    }
+    table.table-des tr td:first-child input[type="radio"] {
+        width: 26px;
+        height: 26px;
+    }
+    table.table-des tr td {
+        border: 0;
+        padding: .15rem 0;
+    }
+    /* Nome em destaque, demais linhas menores */
+    table.table-des tr td:nth-child(2) {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    table.table-des tr td:nth-child(3),
+    table.table-des tr td:nth-child(4) {
+        font-size: .82rem;
+        color: #495057;
+    }
+    table.table-des tr td:nth-child(3)::before {
+        content: "Ultima desta: ";
+        font-weight: 600;
+        color: #6c757d;
+    }
+    table.table-des tr td:nth-child(4)::before {
+        content: "Ultima de outra: ";
+        font-weight: 600;
+        color: #6c757d;
+    }
+    /* Selos quebram linha sem estourar */
+    table.table-des .badge {
+        display: inline-block;
+        white-space: normal;
+        text-align: left;
+        margin: 2px 4px 2px 0;
+        font-size: .72rem;
+    }
+    /* Busca do DataTables em largura total */
+    .modal .dataTables_wrapper .dataTables_filter {
+        float: none;
+        text-align: left;
+        margin-bottom: .5rem;
+    }
+    .modal .dataTables_wrapper .dataTables_filter label {
+        display: block;
+        width: 100%;
+    }
+    .modal .dataTables_wrapper .dataTables_filter input {
+        width: 100%;
+        margin-left: 0;
+        height: calc(1.5em + .75rem + 2px);
+        padding: .375rem .75rem;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+    }
+}
+/* ===== Página do programa no mobile: menos padding, mais área útil ===== */
+@media (max-width: 767.98px) {
+    .content-wrapper > .content {
+        padding-left: .25rem;
+        padding-right: .25rem;
+    }
+    .card-body {
+        padding: .65rem;
+    }
+    .card-header {
+        padding: .6rem .65rem;
+    }
+    .list-group-item {
+        padding: .6rem .65rem;
+    }
+    /* Tabelas: menos padding nas células (ex.: td que envolve a semana) */
+    table.table > thead > tr > th,
+    table.table > tbody > tr > td {
+        padding: .35rem;
+    }
+    table.table {
+        margin-bottom: .5rem;
+    }
+    /* Grid sem calhas: colunas zeradas (rows sem margem negativa p/ não estourar) */
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .row > div[class*="col-"] {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
