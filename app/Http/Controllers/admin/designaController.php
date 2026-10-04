@@ -1008,6 +1008,8 @@ class designaController extends Controller
         $id_ajudante_tag = Qlib::qoption('id_ajudante') ? Qlib::qoption('id_ajudante') : 28;
         // Sessoes que pedem ajudante (mesma regra da view li_partes_meio)
         $sessao_sem_ajudante = ['tesouros', 'inicio', 'vida'];
+        // Partes que nunca pedem ajudante (ex.: Discurso) — resolve por nome
+        $partes_sem_ajudante = self::idsSemAjudante();
         try {
             foreach($arr_datas as $data){
                 $data = trim((string)$data);
@@ -1019,7 +1021,37 @@ class designaController extends Controller
                     ->where('excluido', '=', 'n')
                     ->orderBy('ordem', 'asc')
                     ->get();
+                // Normaliza Discurso (e demais partes sem ajudante): remove ajudante
+                // indevido mesmo em partes já preenchidas manualmente. Vale na
+                // próxima execução do automático, sem apagar o designado.
+                foreach($partes as $parte){
+                    if((int)$parte->id_designacao === (int)$id_ajudante_tag){
+                        continue;
+                    }
+                    if(empty($parte->id_ajudante)){
+                        continue;
+                    }
+                    if(!in_array((int)$parte->id_designacao, $partes_sem_ajudante, true)){
+                        continue;
+                    }
+                    $oldAj = (int)$parte->id_ajudante;
+                    designation::where('id', $parte->id)->update(['id_ajudante' => 0]);
+                    $parte->id_ajudante = 0;
+                    // Remove linha-espelho do ajudante (id_designacao 28) do mesmo número/data
+                    try {
+                        designation::where('data', '=', $data)
+                            ->where('post_type', '=', $post_type)
+                            ->where('id_designacao', '=', (int)$id_ajudante_tag)
+                            ->where('numero', '=', $parte->numero)
+                            ->where('id_designado', '=', $oldAj)
+                            ->delete();
+                    } catch (\Throwable $e) {
+                        // Limpeza do espelho é best-effort
+                    }
+                    $ret['avisos'][] = $data . ': ajudante removido de ' . $this->nomeParte($parte->id_designacao) . ' (parte ' . $parte->numero . ')';
+                }
                 // Pessoas já ocupadas na semana (manuais ou não): não repetir
+                // (montado após a limpeza acima, já sem o ajudante do Discurso)
                 $usados = [];
                 foreach($partes as $p){
                     if(!empty($p->id_designado)){
@@ -1052,8 +1084,14 @@ class designaController extends Controller
                     }
                     $upd = ['id_designado' => (int)$escolhido['id']];
                     $usados[(int)$escolhido['id']] = true;
+                    $eh_sem_ajudante = in_array((int)$parte->id_designacao, $partes_sem_ajudante, true);
+                    if($eh_sem_ajudante){
+                        // Parte sem ajudante (Discurso/mecânicas): garante zerado
+                        $upd['id_ajudante'] = 0;
+                    }
                     // Ajudante: só onde a tela pede (meio-semana/ministerio) e se vazio
-                    if(empty($parte->id_ajudante) && !in_array($parte->sessao, $sessao_sem_ajudante)){
+                    // e nunca para partes sem ajudante (ex.: Discurso, Palco)
+                    if(!$eh_sem_ajudante && empty($parte->id_ajudante) && !in_array($parte->sessao, $sessao_sem_ajudante)){
                         $ajud = $this->escolheAjudante($parte->id_designacao, $post_type, $usados, @$escolhido['genero'], $data, true);
                         if($ajud){
                             $upd['id_ajudante'] = (int)$ajud['id'];
@@ -1160,6 +1198,59 @@ class designaController extends Controller
     protected function nomeParte($id_designacao){
         $n = Qlib::buscaValorDb0('tags', 'id', (int)$id_designacao, 'nome');
         return $n ? $n : ('parte ' . $id_designacao);
+    }
+    /**
+     * Nomes das partes que nunca pedem ajudante (comparação sem acento).
+     * @return array<string>
+     */
+    public static function nomesSemAjudante(){
+        return ['discurso', 'indicador de auditorio', 'indicador externo', 'palco'];
+    }
+    /**
+     * Normaliza nome p/ comparação (minúsculo + sem acento).
+     */
+    protected static function normalizaNomeParte($nome){
+        $n = mb_strtolower(trim((string)$nome), 'UTF-8');
+        $map = ['á'=>'a','à'=>'a','â'=>'a','ã'=>'a','é'=>'e','ê'=>'e','í'=>'i','ó'=>'o','ô'=>'o','õ'=>'o','ú'=>'u','ç'=>'c'];
+        $n = strtr($n, $map);
+        $n = preg_replace('/\s+/', ' ', $n);
+        return trim($n);
+    }
+    /**
+     * IDs das partes que nunca pedem ajudante (ex.: Discurso, Indicador de
+     * auditório/externo, Palco).
+     * Resolve por nome da Tag para não depender do ID numérico (que varia
+     * por ambiente/seed). Mantém 13 como fallback (ID histórico do Discurso).
+     * @return array<int>
+     */
+    public static function idsSemAjudante(){
+        static $cache = null;
+        if(is_array($cache)){
+            return $cache;
+        }
+        $ids = [13];
+        try {
+            $alvos = self::nomesSemAjudante();
+            $rows = Tag::select('id', 'nome')->get();
+            foreach($rows as $r){
+                $nid = (int)(is_array($r) ? @$r['id'] : @$r->id);
+                $nnome = is_array($r) ? @$r['nome'] : @$r->nome;
+                if($nid > 0 && in_array(self::normalizaNomeParte($nnome), $alvos, true) && !in_array($nid, $ids, true)){
+                    $ids[] = $nid;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Mantém fallback [13]
+        }
+        $cache = $ids;
+        return $cache;
+    }
+    /**
+     * Verifica se a parte não pode ter ajudante (ex.: Discurso, mecânicas).
+     * @param int|string $id_designacao
+     */
+    public static function parteSemAjudante($id_designacao){
+        return in_array((int)$id_designacao, self::idsSemAjudante(), true);
     }
     /**
      * Sincroniza data_ultima/token_ultima dos designados (igual ao save manual).

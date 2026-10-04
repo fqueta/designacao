@@ -45,8 +45,8 @@
         </div>
 
         <div class="row w-100 mr-0 ml-0">
-            @if($k_sessao!='tesouros' && $k_sessao!='inicio' && $k_sessao!='vida')
-                <div class="col-md-4">
+            @if($k_sessao!='tesouros' && $k_sessao!='inicio' && $k_sessao!='vida' && !\App\Http\Controllers\admin\designaController::parteSemAjudante(@$designacao['id_designacao']))
+                <div class="col-md-4 d-ajudante">
                         <label>Ajudante</label>
                         @include('programa.select_participantes',[
                             'arr' => $arr_participantes,

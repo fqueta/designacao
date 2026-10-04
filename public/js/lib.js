@@ -2298,6 +2298,28 @@ function selec_desig(obj){
     }else{
         $('[data-token="'+token+'"] .d-orador').hide();
     }
+    // Partes sem ajudante (regra por nome, ids variam por ambiente)
+    try {
+        var txt = obj.options && obj.selectedIndex >= 0 ? obj.options[obj.selectedIndex].text : '';
+        var norm = (txt || '').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+        var semAjudante = ['discurso', 'indicador de auditorio', 'indicador externo', 'palco'].indexOf(norm) !== -1;
+        var $li = $(obj).closest('li');
+        var $aj = $li.length ? $li.find('.d-ajudante') : $();
+        if(!$aj.length){
+            $aj = $('[data-token="'+token+'"] .d-ajudante');
+        }
+        if(semAjudante){
+            $aj.hide();
+            // Limpa valor para não salvar ajudante residual
+            $li.find('input[name$="[id_ajudante]"]').val(0);
+        }else{
+            // Só reexibe se a sessão permite ajudante (mesma regra da view)
+            var sessao = obj.getAttribute('data-sessao') || '';
+            if(sessao !== 'tesouros' && sessao !== 'inicio' && sessao !== 'vida'){
+                $aj.show();
+            }
+        }
+    } catch(e){ console.log(e); }
 }
 function select_parcipante(obj){
     const json_arr = obj.getAttribute('data-arr');

@@ -912,6 +912,10 @@ class PostController extends Controller
                                 $dataSalv[$data][$k]['id_designacao'] = isset($ddta['id_designacao'])?$ddta['id_designacao']:0;
                                 $dataSalv[$data][$k]['id_designado'] = isset($ddta['id_designado'])?$ddta['id_designado']:0;
                                 $dataSalv[$data][$k]['id_ajudante'] = isset($ddta['id_ajudante'])?$ddta['id_ajudante']:0;
+                                // Discurso nunca tem ajudante (regra por nome, ids variam)
+                                if(designaController::parteSemAjudante($dataSalv[$data][$k]['id_designacao'])){
+                                    $dataSalv[$data][$k]['id_ajudante'] = 0;
+                                }
                                 $dataSalv[$data][$k]['orador_visitante'] = isset($ddta['orador_visitante'])?$ddta['orador_visitante']:false;
                                 $dataSalv[$data][$k]['post_type'] = isset($ddta['post_type'])?$ddta['post_type']:$post_type;
                                 $dataSalv[$data][$k]['data'] = $data;
@@ -980,6 +984,11 @@ class PostController extends Controller
         $ret['mens'] = false;
         try {
             if(isset($config['id_ajudante']) && $config['id_ajudante']>0 && isset($config['id_designacao']) && $config['id_designacao']>0 && isset($config['data'])){
+                // Discurso nunca tem ajudante (regra por nome) — não gera espelho
+                if(designaController::parteSemAjudante($config['id_designacao'])){
+                    $ret['mens'] = 'Parte sem ajudante';
+                    return $ret;
+                }
                 $config['id_designado'] = $config['id_ajudante'];
                 $config['id_ajudante']=0;
                 $config['token'] = uniqid();

@@ -24,7 +24,13 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Mês</th>
+            <th>
+                <span>Mês</span>
+                <span class="float-right d-print-none">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="recolherTudo();" title="Recolhe semanas e sessões para visão rápida"><i class="fas fa-compress"></i> Recolher tudo</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="expandirTudo();" title="Expande semanas e sessões"><i class="fas fa-expand"></i> Expandir tudo</button>
+                </span>
+            </th>
             {{-- <th>Desiganções</th> --}}
             {{-- <th>Ação</th> --}}
             {{-- <th>Assembléia</th>
@@ -41,8 +47,8 @@
                             </td> --}}
                             <td>
                                 <div class="col-12">
-                                    <div class="card card-secondary card-outline">
-                                        <div class="card-header">
+                                    <div class="card card-secondary card-outline card-semana" data-semana="{{$v1}}">
+                                        <div class="card-header card-semana-header" style="cursor:pointer;" title="Clique para recolher/expandir a semana">
                                             <h3 class="card-title">
                                                 {{$label_semana}}
                                                 {{App\Qlib\Qlib::dataExtensso($v1)}} {!!App\Qlib\Qlib::link_programacao_woljw($v1,'<div class=""><a class="underline" href="{link}" target="_BLANK">Acesso à Programação no Jw.ORG</a></div>')!!}
@@ -62,6 +68,9 @@
                                                 }
                                             @endphp
                                             <div class="card-tools d-print-none">
+                                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Recolher/expandir semana">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
                                                 <button type="button" data-semanas="{{App\Qlib\Qlib::encodeArray([$v1])}}" data-post_type="{{$sec}}" class="btn btn-sm btn-outline-primary" onclick="designar_auto(this)" title="Preenche as partes vazias desta semana com os participantes elegíveis mais antigos (suas escolhas manuais são mantidas, você ajusta depois)">
                                                     <i class="fa fa-magic" aria-hidden="true"></i> (3) Designar automaticamente
                                                 </button>
@@ -100,9 +109,14 @@
                                                     @foreach ($sessoes as $k_sessao=>$sessao)
                                                         @if ($sec=='fim-semana')
                                                             @if($k_sessao=='inicio')
-                                                            <div class="card card-sessao-{{$k_sessao}}">
-                                                                <div class="card-header {{@$sessao['color']}}">
+                                                            <div class="card card-sessao card-sessao-{{$k_sessao}}" data-sessao="{{$v1}}|{{$k_sessao}}">
+                                                                <div class="card-header {{@$sessao['color']}} card-sessao-header" style="cursor:pointer;" title="Clique para recolher/expandir a sessão">
                                                                     {{@$sessao['label']}}
+                                                                    <div class="card-tools d-print-none">
+                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Recolher/expandir sessão">
+                                                                            <i class="fas fa-minus"></i>
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                                 <div class="card-body">
                                                                     <ul class="list-group sortable">
@@ -132,9 +146,14 @@
                                                             </div>
                                                             @endif
                                                         @else
-                                                            <div class="card card-sessao-{{$k_sessao}}">
-                                                                <div class="card-header {{@$sessao['color']}}">
+                                                            <div class="card card-sessao card-sessao-{{$k_sessao}}" data-sessao="{{$v1}}|{{$k_sessao}}">
+                                                                <div class="card-header {{@$sessao['color']}} card-sessao-header" style="cursor:pointer;" title="Clique para recolher/expandir a sessão">
                                                                     {{@$sessao['label']}}
+                                                                    <div class="card-tools d-print-none">
+                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Recolher/expandir sessão">
+                                                                            <i class="fas fa-minus"></i>
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                                 <div class="card-body">
                                                                     <ul class="list-group sortable">
@@ -291,6 +310,147 @@
         document.querySelectorAll('.designation-template-wrapper input, .designation-template-wrapper select, .designation-template-wrapper textarea').forEach(function(el) {
             el.disabled = true;
         });
+        // Aplica estado salvo (semanas recolhidas) após o AdminLTE carregar
+        try {
+            var salvas = JSON.parse(localStorage.getItem('semanas_recolhidas_v1') || '[]');
+            if(salvas.length){
+                setTimeout(function(){
+                    salvas.forEach(function(v1){
+                        var card = document.querySelector('.card-semana[data-semana="' + v1 + '"]');
+                        if(card && !card.classList.contains('collapsed-card')){
+                            var btn = card.querySelector('[data-card-widget="collapse"]');
+                            if(btn){ btn.click(); }
+                            else { card.classList.add('collapsed-card'); }
+                        }
+                    });
+                }, 300);
+            }
+        } catch(e){}
+        // Clique no cabeçalho (fora de botões/links/inputs) recolhe/expande
+        document.querySelectorAll('.card-semana-header').forEach(function(h){
+            h.addEventListener('click', function(e){
+                if(e.target.closest('button, a, input, label, select')){ return; }
+                var card = h.closest('.card-semana');
+                if(!card){ return; }
+                var btn = card.querySelector(':scope > .card-header [data-card-widget="collapse"], :scope [data-card-widget="collapse"]');
+                if(btn){ btn.click(); }
+                else { card.classList.toggle('collapsed-card'); }
+            });
+        });
+        // Clique no cabeçalho da sessão recolhe/expande só a sessão
+        document.querySelectorAll('.card-sessao-header').forEach(function(h){
+            h.addEventListener('click', function(e){
+                if(e.target.closest('button, a, input, label, select')){ return; }
+                e.stopPropagation();
+                var card = h.closest('.card-sessao');
+                if(!card){ return; }
+                var btn = card.querySelector('[data-card-widget="collapse"]');
+                if(btn){ btn.click(); }
+                else { card.classList.toggle('collapsed-card'); }
+            });
+        });
+        // Aplica sessões salvas como recolhidas
+        try {
+            var sesses = JSON.parse(localStorage.getItem('sessoes_recolhidas_v1') || '[]');
+            if(sesses.length){
+                setTimeout(function(){
+                    sesses.forEach(function(k){
+                        var sc = document.querySelector('.card-sessao[data-sessao="' + k + '"]');
+                        if(sc && !sc.classList.contains('collapsed-card')){
+                            var sb = sc.querySelector('[data-card-widget="collapse"]');
+                            if(sb){ sb.click(); }
+                            else { sc.classList.add('collapsed-card'); }
+                        }
+                    });
+                }, 350);
+            }
+        } catch(e){}
     });
+    function semanasRecolhidasGet(){
+        try { return JSON.parse(localStorage.getItem('semanas_recolhidas_v1') || '[]'); }
+        catch(e){ return []; }
+    }
+    function semanasRecolhidasSet(v){
+        try { localStorage.setItem('semanas_recolhidas_v1', JSON.stringify(v)); } catch(e){}
+    }
+    function sessoesRecolhidasGet(){
+        try { return JSON.parse(localStorage.getItem('sessoes_recolhidas_v1') || '[]'); }
+        catch(e){ return []; }
+    }
+    function sessoesRecolhidasSet(v){
+        try { localStorage.setItem('sessoes_recolhidas_v1', JSON.stringify(v)); } catch(e){}
+    }
+    function setCard(card, recolher){
+        if(!card){ return; }
+        var colapsado = card.classList.contains('collapsed-card');
+        if(recolher && !colapsado){
+            var b1 = card.querySelector('[data-card-widget="collapse"]');
+            if(b1){ b1.click(); } else { card.classList.add('collapsed-card'); }
+        } else if(!recolher && colapsado){
+            var b2 = card.querySelector('[data-card-widget="collapse"]');
+            if(b2){ b2.click(); } else { card.classList.remove('collapsed-card'); }
+        }
+    }
+    function setCardSemana(card, recolher){ setCard(card, recolher); }
+    function recolherTodasSemanas(){
+        document.querySelectorAll('.card-semana').forEach(function(c){ setCard(c, true); });
+        var todas = [];
+        document.querySelectorAll('.card-semana').forEach(function(c){ todas.push(c.getAttribute('data-semana')); });
+        semanasRecolhidasSet(todas);
+    }
+    function expandirTodasSemanas(){
+        document.querySelectorAll('.card-semana').forEach(function(c){ setCard(c, false); });
+        semanasRecolhidasSet([]);
+    }
+    // Fusão: recolhe/expande semanas + sessões de uma vez
+    function recolherTudo(){
+        recolherTodasSemanas();
+        document.querySelectorAll('.card-sessao').forEach(function(c){ setCard(c, true); });
+        var todas = [];
+        document.querySelectorAll('.card-sessao').forEach(function(c){ todas.push(c.getAttribute('data-sessao')); });
+        sessoesRecolhidasSet(todas);
+    }
+    function expandirTudo(){
+        expandirTodasSemanas();
+        document.querySelectorAll('.card-sessao').forEach(function(c){ setCard(c, false); });
+        sessoesRecolhidasSet([]);
+    }
+    // Na impressão, expande tudo para não sair conteúdo oculto
+    window.addEventListener('beforeprint', function(){
+        document.querySelectorAll('.card-semana.collapsed-card, .card-sessao.collapsed-card').forEach(function(c){ setCard(c, false); });
+    });
+</script>
+<script type="text/javascript">
+    // Persiste recolhidas via eventos do AdminLTE (quando jQuery disponível)
+    (function(){
+        function ligar(){
+            if(typeof window.jQuery === 'undefined'){ setTimeout(ligar, 300); return; }
+            var $ = window.jQuery;
+            $(document).on('collapsed.lte.cardwidget', '.card-semana', function(){
+                var v = this.getAttribute('data-semana');
+                if(!v){ return; }
+                var l = semanasRecolhidasGet();
+                if(l.indexOf(v) === -1){ l.push(v); semanasRecolhidasSet(l); }
+            });
+            $(document).on('expanded.lte.cardwidget', '.card-semana', function(){
+                var v = this.getAttribute('data-semana');
+                if(!v){ return; }
+                semanasRecolhidasSet(semanasRecolhidasGet().filter(function(x){ return x !== v; }));
+            });
+            $(document).on('collapsed.lte.cardwidget', '.card-sessao', function(){
+                var k = this.getAttribute('data-sessao');
+                if(!k){ return; }
+                var l = sessoesRecolhidasGet();
+                if(l.indexOf(k) === -1){ l.push(k); sessoesRecolhidasSet(l); }
+            });
+            $(document).on('expanded.lte.cardwidget', '.card-sessao', function(){
+                var k = this.getAttribute('data-sessao');
+                if(!k){ return; }
+                sessoesRecolhidasSet(sessoesRecolhidasGet().filter(function(x){ return x !== k; }));
+            });
+        }
+        if(document.readyState === 'complete'){ ligar(); }
+        else { window.addEventListener('load', ligar); }
+    })();
 </script>
 @endif
